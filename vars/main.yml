@@ -1,2 +1,2 @@
 ---
-# vars file for ansible-role-rhel8-stig
+# defaults file for rhel8_stig
