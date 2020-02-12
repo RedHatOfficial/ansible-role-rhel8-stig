@@ -1,2 +1,7114 @@
----
-# tasks file for ansible-role-rhel8-stig
+- name: Ensure audispd-plugins is installed
+  package:
+    name: audispd-plugins
+    state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - package_audispd-plugins_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82953-1
+
+- name: Ensure audit is installed
+  package:
+    name: audit
+    state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - package_audit_installed | bool
+  - enable_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - package_audit_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-81043-2
+  - NIST-800-53-AC-7(a)
+  - NIST-800-53-AU-7(1)
+  - NIST-800-53-AU-7(2)
+  - NIST-800-53-AU-14
+  - NIST-800-53-AU-12(2)
+  - NIST-800-53-AU-2(a)
+  - NIST-800-53-CM-6(a)
+
+- name: Enable service auditd
+  block:
+  - name: Gather the package facts
+    package_facts:
+      manager: auto
+  - name: Enable service auditd
+    service:
+      name: auditd
+      enabled: 'yes'
+      state: started
+    when:
+    - '"audit" in ansible_facts.packages'
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - enable_strategy | bool
+  - service_auditd_enabled | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - service_auditd_enabled
+  - high_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80872-5
+  - NIST-800-53-AC-2(g)
+  - NIST-800-53-AU-3
+  - NIST-800-53-AU-10
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AU-14(1)
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.3.1
+  - NIST-800-171-3.3.2
+  - NIST-800-171-3.3.6
+  - PCI-DSS-Req-10.1
+  - CJIS-5.4.1.1
+
+- name: get current kernel parameters
+  command: /usr/bin/grub2-editenv - list
+  register: kernelopts
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - grub2_audit_argument | bool
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_complexity | bool
+  - low_disruption | bool
+  tags:
+  - grub2_audit_argument
+  - medium_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80825-3
+  - NIST-800-53-AC-17(1)
+  - NIST-800-53-AU-14(1)
+  - NIST-800-53-AU-10
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IR-5(1)
+  - NIST-800-171-3.3.1
+  - PCI-DSS-Req-10.3
+  - CJIS-5.4.1.1
+
+- name: Update the bootloader menu
+  command: /usr/bin/grub2-editenv - set "{{ item }} audit=1"
+  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') | list }}'
+  when:
+  - kernelopts.stdout_lines is defined
+  - kernelopts.stdout_lines | length > 0
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - grub2_audit_argument | bool
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_complexity | bool
+  - low_disruption | bool
+  tags:
+  - grub2_audit_argument
+  - medium_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80825-3
+  - NIST-800-53-AC-17(1)
+  - NIST-800-53-AU-14(1)
+  - NIST-800-53-AU-10
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IR-5(1)
+  - NIST-800-171-3.3.1
+  - PCI-DSS-Req-10.3
+  - CJIS-5.4.1.1
+
+- name: get current kernel parameters
+  command: /usr/bin/grub2-editenv - list
+  register: kernelopts
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - grub2_audit_backlog_limit_argument | bool
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_complexity | bool
+  - low_disruption | bool
+  tags:
+  - grub2_audit_backlog_limit_argument
+  - medium_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80943-4
+
+- name: Update the bootloader menu
+  command: /usr/bin/grub2-editenv - set "{{ item }} audit_backlog_limit=8192"
+  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') | list }}'
+  when:
+  - kernelopts.stdout_lines is defined
+  - kernelopts.stdout_lines | length > 0
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - grub2_audit_backlog_limit_argument | bool
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_complexity | bool
+  - low_disruption | bool
+  tags:
+  - grub2_audit_backlog_limit_argument
+  - medium_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80943-4
+
+- name: Resolve information before writing to audit logs
+  block:
+  - name: Deduplicate values from /etc/audit/auditd.conf
+    lineinfile:
+      path: /etc/audit/auditd.conf
+      create: false
+      regexp: (?i)^\s*log_format\s*=\s*
+      state: absent
+  - name: Insert correct line to /etc/audit/auditd.conf
+    lineinfile:
+      path: /etc/audit/auditd.conf
+      create: true
+      line: log_format = ENRICHED
+      state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - auditd_log_format | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - auditd_log_format
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82201-5
+
+- name: Set hostname as computer node name in audit logs
+  block:
+  - name: Deduplicate values from /etc/audit/auditd.conf
+    lineinfile:
+      path: /etc/audit/auditd.conf
+      create: false
+      regexp: (?i)^\s*name_format\s*=\s*
+      state: absent
+  - name: Insert correct line to /etc/audit/auditd.conf
+    lineinfile:
+      path: /etc/audit/auditd.conf
+      create: true
+      line: name_format = hostname
+      state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - auditd_name_format | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - auditd_name_format
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82897-0
+
+- name: Configure auditd Flush Priority
+  lineinfile:
+    dest: /etc/audit/auditd.conf
+    regexp: ^\s*flush\s*=\s*.*$
+    line: flush = {{ var_auditd_flush }}
+    state: present
+    create: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - auditd_data_retention_flush | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - auditd_data_retention_flush
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80680-2
+  - NIST-800-53-AU-11
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.3.1
+
+- name: Set number of records to cause an explicit flush to audit logs
+  block:
+  - name: Deduplicate values from /etc/audit/auditd.conf
+    lineinfile:
+      path: /etc/audit/auditd.conf
+      create: false
+      regexp: (?i)^\s*freq\s*=\s*
+      state: absent
+  - name: Insert correct line to /etc/audit/auditd.conf
+    lineinfile:
+      path: /etc/audit/auditd.conf
+      create: true
+      line: freq = 50
+      state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - auditd_freq | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - auditd_freq
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82258-5
+
+- name: Write Audit Logs to the Disk
+  block:
+  - name: Deduplicate values from /etc/audit/auditd.conf
+    lineinfile:
+      path: /etc/audit/auditd.conf
+      create: false
+      regexp: (?i)^\s*write_logs\s*=\s*
+      state: absent
+  - name: Insert correct line to /etc/audit/auditd.conf
+    lineinfile:
+      path: /etc/audit/auditd.conf
+      create: true
+      line: write_logs = yes
+      state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - auditd_write_logs | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - auditd_write_logs
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82366-6
+
+- name: enable syslog plugin
+  lineinfile:
+    dest: /etc/audit/plugins.d/syslog.conf
+    regexp: ^active
+    line: active = yes
+    create: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - auditd_audispd_syslog_plugin_activated | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - auditd_audispd_syslog_plugin_activated
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80677-8
+  - NIST-800-53-AU-4(1)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.3.1
+  - PCI-DSS-Req-10.5.3
+  - CJIS-5.4.1.1
+
+- name: Include Local Events in Audit Logs
+  block:
+  - name: Deduplicate values from /etc/audit/auditd.conf
+    lineinfile:
+      path: /etc/audit/auditd.conf
+      create: false
+      regexp: (?i)^\s*local_events\s*=\s*
+      state: absent
+  - name: Insert correct line to /etc/audit/auditd.conf
+    lineinfile:
+      path: /etc/audit/auditd.conf
+      create: true
+      line: local_events = yes
+      state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - auditd_local_events | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - auditd_local_events
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82233-8
+
+- name: Set architecture for audit passwd tasks
+  set_fact:
+    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - audit_rules_usergroup_modification_passwd | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - audit_rules_usergroup_modification_passwd
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80761-0
+  - NIST-800-53-AC-2(4)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.7
+  - PCI-DSS-Req-10.2.5
+  - CJIS-5.4.1.1
+
+- name: Search /etc/audit/rules.d for other user/group modification audit rules
+  find:
+    paths: /etc/audit/rules.d
+    recurse: false
+    contains: -k audit_rules_usergroup_modification$
+    patterns: '*.rules'
+  register: find_passwd
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - audit_rules_usergroup_modification_passwd | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - audit_rules_usergroup_modification_passwd
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80761-0
+  - NIST-800-53-AC-2(4)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.7
+  - PCI-DSS-Req-10.2.5
+  - CJIS-5.4.1.1
+
+- name: If existing user/group modification ruleset not found, use /etc/audit/rules.d/privileged.rules as the recipient for
+    the rule
+  set_fact:
+    all_files:
+    - /etc/audit/rules.d/privileged.rules
+  when:
+  - find_passwd.matched is defined and find_passwd.matched == 0
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - audit_rules_usergroup_modification_passwd | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - audit_rules_usergroup_modification_passwd
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80761-0
+  - NIST-800-53-AC-2(4)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.7
+  - PCI-DSS-Req-10.2.5
+  - CJIS-5.4.1.1
+
+- name: Use matched file as the recipient for the rule
+  set_fact:
+    all_files:
+    - '{{ find_passwd.files | map(attribute=''path'') | list | first }}'
+  when:
+  - find_passwd.matched is defined and find_passwd.matched > 0
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - audit_rules_usergroup_modification_passwd | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - audit_rules_usergroup_modification_passwd
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80761-0
+  - NIST-800-53-AC-2(4)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.7
+  - PCI-DSS-Req-10.2.5
+  - CJIS-5.4.1.1
+
+- name: Inserts/replaces the passwd rule in rules.d when on x86
+  lineinfile:
+    path: '{{ all_files[0] }}'
+    line: -w /etc/passwd -p wa -k audit_rules_usergroup_modification
+    create: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - audit_rules_usergroup_modification_passwd | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - audit_rules_usergroup_modification_passwd
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80761-0
+  - NIST-800-53-AC-2(4)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.7
+  - PCI-DSS-Req-10.2.5
+  - CJIS-5.4.1.1
+
+- name: Inserts/replaces the passwd rule in /etc/audit/audit.rules
+  lineinfile:
+    line: -w /etc/passwd -p wa -k audit_rules_usergroup_modification
+    state: present
+    dest: /etc/audit/audit.rules
+    create: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - audit_rules_usergroup_modification_passwd | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - audit_rules_usergroup_modification_passwd
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80761-0
+  - NIST-800-53-AC-2(4)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.7
+  - PCI-DSS-Req-10.2.5
+  - CJIS-5.4.1.1
+
+- name: Ensure rsyslog-gnutls is installed
+  package:
+    name: rsyslog-gnutls
+    state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - package_rsyslog-gnutls_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82859-0
+
+- name: Ensure rsyslog is installed
+  package:
+    name: rsyslog
+    state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - package_rsyslog_installed | bool
+  - medium_severity | bool
+  - enable_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - package_rsyslog_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80847-7
+  - NIST-800-53-CM-6(a)
+
+- name: get current kernel parameters
+  command: /usr/bin/grub2-editenv - list
+  register: kernelopts
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - grub2_pti_argument | bool
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - high_severity | bool
+  - medium_complexity | bool
+  - low_disruption | bool
+  tags:
+  - grub2_pti_argument
+  - high_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-82194-2
+
+- name: Update the bootloader menu
+  command: /usr/bin/grub2-editenv - set "{{ item }} pti=on"
+  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') | list }}'
+  when:
+  - kernelopts.stdout_lines is defined
+  - kernelopts.stdout_lines | length > 0
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - grub2_pti_argument | bool
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - high_severity | bool
+  - medium_complexity | bool
+  - low_disruption | bool
+  tags:
+  - grub2_pti_argument
+  - high_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-82194-2
+
+- name: Ensure kernel module 'tipc' is disabled
+  lineinfile:
+    create: true
+    dest: /etc/modprobe.d/tipc.conf
+    regexp: tipc
+    line: install tipc /bin/true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - kernel_module_tipc_disabled | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - kernel_module_tipc_disabled
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-82297-3
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+
+- name: Ensure kernel module 'can' is disabled
+  lineinfile:
+    create: true
+    dest: /etc/modprobe.d/can.conf
+    regexp: can
+    line: install can /bin/true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - kernel_module_can_disabled | bool
+  - low_complexity | bool
+  tags:
+  - kernel_module_can_disabled
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-82059-7
+
+- name: Ensure kernel module 'sctp' is disabled
+  lineinfile:
+    create: true
+    dest: /etc/modprobe.d/sctp.conf
+    regexp: sctp
+    line: install sctp /bin/true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - kernel_module_sctp_disabled | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - kernel_module_sctp_disabled
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80834-5
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.4.6
+  - CJIS-5.10.1
+
+- name: Ensure kernel module 'atm' is disabled
+  lineinfile:
+    create: true
+    dest: /etc/modprobe.d/atm.conf
+    regexp: atm
+    line: install atm /bin/true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - kernel_module_atm_disabled | bool
+  - reboot_required | bool
+  - disable_strategy | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - kernel_module_atm_disabled
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-82028-2
+
+- name: Ensure kernel module 'firewire-core' is disabled
+  lineinfile:
+    create: true
+    dest: /etc/modprobe.d/firewire-core.conf
+    regexp: firewire-core
+    line: install firewire-core /bin/true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - reboot_required | bool
+  - low_complexity | bool
+  tags:
+  - kernel_module_firewire-core_disabled
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-82005-0
+
+- name: Ensure firewalld is installed
+  package:
+    name: firewalld
+    state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - package_firewalld_installed | bool
+  - enable_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - package_firewalld_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82998-6
+  - NIST-800-53-CM-6(a)
+
+- name: Enable service firewalld
+  block:
+  - name: Gather the package facts
+    package_facts:
+      manager: auto
+  - name: Enable service firewalld
+    service:
+      name: firewalld
+      enabled: 'yes'
+      state: started
+    when:
+    - '"firewalld" in ansible_facts.packages'
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - service_firewalld_enabled | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - enable_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - service_firewalld_enabled
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80877-4
+  - NIST-800-53-AC-4
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CA-3(5)
+  - NIST-800-53-SC-7(21)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.3
+  - NIST-800-171-3.4.7
+
+- name: Ensure sysctl net.ipv4.conf.default.accept_source_route is set
+  sysctl:
+    name: net.ipv4.conf.default.accept_source_route
+    value: '{{ sysctl_net_ipv4_conf_default_accept_source_route_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - sysctl_net_ipv4_conf_default_accept_source_route | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_default_accept_source_route
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80920-2
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-5
+  - NIST-800-53-SC-7(a)
+  - NIST-800-171-3.1.20
+  - CJIS-5.10.1.1
+
+- name: Ensure sysctl net.ipv4.icmp_ignore_bogus_error_responses is set
+  sysctl:
+    name: net.ipv4.icmp_ignore_bogus_error_responses
+    value: '{{ sysctl_net_ipv4_icmp_ignore_bogus_error_responses_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_disruption | bool
+  - sysctl_net_ipv4_icmp_ignore_bogus_error_responses | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_icmp_ignore_bogus_error_responses
+  - unknown_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81023-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-5
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv4.tcp_syncookies is set
+  sysctl:
+    name: net.ipv4.tcp_syncookies
+    value: '{{ sysctl_net_ipv4_tcp_syncookies_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - sysctl_net_ipv4_tcp_syncookies | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_tcp_syncookies
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80923-6
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-5(1)
+  - NIST-800-53-SC-5(2)
+  - NIST-800-53-SC-5(3)(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.20
+  - CJIS-5.10.1.1
+
+- name: Ensure sysctl net.ipv4.conf.default.secure_redirects is set
+  sysctl:
+    name: net.ipv4.conf.default.secure_redirects
+    value: '{{ sysctl_net_ipv4_conf_default_secure_redirects_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - sysctl_net_ipv4_conf_default_secure_redirects | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_default_secure_redirects
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81017-6
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-5
+  - NIST-800-53-SC-7(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv4.conf.all.secure_redirects is set
+  sysctl:
+    name: net.ipv4.conf.all.secure_redirects
+    value: '{{ sysctl_net_ipv4_conf_all_secure_redirects_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - sysctl_net_ipv4_conf_all_secure_redirects | bool
+  - reboot_required | bool
+  - disable_strategy | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_all_secure_redirects
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81016-8
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SC-7(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv4.icmp_echo_ignore_broadcasts is set
+  sysctl:
+    name: net.ipv4.icmp_echo_ignore_broadcasts
+    value: '{{ sysctl_net_ipv4_icmp_echo_ignore_broadcasts_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - sysctl_net_ipv4_icmp_echo_ignore_broadcasts | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_icmp_echo_ignore_broadcasts
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80922-8
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-5
+  - NIST-800-171-3.1.20
+  - CJIS-5.10.1.1
+
+- name: Ensure sysctl net.ipv4.conf.default.accept_redirects is set
+  sysctl:
+    name: net.ipv4.conf.default.accept_redirects
+    value: '{{ sysctl_net_ipv4_conf_default_accept_redirects_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - sysctl_net_ipv4_conf_default_accept_redirects | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_default_accept_redirects
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80919-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SC-7(a)
+  - NIST-800-171-3.1.20
+  - CJIS-5.10.1.1
+
+- name: Ensure sysctl net.ipv4.conf.all.rp_filter is set
+  sysctl:
+    name: net.ipv4.conf.all.rp_filter
+    value: '{{ sysctl_net_ipv4_conf_all_rp_filter_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - sysctl_net_ipv4_conf_all_rp_filter | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_all_rp_filter
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81021-8
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SC-7(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv4.conf.all.accept_source_route is set
+  sysctl:
+    name: net.ipv4.conf.all.accept_source_route
+    value: '{{ sysctl_net_ipv4_conf_all_accept_source_route_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - sysctl_net_ipv4_conf_all_accept_source_route | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_all_accept_source_route
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81011-9
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-5CM-6(a)
+  - NIST-800-53-SC-7(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv4.conf.default.rp_filter is set
+  sysctl:
+    name: net.ipv4.conf.default.rp_filter
+    value: '{{ sysctl_net_ipv4_conf_default_rp_filter_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - sysctl_net_ipv4_conf_default_rp_filter | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_default_rp_filter
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81022-6
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SC-7(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv4.conf.all.accept_redirects is set
+  sysctl:
+    name: net.ipv4.conf.all.accept_redirects
+    value: '{{ sysctl_net_ipv4_conf_all_accept_redirects_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - sysctl_net_ipv4_conf_all_accept_redirects | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_all_accept_redirects
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80917-8
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SC-7(a)
+  - NIST-800-171-3.1.20
+  - CJIS-5.10.1.1
+
+- name: Ensure sysctl net.ipv4.conf.default.log_martians is set
+  sysctl:
+    name: net.ipv4.conf.default.log_martians
+    value: '{{ sysctl_net_ipv4_conf_default_log_martians_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - sysctl_net_ipv4_conf_default_log_martians | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_default_log_martians
+  - unknown_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81020-0
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-5(3)(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv4.conf.all.log_martians is set
+  sysctl:
+    name: net.ipv4.conf.all.log_martians
+    value: '{{ sysctl_net_ipv4_conf_all_log_martians_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - sysctl_net_ipv4_conf_all_log_martians | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_all_log_martians
+  - unknown_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81018-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-5(3)(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv4.conf.all.send_redirects is set to 0
+  sysctl:
+    name: net.ipv4.conf.all.send_redirects
+    value: '0'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - sysctl_net_ipv4_conf_all_send_redirects | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_all_send_redirects
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80918-6
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-5CM-6(a)
+  - NIST-800-53-SC-7(a)
+  - NIST-800-171-3.1.20
+  - CJIS-5.10.1.1
+
+- name: Ensure sysctl net.ipv4.ip_forward is set to 0
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '0'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - sysctl_net_ipv4_ip_forward | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_ip_forward
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81024-2
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-5CM-6(a)
+  - NIST-800-53-SC-7(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv4.conf.default.send_redirects is set to 0
+  sysctl:
+    name: net.ipv4.conf.default.send_redirects
+    value: '0'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - sysctl_net_ipv4_conf_default_send_redirects | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv4_conf_default_send_redirects
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80921-0
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-5CM-6(a)
+  - NIST-800-53-SC-7(a)
+  - NIST-800-171-3.1.20
+  - CJIS-5.10.1.1
+
+- name: Ensure sysctl net.ipv6.conf.default.accept_redirects is set
+  sysctl:
+    name: net.ipv6.conf.default.accept_redirects
+    value: '{{ sysctl_net_ipv6_conf_default_accept_redirects_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - sysctl_net_ipv6_conf_default_accept_redirects | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv6_conf_default_accept_redirects
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81010-1
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv6.conf.default.accept_ra is set
+  sysctl:
+    name: net.ipv6.conf.default.accept_ra
+    value: '{{ sysctl_net_ipv6_conf_default_accept_ra_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - sysctl_net_ipv6_conf_default_accept_ra | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv6_conf_default_accept_ra
+  - unknown_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81007-7
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv6.conf.all.accept_redirects is set
+  sysctl:
+    name: net.ipv6.conf.all.accept_redirects
+    value: '{{ sysctl_net_ipv6_conf_all_accept_redirects_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - sysctl_net_ipv6_conf_all_accept_redirects | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv6_conf_all_accept_redirects
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81009-3
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv6.conf.all.accept_source_route is set
+  sysctl:
+    name: net.ipv6.conf.all.accept_source_route
+    value: '{{ sysctl_net_ipv6_conf_all_accept_source_route_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - sysctl_net_ipv6_conf_all_accept_source_route | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv6_conf_all_accept_source_route
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81013-5
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv6.conf.all.accept_ra is set
+  sysctl:
+    name: net.ipv6.conf.all.accept_ra
+    value: '{{ sysctl_net_ipv6_conf_all_accept_ra_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - sysctl_net_ipv6_conf_all_accept_ra | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv6_conf_all_accept_ra
+  - unknown_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81006-9
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure sysctl net.ipv6.conf.default.accept_source_route is set
+  sysctl:
+    name: net.ipv6.conf.default.accept_source_route
+    value: '{{ sysctl_net_ipv6_conf_default_accept_source_route_value }}'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - sysctl_net_ipv6_conf_default_accept_source_route | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_ipv6_conf_default_accept_source_route
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81015-0
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.20
+
+- name: Ensure iptables is installed
+  package:
+    name: iptables
+    state: present
+  tags:
+  - package_iptables_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82982-0
+  - NIST-800-53-CM-6(a)
+  when:
+  - no_reboot_needed | bool
+  - package_iptables_installed | bool
+  - medium_severity | bool
+  - enable_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure kernel module 'bluetooth' is disabled
+  lineinfile:
+    create: true
+    dest: /etc/modprobe.d/bluetooth.conf
+    regexp: bluetooth
+    line: install bluetooth /bin/true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - kernel_module_bluetooth_disabled | bool
+  - reboot_required | bool
+  - disable_strategy | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - kernel_module_bluetooth_disabled
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80832-9
+  - NIST-800-53-AC-18(a)
+  - NIST-800-53-AC-18(3)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-MP-7
+  - NIST-800-171-3.1.16
+  - CJIS-5.13.1.3
+
+- name: Ensure policycoreutils is installed
+  package:
+    name: policycoreutils
+    state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - enable_strategy | bool
+  - package_policycoreutils_installed | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - package_policycoreutils_installed
+  - high_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82976-2
+
+- name: Configure SELinux Policy
+  lineinfile:
+    path: /etc/sysconfig/selinux
+    regexp: ^SELINUXTYPE=
+    line: SELINUXTYPE={{ var_selinux_policy_name }}
+    create: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - high_severity | bool
+  - selinux_policytype | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - selinux_policytype
+  - high_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80868-3
+  - NIST-800-53-AC-3
+  - NIST-800-53-AC-3(3)(a)
+  - NIST-800-53-AU-9
+  - NIST-800-53-SC-7(21)
+  - NIST-800-171-3.1.2
+  - NIST-800-171-3.7.2
+
+- name: Ensure SELinux State is Enforcing
+  lineinfile:
+    path: /etc/sysconfig/selinux
+    regexp: ^SELINUX=
+    line: SELINUX={{ var_selinux_state }}
+    create: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - high_severity | bool
+  - low_disruption | bool
+  - selinux_state | bool
+  - low_complexity | bool
+  tags:
+  - selinux_state
+  - high_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80869-1
+  - NIST-800-53-AC-3
+  - NIST-800-53-AC-3(3)(a)
+  - NIST-800-53-AU-9
+  - NIST-800-53-SC-7(21)
+  - NIST-800-171-3.1.2
+  - NIST-800-171-3.7.2
+
+- name: Ensure sudo is installed
+  package:
+    name: sudo
+    state: present
+  tags:
+  - package_sudo_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82214-8
+  - NIST-800-53-CM-6(a)
+  when:
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - enable_strategy | bool
+  - package_sudo_installed | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure nss-tools is installed
+  package:
+    name: nss-tools
+    state: present
+  tags:
+  - package_nss-tools_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82396-3
+  when:
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure libcap-ng-utils is installed
+  package:
+    name: libcap-ng-utils
+    state: present
+  tags:
+  - package_libcap-ng-utils_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82979-6
+  when:
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure openscap-scanner is installed
+  package:
+    name: openscap-scanner
+    state: present
+  tags:
+  - package_openscap-scanner_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82220-5
+  when:
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure scap-security-guide is installed
+  package:
+    name: scap-security-guide
+    state: present
+  tags:
+  - package_scap-security-guide_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82949-9
+  when:
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure dnf-plugin-subscription-manager is installed
+  package:
+    name: dnf-plugin-subscription-manager
+    state: present
+  tags:
+  - package_dnf-plugin-subscription-manager_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82315-3
+  when:
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure subscription-manager is installed
+  package:
+    name: subscription-manager
+    state: present
+  tags:
+  - package_subscription-manager_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82316-1
+  when:
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure gnutls-utils is installed
+  package:
+    name: gnutls-utils
+    state: present
+  tags:
+  - package_gnutls-utils_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82395-5
+  when:
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure rng-tools is installed
+  package:
+    name: rng-tools
+    state: present
+  tags:
+  - package_rng-tools_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82968-9
+  when:
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure abrt-addon-kerneloops is removed
+  package:
+    name: abrt-addon-kerneloops
+    state: absent
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - low_complexity | bool
+  tags:
+  - package_abrt-addon-kerneloops_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82926-7
+
+- name: Ensure pigz is removed
+  package:
+    name: pigz
+    state: absent
+  tags:
+  - package_pigz_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82397-1
+  when:
+  - package_pigz_removed | bool
+  - disable_strategy | bool
+  - no_reboot_needed | bool
+  - low_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure abrt-plugin-sosreport is removed
+  package:
+    name: abrt-plugin-sosreport
+    state: absent
+  tags:
+  - package_abrt-plugin-sosreport_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82910-1
+  when:
+  - disable_strategy | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - low_complexity | bool
+
+- name: Ensure abrt-cli is removed
+  package:
+    name: abrt-cli
+    state: absent
+  tags:
+  - package_abrt-cli_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82907-7
+  when:
+  - disable_strategy | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - low_complexity | bool
+
+- name: Ensure abrt-addon-ccpp is removed
+  package:
+    name: abrt-addon-ccpp
+    state: absent
+  tags:
+  - package_abrt-addon-ccpp_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82919-2
+  when:
+  - disable_strategy | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - low_complexity | bool
+
+- name: Ensure abrt-plugin-rhtsupport is removed
+  package:
+    name: abrt-plugin-rhtsupport
+    state: absent
+  tags:
+  - package_abrt-plugin-rhtsupport_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82916-8
+  when:
+  - disable_strategy | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - low_complexity | bool
+
+- name: Ensure krb5-workstation is removed
+  package:
+    name: krb5-workstation
+    state: absent
+  tags:
+  - package_krb5-workstation_removed
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82931-7
+  when:
+  - disable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure tuned is removed
+  package:
+    name: tuned
+    state: absent
+  tags:
+  - package_tuned_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82904-4
+  when:
+  - package_tuned_removed | bool
+  - disable_strategy | bool
+  - no_reboot_needed | bool
+  - low_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure gssproxy is removed
+  package:
+    name: gssproxy
+    state: absent
+  tags:
+  - package_gssproxy_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82943-2
+  when:
+  - disable_strategy | bool
+  - no_reboot_needed | bool
+  - low_severity | bool
+  - package_gssproxy_removed | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure abrt-addon-python is removed
+  package:
+    name: abrt-addon-python
+    state: absent
+  tags:
+  - package_abrt-addon-python_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82923-4
+  when:
+  - disable_strategy | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - low_complexity | bool
+
+- name: Ensure iprutils is removed
+  package:
+    name: iprutils
+    state: absent
+  tags:
+  - package_iprutils_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82946-5
+  when:
+  - package_iprutils_removed | bool
+  - disable_strategy | bool
+  - no_reboot_needed | bool
+  - low_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure abrt-plugin-logger is removed
+  package:
+    name: abrt-plugin-logger
+    state: absent
+  tags:
+  - package_abrt-plugin-logger_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82913-5
+  when:
+  - disable_strategy | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - low_complexity | bool
+
+- name: Ensure dnf-automatic is installed
+  package:
+    name: dnf-automatic
+    state: present
+  tags:
+  - package_dnf-automatic_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82985-3
+  when:
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure YUM Removes Previous Package Versions
+  lineinfile:
+    dest: /etc/yum.conf
+    regexp: ^#?clean_requirements_on_remove
+    line: clean_requirements_on_remove=1
+    insertafter: \[main\]
+    create: true
+  tags:
+  - clean_components_post_updating
+  - low_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82476-3
+  - NIST-800-53-SI-2(6)
+  - NIST-800-53-CM-11(a)
+  - NIST-800-53-CM-11(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.4.8
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - low_severity | bool
+  - clean_components_post_updating | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Check existence of yum on Fedora
+  stat:
+    path: /etc/yum.conf
+  register: yum_config_file
+  check_mode: false
+  when:
+  - ansible_distribution == "Fedora"
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - unknown_strategy | bool
+  - ensure_gpgcheck_globally_activated | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - ensure_gpgcheck_globally_activated
+  - high_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80790-9
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SC-12
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SA-12
+  - NIST-800-53-SA-12(10)
+  - NIST-800-53-CM-11(a)
+  - NIST-800-53-CM-11(b)
+  - NIST-800-171-3.4.8
+  - PCI-DSS-Req-6.2
+  - CJIS-5.10.4.1
+
+- name: Ensure GPG check is globally activated (yum)
+  ini_file:
+    dest: /etc/yum.conf
+    section: main
+    option: gpgcheck
+    value: 1
+    create: false
+  when:
+  - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or yum_config_file.stat.exists)
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - unknown_strategy | bool
+  - ensure_gpgcheck_globally_activated | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - ensure_gpgcheck_globally_activated
+  - high_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80790-9
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SC-12
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SA-12
+  - NIST-800-53-SA-12(10)
+  - NIST-800-53-CM-11(a)
+  - NIST-800-53-CM-11(b)
+  - NIST-800-171-3.4.8
+  - PCI-DSS-Req-6.2
+  - CJIS-5.10.4.1
+
+- name: Ensure GPG check is globally activated (dnf)
+  ini_file:
+    dest: /etc/dnf/dnf.conf
+    section: main
+    option: gpgcheck
+    value: 1
+    create: false
+  when:
+  - ansible_distribution == "Fedora"
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - unknown_strategy | bool
+  - ensure_gpgcheck_globally_activated | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - ensure_gpgcheck_globally_activated
+  - high_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80790-9
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SC-12
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SA-12
+  - NIST-800-53-SA-12(10)
+  - NIST-800-53-CM-11(a)
+  - NIST-800-53-CM-11(b)
+  - NIST-800-171-3.4.8
+  - PCI-DSS-Req-6.2
+  - CJIS-5.10.4.1
+
+- name: Configure dnf-automatic to Install Only Security Updates
+  ini_file:
+    dest: /etc/dnf/automatic.conf
+    section: commands
+    option: upgrade_type
+    value: security
+    create: true
+  tags:
+  - dnf-automatic_security_updates_only
+  - low_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-82267-6
+  - NIST-800-53-SI-2(5)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SI-2(c)
+  when:
+  - no_reboot_needed | bool
+  - medium_disruption | bool
+  - low_severity | bool
+  - unknown_strategy | bool
+  - low_complexity | bool
+
+- name: Enable timer dnf-automatic
+  block:
+  - name: Gather the package facts
+    package_facts:
+      manager: auto
+  - name: Enable timer dnf-automatic
+    systemd:
+      name: dnf-automatic.timer
+      enabled: 'yes'
+      state: started
+    when:
+    - '"dnf-automatic" in ansible_facts.packages'
+  tags:
+  - timer_dnf-automatic_enabled
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82360-9
+  - NIST-800-53-SI-2(5)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SI-2(c)
+  when:
+  - enable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Read permission of GPG key directory
+  stat:
+    path: /etc/pki/rpm-gpg/
+  register: gpg_key_directory_permission
+  check_mode: false
+  tags:
+  - ensure_redhat_gpgkey_installed
+  - high_severity
+  - restrict_strategy
+  - medium_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80795-8
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SC-12
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.4.8
+  - PCI-DSS-Req-6.2
+  - CJIS-5.10.4.1
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - high_severity | bool
+  - ensure_redhat_gpgkey_installed | bool
+  - medium_complexity | bool
+  - medium_disruption | bool
+
+- name: Read signatures in GPG key
+  command: gpg --show-keys --with-fingerprint --with-colons "/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release"
+  args:
+    warn: false
+  changed_when: false
+  register: gpg_fingerprints
+  check_mode: false
+  tags:
+  - ensure_redhat_gpgkey_installed
+  - high_severity
+  - restrict_strategy
+  - medium_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80795-8
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SC-12
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.4.8
+  - PCI-DSS-Req-6.2
+  - CJIS-5.10.4.1
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - high_severity | bool
+  - ensure_redhat_gpgkey_installed | bool
+  - medium_complexity | bool
+  - medium_disruption | bool
+
+- name: Set Fact - Installed GPG Fingerprints
+  set_fact:
+    gpg_installed_fingerprints: '{{ gpg_fingerprints.stdout | regex_findall(''^pub.*
+
+      (?:^fpr[:]*)([0-9A-Fa-f]*)'', ''\1'') | list }}'
+  tags:
+  - ensure_redhat_gpgkey_installed
+  - high_severity
+  - restrict_strategy
+  - medium_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80795-8
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SC-12
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.4.8
+  - PCI-DSS-Req-6.2
+  - CJIS-5.10.4.1
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - high_severity | bool
+  - ensure_redhat_gpgkey_installed | bool
+  - medium_complexity | bool
+  - medium_disruption | bool
+
+- name: Set Fact - Valid fingerprints
+  set_fact:
+    gpg_valid_fingerprints: ("567E347AD0044ADE55BA8A5F199E2F91FD431D51" "6A6AA7C97C8890AEC6AEBFE2F76F66C3D4082792")
+  tags:
+  - ensure_redhat_gpgkey_installed
+  - high_severity
+  - restrict_strategy
+  - medium_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80795-8
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SC-12
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.4.8
+  - PCI-DSS-Req-6.2
+  - CJIS-5.10.4.1
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - high_severity | bool
+  - ensure_redhat_gpgkey_installed | bool
+  - medium_complexity | bool
+  - medium_disruption | bool
+
+- name: Import RedHat GPG key
+  rpm_key:
+    state: present
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+  when:
+  - gpg_key_directory_permission.stat.mode <= '0755'
+  - (gpg_installed_fingerprints | difference(gpg_valid_fingerprints)) | length == 0
+  - gpg_installed_fingerprints | length > 0
+  - ansible_distribution == "RedHat"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - high_severity | bool
+  - ensure_redhat_gpgkey_installed | bool
+  - medium_complexity | bool
+  - medium_disruption | bool
+  tags:
+  - ensure_redhat_gpgkey_installed
+  - high_severity
+  - restrict_strategy
+  - medium_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80795-8
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SC-12
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.4.8
+  - PCI-DSS-Req-6.2
+  - CJIS-5.10.4.1
+
+- name: Check existence of yum on Fedora
+  stat:
+    path: /etc/yum.conf
+  register: yum_config_file
+  check_mode: false
+  when:
+  - ansible_distribution == "Fedora"
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - unknown_strategy | bool
+  - medium_disruption | bool
+  - ensure_gpgcheck_local_packages | bool
+  - low_complexity | bool
+  tags:
+  - ensure_gpgcheck_local_packages
+  - high_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80791-7
+  - NIST-800-53-CM-11(a)
+  - NIST-800-53-CM-11(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SA-12
+  - NIST-800-53-SA-12(10)
+  - NIST-800-171-3.4.8
+
+- name: Ensure GPG check Enabled for Local Packages (Yum)
+  ini_file:
+    dest: /etc/yum.conf
+    section: main
+    option: localpkg_gpgcheck
+    value: 1
+    create: true
+  when:
+  - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or yum_config_file.stat.exists)
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - unknown_strategy | bool
+  - medium_disruption | bool
+  - ensure_gpgcheck_local_packages | bool
+  - low_complexity | bool
+  tags:
+  - ensure_gpgcheck_local_packages
+  - high_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80791-7
+  - NIST-800-53-CM-11(a)
+  - NIST-800-53-CM-11(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SA-12
+  - NIST-800-53-SA-12(10)
+  - NIST-800-171-3.4.8
+
+- name: Ensure GPG check Enabled for Local Packages (DNF)
+  ini_file:
+    dest: /etc/dnf/dnf.conf
+    section: main
+    option: localpkg_gpgcheck
+    value: 1
+    create: true
+  when:
+  - ansible_distribution == "Fedora"
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - unknown_strategy | bool
+  - medium_disruption | bool
+  - ensure_gpgcheck_local_packages | bool
+  - low_complexity | bool
+  tags:
+  - ensure_gpgcheck_local_packages
+  - high_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80791-7
+  - NIST-800-53-CM-11(a)
+  - NIST-800-53-CM-11(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SA-12
+  - NIST-800-53-SA-12(10)
+  - NIST-800-171-3.4.8
+
+- name: Configure dnf-automatic to Install Available Updates Automatically
+  ini_file:
+    dest: /etc/dnf/automatic.conf
+    section: commands
+    option: apply_updates
+    value: 'yes'
+    create: true
+  tags:
+  - dnf-automatic_apply_updates
+  - medium_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-82494-6
+  - NIST-800-53-SI-2(5)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SI-2(c)
+  when:
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - unknown_strategy | bool
+  - low_complexity | bool
+
+- name: Find All yum Repositories
+  find:
+    paths: /etc/yum.repos.d/
+    patterns: '*.repo'
+    contains: ^\[.+]$
+  register: yum_find
+  tags:
+  - ensure_gpgcheck_never_disabled
+  - high_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80792-5
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SC-12
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SA-12
+  - NIST-800-53-SA-12(10)
+  - NIST-800-53-CM-11(a)
+  - NIST-800-53-CM-11(b)
+  - NIST-800-171-3.4.8
+  - PCI-DSS-Req-6.2
+  - CJIS-5.10.4.1
+  when:
+  - ensure_gpgcheck_never_disabled | bool
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - unknown_strategy | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure gpgcheck Enabled For All yum Package Repositories
+  with_items: '{{ yum_find.files }}'
+  lineinfile:
+    create: true
+    dest: '{{ item.path }}'
+    regexp: ^gpgcheck
+    line: gpgcheck=1
+  tags:
+  - ensure_gpgcheck_never_disabled
+  - high_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80792-5
+  - NIST-800-53-CM-5(3)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SC-12
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SA-12
+  - NIST-800-53-SA-12(10)
+  - NIST-800-53-CM-11(a)
+  - NIST-800-53-CM-11(b)
+  - NIST-800-171-3.4.8
+  - PCI-DSS-Req-6.2
+  - CJIS-5.10.4.1
+  when:
+  - ensure_gpgcheck_never_disabled | bool
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - unknown_strategy | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+
+- name: enable fips mode
+  command: /usr/bin/fips-mode-setup --enable
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - high_severity | bool
+  - medium_complexity | bool
+  - medium_disruption | bool
+  - enable_fips_mode | bool
+  tags:
+  - enable_fips_mode
+  - high_severity
+  - restrict_strategy
+  - medium_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80942-6
+  - NIST-800-53-SC-12(2)
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-IA-7
+  - NIST-800-53-SC-13
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SC-12
+
+- name: Configure Kerberos to use System Crypto Policy
+  file:
+    src: /etc/crypto-policies/back-ends/krb5.config
+    path: /etc/krb5.conf.d/crypto-policies
+    state: link
+  tags:
+  - configure_kerberos_crypto_policy
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80936-8
+  - NIST-800-53-SC-13
+  - NIST-800-53-SC-12(2)
+  - NIST-800-53-SC-12(3)
+  when:
+  - configure_strategy | bool
+  - reboot_required | bool
+  - configure_kerberos_crypto_policy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Configure Libreswan to use System Crypto Policy
+  lineinfile:
+    path: /etc/ipsec.conf
+    line: include /etc/crypto-policies/back-ends/libreswan.config
+    create: true
+  tags:
+  - configure_libreswan_crypto_policy
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80937-6
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-MA-4(6)
+  - NIST-800-53-SC-13
+  - NIST-800-53-SC-12(2)
+  - NIST-800-53-SC-12(3)
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - configure_libreswan_crypto_policy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Configure System Cryptography Policy
+  lineinfile:
+    path: /etc/crypto-policies/config
+    regexp: ^(?!#)(\S+)$
+    line: '{{ var_system_crypto_policy }}'
+    create: true
+  tags:
+  - configure_crypto_policy
+  - high_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80935-0
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-AC-17(2)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-MA-4(6)
+  - NIST-800-53-SC-13
+  - NIST-800-53-SC-12(2)
+  - NIST-800-53-SC-12(3)
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - high_severity | bool
+  - configure_crypto_policy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Verify that Crypto Policy is Set (runtime)
+  command: /usr/bin/update-crypto-policies --set {{ var_system_crypto_policy }}
+  tags:
+  - configure_crypto_policy
+  - high_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80935-0
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-AC-17(2)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-MA-4(6)
+  - NIST-800-53-SC-13
+  - NIST-800-53-SC-12(2)
+  - NIST-800-53-SC-12(3)
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - high_severity | bool
+  - configure_crypto_policy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure aide is installed
+  package:
+    name: aide
+    state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - package_aide_installed | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - enable_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - package_aide_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80844-4
+  - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-11.5
+  - CJIS-5.10.1.3
+
+- name: Restrict Virtual Console Root Logins
+  lineinfile:
+    dest: /etc/securetty
+    regexp: ^vc
+    state: absent
+  tags:
+  - securetty_root_login_console_only
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80864-2
+  - NIST-800-53-AC-6
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.1
+  - NIST-800-171-3.1.5
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - securetty_root_login_console_only | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Prevent Log In to Accounts With Empty Password - system-auth
+  replace:
+    dest: /etc/pam.d/system-auth
+    follow: true
+    regexp: nullok
+  tags:
+  - no_empty_passwords
+  - high_severity
+  - configure_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80841-0
+  - NIST-800-53-IA-5(1)(a)
+  - NIST-800-53-IA-5(c)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.1
+  - NIST-800-171-3.1.5
+  - PCI-DSS-Req-8.2.3
+  - CJIS-5.5.2
+  when:
+  - no_empty_passwords | bool
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - configure_strategy | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+
+- name: Prevent Log In to Accounts With Empty Password - password-auth
+  replace:
+    dest: /etc/pam.d/password-auth
+    follow: true
+    regexp: nullok
+  tags:
+  - no_empty_passwords
+  - high_severity
+  - configure_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80841-0
+  - NIST-800-53-IA-5(1)(a)
+  - NIST-800-53-IA-5(c)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.1
+  - NIST-800-171-3.1.5
+  - PCI-DSS-Req-8.2.3
+  - CJIS-5.5.2
+  when:
+  - no_empty_passwords | bool
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - configure_strategy | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+
+- name: Set Account Expiration Following Inactivity
+  lineinfile:
+    create: true
+    dest: /etc/default/useradd
+    regexp: ^INACTIVE
+    line: INACTIVE={{ var_account_disable_post_pw_expiration }}
+  tags:
+  - account_disable_post_pw_expiration
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80954-1
+  - NIST-800-53-IA-4(e)
+  - NIST-800-53-AC-2(3)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.5.6
+  - PCI-DSS-Req-8.1.4
+  - CJIS-5.6.2.1.1
+  when:
+  - account_disable_post_pw_expiration | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Set Password Minimum Length in login.defs
+  lineinfile:
+    dest: /etc/login.defs
+    regexp: ^PASS_MIN_LEN *[0-9]*
+    state: present
+    line: PASS_MIN_LEN        {{ var_accounts_password_minlen_login_defs }}
+    create: true
+  tags:
+  - accounts_password_minlen_login_defs
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80652-1
+  - NIST-800-53-IA-5(f)
+  - NIST-800-53-IA-5(1)(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.5.7
+  - CJIS-5.6.2.1
+  when:
+  - accounts_password_minlen_login_defs | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Do not allow users to reuse recent passwords - system-auth (change)
+  replace:
+    dest: /etc/pam.d/system-auth
+    follow: true
+    regexp: ^(password\s+sufficient\s+pam_unix\.so\s.*remember\s*=\s*)(\S+)(.*)$
+    replace: \g<1>{{ var_password_pam_unix_remember }}\g<3>
+  tags:
+  - accounts_password_pam_unix_remember
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80666-1
+  - NIST-800-53-IA-5(f)
+  - NIST-800-53-IA-5(1)(e)
+  - NIST-800-171-3.5.8
+  - PCI-DSS-Req-8.2.5
+  - CJIS-5.6.2.1.1
+  when:
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - accounts_password_pam_unix_remember | bool
+  - low_complexity | bool
+
+- name: Do not allow users to reuse recent passwords - system-auth (add)
+  replace:
+    dest: /etc/pam.d/system-auth
+    follow: true
+    regexp: ^password\s+sufficient\s+pam_unix\.so\s(?!.*remember\s*=\s*).*$
+    replace: \g<0> remember={{ var_password_pam_unix_remember }}
+  tags:
+  - accounts_password_pam_unix_remember
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80666-1
+  - NIST-800-53-IA-5(f)
+  - NIST-800-53-IA-5(1)(e)
+  - NIST-800-171-3.5.8
+  - PCI-DSS-Req-8.2.5
+  - CJIS-5.6.2.1.1
+  when:
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - accounts_password_pam_unix_remember | bool
+  - low_complexity | bool
+
+- name: Add auth pam_faillock preauth fail_interval before pam_unix.so
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    control: sufficient
+    module_path: pam_unix.so
+    new_type: auth
+    new_control: required
+    new_module_path: pam_faillock.so
+    module_arguments: preauth silent fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval }}
+    state: before
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_interval
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80669-5
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(a)
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - accounts_passwords_pam_faillock_interval | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add fail_interval argument to auth pam_faillock preauth
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    control: required
+    module_path: pam_faillock.so
+    module_arguments: preauth silent fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval }}
+    state: args_present
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_interval
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80669-5
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(a)
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - accounts_passwords_pam_faillock_interval | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add auth pam_faillock aufthfail fail_interval after pam_unix.so
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    control: sufficient
+    module_path: pam_unix.so
+    new_type: auth
+    new_control: '[default=die]'
+    new_module_path: pam_faillock.so
+    module_arguments: authfail fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval }}
+    state: after
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_interval
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80669-5
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(a)
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - accounts_passwords_pam_faillock_interval | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add fail_interval argument to auth pam_faillock authfail
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    control: '[default=die]'
+    module_path: pam_faillock.so
+    module_arguments: authfail fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval }}
+    state: args_present
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_interval
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80669-5
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(a)
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - accounts_passwords_pam_faillock_interval | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add account pam_faillock before pam_unix.so
+  pamd:
+    name: '{{ item }}'
+    type: account
+    control: required
+    module_path: pam_unix.so
+    new_type: account
+    new_control: required
+    new_module_path: pam_faillock.so
+    state: before
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_interval
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80669-5
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(a)
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - accounts_passwords_pam_faillock_interval | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add auth pam_faillock preauth deny before pam_unix.so
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    control: sufficient
+    module_path: pam_unix.so
+    new_type: auth
+    new_control: required
+    new_module_path: pam_faillock.so
+    module_arguments: preauth silent deny={{ var_accounts_passwords_pam_faillock_deny }}
+    state: before
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_deny
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80667-9
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(a)
+  - NIST-800-171-3.1.8
+  - PCI-DSS-Req-8.1.6
+  - CJIS-5.5.3
+  when:
+  - accounts_passwords_pam_faillock_deny | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add deny argument to auth pam_faillock preauth
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    control: required
+    module_path: pam_faillock.so
+    module_arguments: preauth silent deny={{ var_accounts_passwords_pam_faillock_deny }}
+    state: args_present
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_deny
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80667-9
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(a)
+  - NIST-800-171-3.1.8
+  - PCI-DSS-Req-8.1.6
+  - CJIS-5.5.3
+  when:
+  - accounts_passwords_pam_faillock_deny | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add auth pam_faillock authfail deny after pam_unix.so
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    control: sufficient
+    module_path: pam_unix.so
+    new_type: auth
+    new_control: '[default=die]'
+    new_module_path: pam_faillock.so
+    module_arguments: authfail deny={{ var_accounts_passwords_pam_faillock_deny }}
+    state: after
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_deny
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80667-9
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(a)
+  - NIST-800-171-3.1.8
+  - PCI-DSS-Req-8.1.6
+  - CJIS-5.5.3
+  when:
+  - accounts_passwords_pam_faillock_deny | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add deny argument to auth pam_faillock authfail
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    new_type: auth
+    control: '[default=die]'
+    module_path: pam_faillock.so
+    module_arguments: authfail deny={{ var_accounts_passwords_pam_faillock_deny }}
+    state: args_present
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_deny
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80667-9
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(a)
+  - NIST-800-171-3.1.8
+  - PCI-DSS-Req-8.1.6
+  - CJIS-5.5.3
+  when:
+  - accounts_passwords_pam_faillock_deny | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add account pam_faillock before pam_unix.so
+  pamd:
+    name: '{{ item }}'
+    type: account
+    control: required
+    module_path: pam_unix.so
+    new_type: account
+    new_control: required
+    new_module_path: pam_faillock.so
+    state: before
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_deny
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80667-9
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(a)
+  - NIST-800-171-3.1.8
+  - PCI-DSS-Req-8.1.6
+  - CJIS-5.5.3
+  when:
+  - accounts_passwords_pam_faillock_deny | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add auth pam_faillock preauth unlock_time before pam_unix.so
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    control: sufficient
+    module_path: pam_unix.so
+    new_type: auth
+    new_control: required
+    new_module_path: pam_faillock.so
+    module_arguments: preauth silent unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time }}
+    state: before
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_unlock_time
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80670-3
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(b)
+  - NIST-800-171-3.1.8
+  - PCI-DSS-Req-8.1.7
+  - CJIS-5.5.3
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - accounts_passwords_pam_faillock_unlock_time | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add unlock_time argument to pam_faillock preauth
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    control: required
+    module_path: pam_faillock.so
+    module_arguments: preauth silent unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time }}
+    state: args_present
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_unlock_time
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80670-3
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(b)
+  - NIST-800-171-3.1.8
+  - PCI-DSS-Req-8.1.7
+  - CJIS-5.5.3
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - accounts_passwords_pam_faillock_unlock_time | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add auth pam_faillock authfail unlock_interval after pam_unix.so
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    control: sufficient
+    module_path: pam_unix.so
+    new_type: auth
+    new_control: '[default=die]'
+    new_module_path: pam_faillock.so
+    module_arguments: authfail unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time }}
+    state: after
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_unlock_time
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80670-3
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(b)
+  - NIST-800-171-3.1.8
+  - PCI-DSS-Req-8.1.7
+  - CJIS-5.5.3
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - accounts_passwords_pam_faillock_unlock_time | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add unlock_time argument to auth pam_faillock authfail
+  pamd:
+    name: '{{ item }}'
+    type: auth
+    control: '[default=die]'
+    module_path: pam_faillock.so
+    module_arguments: authfail unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time }}
+    state: args_present
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_unlock_time
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80670-3
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(b)
+  - NIST-800-171-3.1.8
+  - PCI-DSS-Req-8.1.7
+  - CJIS-5.5.3
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - accounts_passwords_pam_faillock_unlock_time | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Add account pam_faillock before pam_unix.so
+  pamd:
+    name: '{{ item }}'
+    type: account
+    control: required
+    module_path: pam_unix.so
+    new_type: account
+    new_control: required
+    new_module_path: pam_faillock.so
+    state: before
+  loop:
+  - system-auth
+  - password-auth
+  tags:
+  - accounts_passwords_pam_faillock_unlock_time
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80670-3
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-7(b)
+  - NIST-800-171-3.1.8
+  - PCI-DSS-Req-8.1.7
+  - CJIS-5.5.3
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - accounts_passwords_pam_faillock_unlock_time | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure PAM variable ucredit is set accordingly
+  lineinfile:
+    create: true
+    dest: /etc/security/pwquality.conf
+    regexp: ^#?\s*ucredit
+    line: ucredit = {{ var_password_pam_ucredit }}
+  tags:
+  - accounts_password_pam_ucredit
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80665-3
+  - NIST-800-53-IA-5(c)
+  - NIST-800-53-IA-5(1)(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(4)
+  - PCI-DSS-Req-8.2.3
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - accounts_password_pam_ucredit | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure PAM variable lcredit is set accordingly
+  lineinfile:
+    create: true
+    dest: /etc/security/pwquality.conf
+    regexp: ^#?\s*lcredit
+    line: lcredit = {{ var_password_pam_lcredit }}
+  tags:
+  - accounts_password_pam_lcredit
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80655-4
+  - NIST-800-53-IA-5(c)
+  - NIST-800-53-IA-5(1)(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(4)
+  - PCI-DSS-Req-8.2.3
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - accounts_password_pam_lcredit | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure PAM variable dcredit is set accordingly
+  lineinfile:
+    create: true
+    dest: /etc/security/pwquality.conf
+    regexp: ^#?\s*dcredit
+    line: dcredit = {{ var_password_pam_dcredit }}
+  tags:
+  - accounts_password_pam_dcredit
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80653-9
+  - NIST-800-53-IA-5(c)
+  - NIST-800-53-IA-5(1)(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(4)
+  - PCI-DSS-Req-8.2.3
+  when:
+  - accounts_password_pam_dcredit | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure PAM variable difok is set accordingly
+  lineinfile:
+    create: true
+    dest: /etc/security/pwquality.conf
+    regexp: ^#?\s*difok
+    line: difok = {{ var_password_pam_difok }}
+  tags:
+  - accounts_password_pam_difok
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80654-7
+  - NIST-800-53-IA-5(c)
+  - NIST-800-53-IA-5(1)(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(4)
+  - CJIS-5.6.2.1.1
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - accounts_password_pam_difok | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure PAM variable maxclassrepeat is set accordingly
+  lineinfile:
+    create: true
+    dest: /etc/security/pwquality.conf
+    regexp: ^#?\s*maxclassrepeat
+    line: maxclassrepeat = {{ var_password_pam_maxclassrepeat }}
+  tags:
+  - accounts_password_pam_maxclassrepeat
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-81034-1
+  - NIST-800-53-IA-5(c)
+  - NIST-800-53-IA-5(1)(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(4)
+  when:
+  - accounts_password_pam_maxclassrepeat | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure PAM variable maxrepeat is set accordingly
+  lineinfile:
+    create: true
+    dest: /etc/security/pwquality.conf
+    regexp: ^#?\s*maxrepeat
+    line: maxrepeat = {{ var_password_pam_maxrepeat }}
+  tags:
+  - accounts_password_pam_maxrepeat
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82066-2
+  - NIST-800-53-IA-5(c)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(4)
+  when:
+  - accounts_password_pam_maxrepeat | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure PAM variable minlen is set accordingly
+  lineinfile:
+    create: true
+    dest: /etc/security/pwquality.conf
+    regexp: ^#?\s*minlen
+    line: minlen = {{ var_password_pam_minlen }}
+  tags:
+  - accounts_password_pam_minlen
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80656-2
+  - NIST-800-53-IA-5(c)
+  - NIST-800-53-IA-5(1)(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(4)
+  - PCI-DSS-Req-8.2.3
+  - CJIS-5.6.2.1.1
+  when:
+  - accounts_password_pam_minlen | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure PAM variable ocredit is set accordingly
+  lineinfile:
+    create: true
+    dest: /etc/security/pwquality.conf
+    regexp: ^#?\s*ocredit
+    line: ocredit = {{ var_password_pam_ocredit }}
+  tags:
+  - accounts_password_pam_ocredit
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80663-8
+  - NIST-800-53-IA-5(c)
+  - NIST-800-53-IA-5(1)(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(4)
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - accounts_password_pam_ocredit | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Limit the Number of Concurrent Login Sessions Allowed Per User
+  lineinfile:
+    state: present
+    dest: /etc/security/limits.conf
+    insertbefore: ^# End of file
+    regexp: ^#?\*.*maxlogins
+    line: '*           hard    maxlogins     {{ var_accounts_max_concurrent_login_sessions }}'
+    create: true
+  tags:
+  - accounts_max_concurrent_login_sessions
+  - low_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80955-8
+  - NIST-800-53-AC-10
+  - NIST-800-53-CM-6(a)
+  - CJIS-5.5.2.2
+  when:
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - accounts_max_concurrent_login_sessions | bool
+  - low_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Set user umask in /etc/csh.cshrc
+  replace:
+    path: /etc/csh.cshrc
+    regexp: umask.*
+    replace: umask {{ var_accounts_user_umask }}
+  tags:
+  - accounts_umask_etc_csh_cshrc
+  - unknown_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-81037-4
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-CM-6(a)
+  when:
+  - unknown_severity | bool
+  - accounts_umask_etc_csh_cshrc | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Set user umask in /etc/profile
+  replace:
+    path: /etc/profile
+    regexp: umask.*
+    replace: umask {{ var_accounts_user_umask }}
+  tags:
+  - accounts_umask_etc_profile
+  - unknown_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-81035-8
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-CM-6(a)
+  when:
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - accounts_umask_etc_profile | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Set user umask in /etc/bashrc
+  replace:
+    path: /etc/bashrc
+    regexp: umask.*
+    replace: umask {{ var_accounts_user_umask }}
+  tags:
+  - accounts_umask_etc_bashrc
+  - unknown_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-81036-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-CM-6(a)
+  when:
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - accounts_umask_etc_bashrc | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Enable GNOME3 Login Warning Banner
+  ini_file:
+    dest: /etc/dconf/db/local.d/00-security-settings
+    section: org/gnome/login-screen
+    option: banner-message-enable
+    value: 'true'
+    create: true
+  tags:
+  - dconf_gnome_banner_enabled
+  - medium_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80768-5
+  - NIST-800-53-AC-8(a)
+  - NIST-800-53-AC-8(b)
+  - NIST-800-53-AC-8(c)
+  - NIST-800-171-3.1.9
+  when:
+  - dconf_gnome_banner_enabled | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - unknown_strategy | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+
+- name: Prevent user modification of GNOME banner-message-enabled
+  lineinfile:
+    path: /etc/dconf/db/local.d/locks/00-security-settings-lock
+    regexp: ^/org/gnome/login-screen/banner-message-enable
+    line: /org/gnome/login-screen/banner-message-enable
+    create: true
+  tags:
+  - dconf_gnome_banner_enabled
+  - medium_severity
+  - unknown_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80768-5
+  - NIST-800-53-AC-8(a)
+  - NIST-800-53-AC-8(b)
+  - NIST-800-53-AC-8(c)
+  - NIST-800-171-3.1.9
+  when:
+  - dconf_gnome_banner_enabled | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - unknown_strategy | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+
+- name: Disable service debug-shell
+  block:
+  - name: Gather the service facts
+    service_facts: null
+  - name: Disable service debug-shell
+    systemd:
+      name: debug-shell.service
+      enabled: 'no'
+      state: stopped
+      masked: 'yes'
+    when: '"debug-shell.service" in ansible_facts.services'
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - service_debug-shell_disabled
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80876-6
+  - NIST-800-171-3.4.5
+
+- name: Unit Socket Exists - debug-shell.socket
+  command: systemctl list-unit-files debug-shell.socket
+  args:
+    warn: false
+  register: socket_file_exists
+  changed_when: false
+  ignore_errors: true
+  check_mode: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - service_debug-shell_disabled
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80876-6
+  - NIST-800-171-3.4.5
+
+- name: Disable socket debug-shell
+  systemd:
+    name: debug-shell.socket
+    enabled: 'no'
+    state: stopped
+    masked: 'yes'
+  when:
+  - '"debug-shell.socket" in socket_file_exists.stdout_lines[1]'
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - service_debug-shell_disabled
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80876-6
+  - NIST-800-171-3.4.5
+
+- name: require single user mode password
+  lineinfile:
+    create: true
+    dest: /usr/lib/systemd/system/rescue.service
+    regexp: ^#?ExecStart=
+    line: ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - require_singleuser_auth | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - require_singleuser_auth
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80855-0
+  - NIST-800-53-IA-2
+  - NIST-800-53-AC-3
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.1
+  - NIST-800-171-3.4.5
+
+- name: Disable Ctrl-Alt-Del Burst Action
+  lineinfile:
+    dest: /etc/systemd/system.conf
+    state: present
+    regexp: ^CtrlAltDelBurstAction
+    line: CtrlAltDelBurstAction=none
+    create: true
+  tags:
+  - disable_ctrlaltdel_burstaction
+  - high_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80784-2
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.4.5
+  when:
+  - disable_strategy | bool
+  - no_reboot_needed | bool
+  - disable_ctrlaltdel_burstaction | bool
+  - high_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Verify that Interactive Boot is Disabled in /etc/default/grub
+  replace:
+    dest: /etc/default/grub
+    regexp: systemd.confirm_spawn=(1|yes|true|on)
+    replace: systemd.confirm_spawn=no
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - grub2_disable_interactive_boot | bool
+  - reboot_required | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - grub2_disable_interactive_boot
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80826-1
+  - NIST-800-53-SC-2(1)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.2
+  - NIST-800-171-3.4.5
+
+- name: Verify that Interactive Boot is Disabled (runtime)
+  command: /sbin/grubby --update-kernel=ALL --remove-args="systemd.confirm_spawn"
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - grub2_disable_interactive_boot | bool
+  - reboot_required | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - grub2_disable_interactive_boot
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80826-1
+  - NIST-800-53-SC-2(1)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.2
+  - NIST-800-171-3.4.5
+
+- name: Disable Ctrl-Alt-Del Reboot Activation
+  systemd:
+    name: ctrl-alt-del.target
+    masked: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - no_reboot_needed | bool
+  - high_severity | bool
+  - disable_ctrlaltdel_reboot | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - disable_ctrlaltdel_reboot
+  - high_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80785-9
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6(1)
+  - NIST-800-171-3.4.5
+
+- name: Ensure tmux is installed
+  package:
+    name: tmux
+    state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - package_tmux_installed | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - enable_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - package_tmux_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80644-8
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.10
+
+- name: Configure the tmux Lock Command
+  block:
+  - name: Deduplicate values from /etc/tmux.conf
+    lineinfile:
+      path: /etc/tmux.conf
+      create: false
+      regexp: ^\s*set -g lock-command\s+
+      state: absent
+  - name: Insert correct line to /etc/tmux.conf
+    lineinfile:
+      path: /etc/tmux.conf
+      create: true
+      line: set -g lock-command vlock
+      state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - configure_tmux_lock_command | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - configure_tmux_lock_command
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80940-0
+  - NIST-800-53-AC-11(a)
+  - NIST-800-53-AC-11(b)
+  - NIST-800-53-CM-6(a)
+
+- name: Configure tmux to lock session after inactivity
+  block:
+  - name: Deduplicate values from /etc/tmux.conf
+    lineinfile:
+      path: /etc/tmux.conf
+      create: false
+      regexp: ^\s*set -g lock-after-time\s+
+      state: absent
+  - name: Insert correct line to /etc/tmux.conf
+    lineinfile:
+      path: /etc/tmux.conf
+      create: true
+      line: set -g lock-after-time 900
+      state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - configure_tmux_lock_after_time | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - configure_tmux_lock_after_time
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82199-1
+
+- name: Ensure sysctl kernel.yama.ptrace_scope is set to 1
+  sysctl:
+    name: kernel.yama.ptrace_scope
+    value: '1'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - sysctl_kernel_yama_ptrace_scope | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_kernel_yama_ptrace_scope
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80953-3
+
+- name: Ensure sysctl kernel.core_pattern is set to |/bin/false
+  sysctl:
+    name: kernel.core_pattern
+    value: '|/bin/false'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_disruption | bool
+  - sysctl_kernel_core_pattern | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_kernel_core_pattern
+  - unknown_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-82215-5
+
+- name: Ensure sysctl kernel.dmesg_restrict is set to 1
+  sysctl:
+    name: kernel.dmesg_restrict
+    value: '1'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - sysctl_kernel_dmesg_restrict | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_kernel_dmesg_restrict
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80913-7
+  - NIST-800-53-SI-11(a)
+  - NIST-800-53-SI-11(b)
+  - NIST-800-171-3.1.5
+
+- name: Ensure sysctl kernel.kexec_load_disabled is set to 1
+  sysctl:
+    name: kernel.kexec_load_disabled
+    value: '1'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - sysctl_kernel_kexec_load_disabled | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_kernel_kexec_load_disabled
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80952-5
+
+- name: Ensure sysctl net.core.bpf_jit_harden is set to 2
+  sysctl:
+    name: net.core.bpf_jit_harden
+    value: '2'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - sysctl_net_core_bpf_jit_harden | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_net_core_bpf_jit_harden
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-82934-1
+
+- name: Ensure sysctl kernel.unprivileged_bpf_disabled is set to 1
+  sysctl:
+    name: kernel.unprivileged_bpf_disabled
+    value: '1'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - sysctl_kernel_unprivileged_bpf_disabled | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_kernel_unprivileged_bpf_disabled
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-82974-7
+
+- name: Ensure sysctl user.max_user_namespaces is set to 0
+  sysctl:
+    name: user.max_user_namespaces
+    value: '0'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - sysctl_user_max_user_namespaces | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - low_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_user_max_user_namespaces
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-82211-4
+  - NIST-800-53-SC-39
+  - NIST-800-53-CM-6(a)
+
+- name: Ensure sysctl kernel.perf_event_paranoid is set to 2
+  sysctl:
+    name: kernel.perf_event_paranoid
+    value: '2'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - sysctl_kernel_perf_event_paranoid | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_kernel_perf_event_paranoid
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81054-9
+
+- name: get current kernel parameters
+  command: /usr/bin/grub2-editenv - list
+  register: kernelopts
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_complexity | bool
+  - grub2_vsyscall_argument | bool
+  - low_disruption | bool
+  tags:
+  - grub2_vsyscall_argument
+  - medium_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80946-7
+
+- name: Update the bootloader menu
+  command: /usr/bin/grub2-editenv - set "{{ item }} vsyscall=none"
+  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') | list }}'
+  when:
+  - kernelopts.stdout_lines is defined
+  - kernelopts.stdout_lines | length > 0
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_complexity | bool
+  - grub2_vsyscall_argument | bool
+  - low_disruption | bool
+  tags:
+  - grub2_vsyscall_argument
+  - medium_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80946-7
+
+- name: get current kernel parameters
+  command: /usr/bin/grub2-editenv - list
+  register: kernelopts
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - grub2_slub_debug_argument | bool
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_complexity | bool
+  - low_disruption | bool
+  tags:
+  - grub2_slub_debug_argument
+  - medium_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80945-9
+
+- name: Update the bootloader menu
+  command: /usr/bin/grub2-editenv - set "{{ item }} slub_debug=P"
+  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') | list }}'
+  when:
+  - kernelopts.stdout_lines is defined
+  - kernelopts.stdout_lines | length > 0
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - grub2_slub_debug_argument | bool
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_complexity | bool
+  - low_disruption | bool
+  tags:
+  - grub2_slub_debug_argument
+  - medium_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80945-9
+
+- name: get current kernel parameters
+  command: /usr/bin/grub2-editenv - list
+  register: kernelopts
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_complexity | bool
+  - grub2_page_poison_argument | bool
+  - low_disruption | bool
+  tags:
+  - grub2_page_poison_argument
+  - medium_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80944-2
+
+- name: Update the bootloader menu
+  command: /usr/bin/grub2-editenv - set "{{ item }} page_poison=1"
+  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') | list }}'
+  when:
+  - kernelopts.stdout_lines is defined
+  - kernelopts.stdout_lines | length > 0
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - restrict_strategy | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_complexity | bool
+  - grub2_page_poison_argument | bool
+  - low_disruption | bool
+  tags:
+  - grub2_page_poison_argument
+  - medium_severity
+  - restrict_strategy
+  - medium_complexity
+  - low_disruption
+  - reboot_required
+  - CCE-80944-2
+
+- name: Disable service systemd-coredump
+  block:
+  - name: Gather the service facts
+    service_facts: null
+  - name: Disable service systemd-coredump
+    systemd:
+      name: systemd-coredump.service
+      enabled: 'no'
+      state: stopped
+      masked: 'yes'
+    when: '"systemd-coredump.service" in ansible_facts.services'
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - disable_strategy | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - low_complexity | bool
+  tags:
+  - service_systemd-coredump_disabled
+  - unknown_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82881-4
+
+- name: Unit Socket Exists - systemd-coredump.socket
+  command: systemctl list-unit-files systemd-coredump.socket
+  args:
+    warn: false
+  register: socket_file_exists
+  changed_when: false
+  ignore_errors: true
+  check_mode: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - disable_strategy | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - low_complexity | bool
+  tags:
+  - service_systemd-coredump_disabled
+  - unknown_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82881-4
+
+- name: Disable socket systemd-coredump
+  systemd:
+    name: systemd-coredump.socket
+    enabled: 'no'
+    state: stopped
+    masked: 'yes'
+  when:
+  - '"systemd-coredump.socket" in socket_file_exists.stdout_lines[1]'
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - disable_strategy | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - low_complexity | bool
+  tags:
+  - service_systemd-coredump_disabled
+  - unknown_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82881-4
+
+- name: disable core dumps with limits
+  lineinfile:
+    dest: /etc/security/limits.conf
+    regexp: ^[^#].*core
+    line: '*        hard       core      0'
+    create: true
+  tags:
+  - disable_users_coredumps
+  - unknown_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-81038-2
+  when:
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - disable_users_coredumps | bool
+  - restrict_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Disable core dump backtraces
+  block:
+  - name: Deduplicate values from /etc/systemd/coredump.conf
+    lineinfile:
+      path: /etc/systemd/coredump.conf
+      create: false
+      regexp: ^\s*ProcessSizeMax\s*=\s*
+      state: absent
+  - name: Insert correct line to /etc/systemd/coredump.conf
+    lineinfile:
+      path: /etc/systemd/coredump.conf
+      create: false
+      line: ProcessSizeMax=0
+      state: present
+  tags:
+  - coredump_disable_backtraces
+  - unknown_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82251-0
+  when:
+  - unknown_severity | bool
+  - coredump_disable_backtraces | bool
+  - restrict_strategy | bool
+  - no_reboot_needed | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Disable storing core dump
+  block:
+  - name: Deduplicate values from /etc/systemd/coredump.conf
+    lineinfile:
+      path: /etc/systemd/coredump.conf
+      create: false
+      regexp: ^\s*Storage\s*=\s*
+      state: absent
+  - name: Insert correct line to /etc/systemd/coredump.conf
+    lineinfile:
+      path: /etc/systemd/coredump.conf
+      create: false
+      line: Storage=none
+      state: present
+  tags:
+  - coredump_disable_storage
+  - unknown_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82252-8
+  when:
+  - unknown_severity | bool
+  - coredump_disable_storage | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Ensure sysctl kernel.kptr_restrict is set to 1
+  sysctl:
+    name: kernel.kptr_restrict
+    value: '1'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - sysctl_kernel_kptr_restrict | bool
+  - reboot_required | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_kernel_kptr_restrict
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-80915-2
+  - NIST-800-53-SC-30
+  - NIST-800-53-SC-30(2)
+  - NIST-800-53-SC-30(5)
+  - NIST-800-53-CM-6(a)
+
+- name: Ensure kernel module 'cramfs' is disabled
+  lineinfile:
+    create: true
+    dest: /etc/modprobe.d/cramfs.conf
+    regexp: cramfs
+    line: install cramfs /bin/true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - reboot_required | bool
+  - low_severity | bool
+  - medium_disruption | bool
+  - kernel_module_cramfs_disabled | bool
+  - low_complexity | bool
+  tags:
+  - kernel_module_cramfs_disabled
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81031-7
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.4.6
+
+- name: Ensure sysctl fs.protected_symlinks is set to 1
+  sysctl:
+    name: fs.protected_symlinks
+    value: '1'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - sysctl_fs_protected_symlinks | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_fs_protected_symlinks
+  - unknown_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81030-9
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6(1)
+
+- name: Ensure sysctl fs.protected_hardlinks is set to 1
+  sysctl:
+    name: fs.protected_hardlinks
+    value: '1'
+    state: present
+    reload: true
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - disable_strategy | bool
+  - reboot_required | bool
+  - sysctl_fs_protected_hardlinks | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sysctl_fs_protected_hardlinks
+  - unknown_severity
+  - disable_strategy
+  - low_complexity
+  - medium_disruption
+  - reboot_required
+  - CCE-81027-5
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6(1)
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/home'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - mount_option_home_nodev | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_home_nodev
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-81048-1
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - mount_option_home_nodev | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_home_nodev
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-81048-1
+
+- name: Ensure permission nodev are set on /home
+  mount:
+    path: /home
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nodev'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - mount_option_home_nodev | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_home_nodev
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-81048-1
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/dev/shm'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_dev_shm_nodev | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_dev_shm_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-80837-8
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_dev_shm_nodev | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_dev_shm_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-80837-8
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nodev are set on /dev/shm
+  mount:
+    path: /dev/shm
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nodev'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_dev_shm_nodev | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_dev_shm_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-80837-8
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/tmp'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_tmp_nodev | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_tmp_nodev
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82623-0
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_tmp_nodev | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_tmp_nodev
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82623-0
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nodev are set on /tmp
+  mount:
+    path: /tmp
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nodev'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_tmp_nodev | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_tmp_nodev
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82623-0
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/var/tmp'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - mount_option_var_tmp_noexec | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_tmp_noexec
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82151-2
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - mount_option_var_tmp_noexec | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_tmp_noexec
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82151-2
+
+- name: Ensure permission noexec are set on /var/tmp
+  mount:
+    path: /var/tmp
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},noexec'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - mount_option_var_tmp_noexec | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_tmp_noexec
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82151-2
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/dev/shm'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_dev_shm_noexec | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_dev_shm_noexec
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-80838-6
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_dev_shm_noexec | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_dev_shm_noexec
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-80838-6
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission noexec are set on /dev/shm
+  mount:
+    path: /dev/shm
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},noexec'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_dev_shm_noexec | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_dev_shm_noexec
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-80838-6
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/dev/shm'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_dev_shm_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_dev_shm_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-80839-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_dev_shm_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_dev_shm_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-80839-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nosuid are set on /dev/shm
+  mount:
+    path: /dev/shm
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nosuid'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_dev_shm_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_dev_shm_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-80839-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/var/tmp'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - mount_option_var_tmp_nodev | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_tmp_nodev
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82068-8
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - mount_option_var_tmp_nodev | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_tmp_nodev
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82068-8
+
+- name: Ensure permission nodev are set on /var/tmp
+  mount:
+    path: /var/tmp
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nodev'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - mount_option_var_tmp_nodev | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_tmp_nodev
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82068-8
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/var'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_var_nodev | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82062-1
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_var_nodev | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82062-1
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nodev are set on /var
+  mount:
+    path: /var
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nodev'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_var_nodev | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82062-1
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/var/log'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - mount_option_var_log_nodev | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82077-9
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - mount_option_var_log_nodev | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82077-9
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nodev are set on /var/log
+  mount:
+    path: /var/log
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nodev'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - mount_option_var_log_nodev | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82077-9
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/boot'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_boot_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_boot_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-81033-3
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_boot_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_boot_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-81033-3
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nosuid are set on /boot
+  mount:
+    path: /boot
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nosuid'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_boot_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_boot_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-81033-3
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/home'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_home_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_home_nosuid
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-81050-7
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_home_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_home_nosuid
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-81050-7
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nosuid are set on /home
+  mount:
+    path: /home
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nosuid'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_home_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_home_nosuid
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-81050-7
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/boot'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_boot_nodev | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_boot_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82941-6
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_boot_nodev | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_boot_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82941-6
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nodev are set on /boot
+  mount:
+    path: /boot
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nodev'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_boot_nodev | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_boot_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82941-6
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/var/tmp'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - mount_option_var_tmp_nosuid | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_tmp_nosuid
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82154-6
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - mount_option_var_tmp_nosuid | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_tmp_nosuid
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82154-6
+
+- name: Ensure permission nosuid are set on /var/tmp
+  mount:
+    path: /var/tmp
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nosuid'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - mount_option_var_tmp_nosuid | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_tmp_nosuid
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82154-6
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/tmp'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_tmp_noexec | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_tmp_noexec
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82139-7
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_tmp_noexec | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_tmp_noexec
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82139-7
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission noexec are set on /tmp
+  mount:
+    path: /tmp
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},noexec'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_tmp_noexec | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_tmp_noexec
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82139-7
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/tmp'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_tmp_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - high_disruption | bool
+  - low_complexity | bool
+  tags:
+  - mount_option_tmp_nosuid
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82140-5
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_tmp_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - high_disruption | bool
+  - low_complexity | bool
+  tags:
+  - mount_option_tmp_nosuid
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82140-5
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nosuid are set on /tmp
+  mount:
+    path: /tmp
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nosuid'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - unknown_severity | bool
+  - mount_option_tmp_nosuid | bool
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - high_disruption | bool
+  - low_complexity | bool
+  tags:
+  - mount_option_tmp_nosuid
+  - unknown_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82140-5
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/var/log/audit'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_var_log_audit_noexec | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_audit_noexec
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82975-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_var_log_audit_noexec | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_audit_noexec
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82975-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission noexec are set on /var/log/audit
+  mount:
+    path: /var/log/audit
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},noexec'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_var_log_audit_noexec | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_audit_noexec
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82975-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/var/log'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_var_log_noexec | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_noexec
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82008-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_var_log_noexec | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_noexec
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82008-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission noexec are set on /var/log
+  mount:
+    path: /var/log
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},noexec'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_var_log_noexec | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_noexec
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82008-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/var/log/audit'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_var_log_audit_nodev | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_audit_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82080-3
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_var_log_audit_nodev | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_audit_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82080-3
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nodev are set on /var/log/audit
+  mount:
+    path: /var/log/audit
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nodev'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_var_log_audit_nodev | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_audit_nodev
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82080-3
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/var/log/audit'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_var_log_audit_nosuid | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_audit_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82921-8
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_var_log_audit_nosuid | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_audit_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82921-8
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nosuid are set on /var/log/audit
+  mount:
+    path: /var/log/audit
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nosuid'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - mount_option_var_log_audit_nosuid | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_audit_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82921-8
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: get back mount information associated to mountpoint
+  command: findmnt --fstab '/var/log'
+  register: device_name
+  failed_when: device_name.rc > 1
+  changed_when: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_var_log_nosuid | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82065-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: create mount_info dictionary variable
+  set_fact:
+    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+  with_together:
+  - '{{ device_name.stdout_lines[0].split() | list | lower }}'
+  - '{{ device_name.stdout_lines[1].split() | list }}'
+  when:
+  - device_name.stdout is defined and device_name.stdout_lines is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_var_log_nosuid | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82065-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure permission nosuid are set on /var/log
+  mount:
+    path: /var/log
+    src: '{{ mount_info.source }}'
+    opts: '{{ mount_info.options }},nosuid'
+    state: mounted
+    fstype: '{{ mount_info.fstype }}'
+  when:
+  - device_name.stdout is defined
+  - (device_name.stdout | length > 0)
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - mount_option_var_log_nosuid | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - high_disruption | bool
+  tags:
+  - mount_option_var_log_nosuid
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - high_disruption
+  - no_reboot_needed
+  - CCE-82065-4
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-MP-7
+
+- name: Ensure nfs-utils is removed
+  package:
+    name: nfs-utils
+    state: absent
+  tags:
+  - package_nfs-utils_removed
+  - low_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82932-5
+  when:
+  - disable_strategy | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - low_complexity | bool
+
+- name: Ensure sendmail is removed
+  package:
+    name: sendmail
+    state: absent
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - package_sendmail_removed | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - package_sendmail_removed
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-81039-0
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+
+- name: Test for domain group
+  command: grep '\s*\[domain\/[^]]*]' /etc/sssd/sssd.conf
+  register: test_grep_domain
+  ignore_errors: true
+  changed_when: false
+  check_mode: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - sssd_enable_smartcards | bool
+  - low_complexity | bool
+  tags:
+  - sssd_enable_smartcards
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80909-5
+
+- name: Add default domain group (if no domain there)
+  ini_file:
+    path: /etc/sssd/sssd.conf
+    section: '{{ item.section }}'
+    option: '{{ item.option }}'
+    value: '{{ item.value }}'
+    create: true
+    mode: 384
+  with_items:
+  - section: sssd
+    option: domains
+    value: default
+  - section: domain/default
+    option: id_provider
+    value: files
+  when:
+  - test_grep_domain.stdout is defined
+  - test_grep_domain.stdout | length < 1
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - sssd_enable_smartcards | bool
+  - low_complexity | bool
+  tags:
+  - sssd_enable_smartcards
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80909-5
+
+- name: Enable Smartcards in SSSD
+  ini_file:
+    dest: /etc/sssd/sssd.conf
+    section: pam
+    option: pam_cert_auth
+    value: true
+    create: true
+    mode: 384
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - configure_strategy | bool
+  - medium_severity | bool
+  - medium_disruption | bool
+  - sssd_enable_smartcards | bool
+  - low_complexity | bool
+  tags:
+  - sssd_enable_smartcards
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-80909-5
+
+- name: Test for domain group
+  command: grep '\s*\[domain\/[^]]*]' /etc/sssd/sssd.conf
+  register: test_grep_domain
+  ignore_errors: true
+  changed_when: false
+  check_mode: false
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - sssd_offline_cred_expiration | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sssd_offline_cred_expiration
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-82460-7
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(13)
+
+- name: Add default domain group (if no domain there)
+  ini_file:
+    path: /etc/sssd/sssd.conf
+    section: '{{ item.section }}'
+    option: '{{ item.option }}'
+    value: '{{ item.value }}'
+    create: true
+    mode: 384
+  with_items:
+  - section: sssd
+    option: domains
+    value: default
+  - section: domain/default
+    option: id_provider
+    value: files
+  when:
+  - test_grep_domain.stdout is defined
+  - test_grep_domain.stdout | length < 1
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - sssd_offline_cred_expiration | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sssd_offline_cred_expiration
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-82460-7
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(13)
+
+- name: Configure SSD to Expire Offline Credentials
+  ini_file:
+    dest: /etc/sssd/sssd.conf
+    section: pam
+    option: offline_credentials_expiration
+    value: 1
+    create: true
+    mode: 384
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - sssd_offline_cred_expiration | bool
+  - medium_severity | bool
+  - configure_strategy | bool
+  - medium_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sssd_offline_cred_expiration
+  - medium_severity
+  - configure_strategy
+  - low_complexity
+  - medium_disruption
+  - no_reboot_needed
+  - CCE-82460-7
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(13)
+
+- name: Disable SSH Access via Empty Passwords
+  block:
+  - name: Deduplicate values from /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: false
+      regexp: (?i)^\s*PermitEmptyPasswords\s+
+      state: absent
+  - name: Insert correct line to /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: true
+      line: PermitEmptyPasswords no
+      state: present
+      insertbefore: ^[#\s]*Match
+      validate: /usr/sbin/sshd -t -f %s
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sshd_disable_empty_passwords | bool
+  - high_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sshd_disable_empty_passwords
+  - high_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80896-4
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.1
+  - NIST-800-171-3.1.5
+  - CJIS-5.5.6
+
+- name: Set SSH Client Alive Max Count
+  block:
+  - name: Deduplicate values from /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: false
+      regexp: (?i)^\s*ClientAliveCountMax\s+
+      state: absent
+  - name: Insert correct line to /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: true
+      line: ClientAliveCountMax {{ var_sshd_set_keepalive }}
+      state: present
+      insertbefore: ^[#\s]*Match
+      validate: /usr/sbin/sshd -t -f %s
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - sshd_set_keepalive | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sshd_set_keepalive
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80907-9
+  - NIST-800-53-AC-2(5)
+  - NIST-800-53-AC-12
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-SC-10
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.11
+  - CJIS-5.5.6
+
+- name: Disable Host-Based Authentication
+  block:
+  - name: Deduplicate values from /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: false
+      regexp: (?i)^\s*HostbasedAuthentication\s+
+      state: absent
+  - name: Insert correct line to /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: true
+      line: HostbasedAuthentication no
+      state: present
+      insertbefore: ^[#\s]*Match
+      validate: /usr/sbin/sshd -t -f %s
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - disable_host_auth | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - disable_host_auth
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80786-7
+  - NIST-800-53-AC-3
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.12
+  - CJIS-5.5.6
+
+- name: Disable Kerberos Authentication
+  block:
+  - name: Deduplicate values from /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: false
+      regexp: (?i)^\s*KerberosAuthentication\s+
+      state: absent
+  - name: Insert correct line to /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: true
+      line: KerberosAuthentication no
+      state: present
+      insertbefore: ^[#\s]*Match
+      validate: /usr/sbin/sshd -t -f %s
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - sshd_disable_kerb_auth | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sshd_disable_kerb_auth
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80898-0
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.12
+
+- name: Set SSH Idle Timeout Interval
+  block:
+  - name: Deduplicate values from /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: false
+      regexp: (?i)^\s*ClientAliveInterval\s+
+      state: absent
+  - name: Insert correct line to /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: true
+      line: ClientAliveInterval {{ sshd_idle_timeout_value }}
+      state: present
+      insertbefore: ^[#\s]*Match
+      validate: /usr/sbin/sshd -t -f %s
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - sshd_set_idle_timeout | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sshd_set_idle_timeout
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80906-1
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-AC-2(5)
+  - NIST-800-53-AC-12
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-SC-10
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.11
+  - PCI-DSS-Req-8.1.8
+  - CJIS-5.5.6
+
+- name: Enable Use of Strict Mode Checking
+  block:
+  - name: Deduplicate values from /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: false
+      regexp: (?i)^\s*StrictModes\s+
+      state: absent
+  - name: Insert correct line to /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: true
+      line: StrictModes yes
+      state: present
+      insertbefore: ^[#\s]*Match
+      validate: /usr/sbin/sshd -t -f %s
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - sshd_enable_strictmodes | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sshd_enable_strictmodes
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80904-6
+  - NIST-800-53-AC-6
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.12
+
+- name: Disable GSSAPI Authentication
+  block:
+  - name: Deduplicate values from /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: false
+      regexp: (?i)^\s*GSSAPIAuthentication\s+
+      state: absent
+  - name: Insert correct line to /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: true
+      line: GSSAPIAuthentication no
+      state: present
+      insertbefore: ^[#\s]*Match
+      validate: /usr/sbin/sshd -t -f %s
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - sshd_disable_gssapi_auth | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sshd_disable_gssapi_auth
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80897-2
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-17(a)
+  - NIST-800-171-3.1.12
+
+- name: Force frequent session key renegotiation
+  block:
+  - name: Deduplicate values from /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: false
+      regexp: (?i)^\s*RekeyLimit\s+
+      state: absent
+  - name: Insert correct line to /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: true
+      line: RekeyLimit 512M 1h
+      state: present
+      insertbefore: ^[#\s]*Match
+      validate: /usr/sbin/sshd -t -f %s
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sshd_rekey_limit | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sshd_rekey_limit
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82177-7
+
+- name: Enable SSH Warning Banner
+  block:
+  - name: Deduplicate values from /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: false
+      regexp: (?i)^\s*Banner\s+
+      state: absent
+  - name: Insert correct line to /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: true
+      line: Banner /etc/issue
+      state: present
+      insertbefore: ^[#\s]*Match
+      validate: /usr/sbin/sshd -t -f %s
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - sshd_enable_warning_banner | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sshd_enable_warning_banner
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80905-3
+  - NIST-800-53-AC-8(a)
+  - NIST-800-53-AC-8(c)
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-171-3.1.9
+  - CJIS-5.5.6
+
+- name: Disable SSH Root Login
+  block:
+  - name: Deduplicate values from /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: false
+      regexp: (?i)^\s*PermitRootLogin\s+
+      state: absent
+  - name: Insert correct line to /etc/ssh/sshd_config
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      create: true
+      line: PermitRootLogin no
+      state: present
+      insertbefore: ^[#\s]*Match
+      validate: /usr/sbin/sshd -t -f %s
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - medium_severity | bool
+  - sshd_disable_root_login | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - sshd_disable_root_login
+  - medium_severity
+  - restrict_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80901-2
+  - NIST-800-53-AC-6(2)
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-IA-2
+  - NIST-800-53-IA-2(5)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-
+  - NIST-800-171-3.1.1
+  - NIST-800-171-3.1.5
+  - CJIS-5.5.6
+
+- name: Ensure abrt is removed
+  package:
+    name: abrt
+    state: absent
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - disable_strategy | bool
+  - package_abrt_removed | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - package_abrt_removed
+  - medium_severity
+  - disable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-80948-3
+
+- name: Ensure fapolicyd is installed
+  package:
+    name: fapolicyd
+    state: present
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - package_fapolicyd_installed | bool
+  - enable_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - package_fapolicyd_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82191-8
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SI-4(22)
+
+- name: Enable service fapolicyd
+  block:
+  - name: Gather the package facts
+    package_facts:
+      manager: auto
+  - name: Enable service fapolicyd
+    service:
+      name: fapolicyd
+      enabled: 'yes'
+      state: started
+    when:
+    - '"fapolicyd" in ansible_facts.packages'
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - service_fapolicyd_enabled | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - enable_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - service_fapolicyd_enabled
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82249-4
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SI-4(22)
+
+- name: Ensure usbguard is installed
+  package:
+    name: usbguard
+    state: present
+  tags:
+  - package_usbguard_installed
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82959-8
+  when:
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - enable_strategy | bool
+  - package_usbguard_installed | bool
+  - low_disruption | bool
+  - low_complexity | bool
+
+- name: Enable service usbguard
+  block:
+  - name: Gather the package facts
+    package_facts:
+      manager: auto
+  - name: Enable service usbguard
+    service:
+      name: usbguard
+      enabled: 'yes'
+      state: started
+    when:
+    - '"usbguard" in ansible_facts.packages'
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - service_usbguard_enabled | bool
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - enable_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - service_usbguard_enabled
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82853-3
+
+- name: Enable service rngd
+  block:
+  - name: Gather the package facts
+    package_facts:
+      manager: auto
+  - name: Enable service rngd
+    service:
+      name: rngd
+      enabled: 'yes'
+      state: started
+    when:
+    - '"rng-tools" in ansible_facts.packages'
+  when:
+  - ansible_virtualization_role != "guest" or ansible_virtualization_type != "docker"
+  - no_reboot_needed | bool
+  - medium_severity | bool
+  - service_rngd_enabled | bool
+  - enable_strategy | bool
+  - low_disruption | bool
+  - low_complexity | bool
+  tags:
+  - service_rngd_enabled
+  - medium_severity
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - CCE-82831-9
