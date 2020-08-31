@@ -10,15 +10,9 @@ galaxy_info:
   min_ansible_version: 2.5
 
   platforms:
-  - name: GenericBSD
+  - name: EL
     versions:
-    - any
-  - name: GenericLinux
-    versions:
-    - any
-  - name: GenericUNIX
-    versions:
-    - any
+    - 8
 
   galaxy_tags:
   - system
@@ -28,6 +22,10 @@ galaxy_info:
   - scap
   - security
   - compliance
-  - compliaceascode
+  - complianceascode
+  - disa
+  - stig
+  - redhatofficial
+  - redhat
 
 dependencies: []
