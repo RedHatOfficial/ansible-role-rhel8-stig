@@ -1,11 +1,11 @@
-[DRAFT] DISA STIG for Red Hat Enterprise Linux 8
+DISA STIG for Red Hat Enterprise Linux 8
 =========
 
-Ansible Role for [DRAFT] DISA STIG for Red Hat Enterprise Linux 8  
+Ansible Role for DISA STIG for Red Hat Enterprise Linux 8  
   
 Profile Description:  
 This profile contains configuration checks that align to the  
-[DRAFT] DISA STIG for Red Hat Enterprise Linux 8.  
+DISA STIG for Red Hat Enterprise Linux 8 V1R2.  
 In addition to being applicable to Red Hat Enterprise Linux 8, DISA recognizes this  
 configuration baseline as applicable to the operating system tier of  
 Red Hat technologies that are based on Red Hat Enterprise Linux 8, such as:  
@@ -18,7 +18,7 @@ Red Hat technologies that are based on Red Hat Enterprise Linux 8, such as:
 The tasks that are used in this role are generated using OpenSCAP.
 See the OpenSCAP project for more details on Ansible playbook generation at [https://github.com/OpenSCAP/openscap](https://github.com/OpenSCAP/openscap)
 
-To submit a fix or enhancement for an Ansible task that is failing or missing,
+To submit a fix or enhancement for an Ansible task that is failing or missing in this role,
 see the ComplianceAsCode project at [https://github.com/ComplianceAsCode/content](https://github.com/ComplianceAsCode/content)
 
 Requirements
