@@ -617,6 +617,7 @@
   - low_disruption | bool
   - medium_severity | bool
   - no_reboot_needed | bool
+  - package_rng-tools_installed | bool
 
 - name: Ensure abrt-addon-ccpp is removed
   package:

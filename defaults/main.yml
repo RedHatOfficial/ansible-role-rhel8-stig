@@ -197,6 +197,7 @@ package_tmux_installed: true
 package_tuned_removed: true
 package_usbguard_installed: true
 package_vsftpd_removed: true
+package_rng-tools_installed: true
 patch_strategy: true
 postfix_client_configure_mail_alias: true
 reboot_required: true
