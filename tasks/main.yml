@@ -217,6 +217,7 @@
     create: true
   tags:
   - CCE-80935-0
+  - DISA-STIG-RHEL-08-010020
   - NIST-800-53-AC-17(2)
   - NIST-800-53-AC-17(a)
   - NIST-800-53-CM-6(a)
@@ -242,6 +243,7 @@
   command: /usr/bin/update-crypto-policies --set {{ var_system_crypto_policy }}
   tags:
   - CCE-80935-0
+  - DISA-STIG-RHEL-08-010020
   - NIST-800-53-AC-17(2)
   - NIST-800-53-AC-17(a)
   - NIST-800-53-CM-6(a)
@@ -377,6 +379,7 @@
     state: link
   tags:
   - CCE-80936-8
+  - DISA-STIG-RHEL-08-010020
   - NIST-800-53-SC-12(2)
   - NIST-800-53-SC-12(3)
   - NIST-800-53-SC-13
@@ -401,6 +404,7 @@
     create: true
   tags:
   - CCE-80937-6
+  - DISA-STIG-RHEL-08-010020
   - NIST-800-53-CM-6(a)
   - NIST-800-53-MA-4(6)
   - NIST-800-53-SC-12(2)
@@ -522,6 +526,7 @@
     regexp: ^\s*CRYPTO_POLICY.*$
   tags:
   - CCE-80939-2
+  - DISA-STIG-RHEL-08-010020
   - NIST-800-53-AC-17(2)
   - NIST-800-53-AC-17(a)
   - NIST-800-53-CM-6(a)
@@ -568,6 +573,7 @@
       state: present
   tags:
   - CCE-85902-5
+  - DISA-STIG-RHEL-08-010020
   - NIST-800-53-AC-17(2)
   - harden_sshd_ciphers_openssh_conf_crypto_policy
   - low_complexity
@@ -715,6 +721,7 @@
       state: present
   tags:
   - CCE-85870-4
+  - DISA-STIG-RHEL-08-010020
   - NIST-800-53-AC-17(2)
   - harden_sshd_macs_openssh_conf_crypto_policy
   - low_complexity
@@ -2329,7 +2336,7 @@
 - name: Modify the System Login Banner - ensure correct banner
   copy:
     dest: /etc/issue
-    content: '{{ login_banner_text | regex_replace("^\^(.*)\$$", "\1") | regex_replace("^\((.*)\|.*\)$", "\1") | regex_replace("\[\\s\\n\]\+","
+    content: '{{ login_banner_text | regex_replace("^\^(.*)\$$", "\1") | regex_replace("^\((.*\.)\|.*\)$", "\1") | regex_replace("\[\\s\\n\]\+","
       ") | regex_replace("\(\?:\[\\n\]\+\|\(\?:\\\\n\)\+\)", "\n") | regex_replace("\\", "") | wordwrap() }}'
   when:
   - banner_etc_issue | bool
@@ -2548,7 +2555,7 @@
     dest: /etc/dconf/db/gdm.d/00-security-settings
     section: org/gnome/login-screen
     option: banner-message-text
-    value: '''{{ login_banner_text | regex_replace("^\^(.*)\$$", "\1") | regex_replace("^\((.*)\|.*\)$", "\1") | regex_replace("\[\\s\\n\]\+","
+    value: '''{{ login_banner_text | regex_replace("^\^(.*)\$$", "\1") | regex_replace("^\((.*\.)\|.*\)$", "\1") | regex_replace("\[\\s\\n\]\+","
       ") | regex_replace("\(\?:\[\\n\]\+\|\(\?:\\\\n\)\+\)", "(n)*") | regex_replace("\\", "") | regex_replace("\(n\)\*",
       "\\n") }}'''
     create: true
@@ -4551,6 +4558,7 @@
   - CCE-80876-6
   - DISA-STIG-RHEL-08-040180
   - NIST-800-171-3.4.5
+  - NIST-800-53-CM-6
   - disable_strategy
   - low_complexity
   - low_disruption
@@ -4577,6 +4585,7 @@
   - CCE-80876-6
   - DISA-STIG-RHEL-08-040180
   - NIST-800-171-3.4.5
+  - NIST-800-53-CM-6
   - disable_strategy
   - low_complexity
   - low_disruption
@@ -4602,6 +4611,7 @@
   - CCE-80876-6
   - DISA-STIG-RHEL-08-040180
   - NIST-800-171-3.4.5
+  - NIST-800-53-CM-6
   - disable_strategy
   - low_complexity
   - low_disruption
@@ -5470,6 +5480,182 @@
   - low_complexity
   - low_disruption
   - low_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Get all local users from /etc/passwd
+  ansible.builtin.getent:
+    database: passwd
+    split: ':'
+  tags:
+  - CCE-83434-1
+  - DISA-STIG-RHEL-08-010740
+  - file_groupownership_home_directories
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - file_groupownership_home_directories | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Create local_users variable from the getent output
+  ansible.builtin.set_fact:
+    local_users: '{{ ansible_facts.getent_passwd|dict2items }}'
+  tags:
+  - CCE-83434-1
+  - DISA-STIG-RHEL-08-010740
+  - file_groupownership_home_directories
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - file_groupownership_home_directories | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Test for existence of home directories to avoid creating them, but only fixing group ownership
+  ansible.builtin.stat:
+    path: '{{ item.value[4] }}'
+  register: path_exists
+  loop: '{{ local_users }}'
+  when:
+  - file_groupownership_home_directories | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - item.value[2]|int >= 1000
+  - item.value[2]|int != 65534
+  tags:
+  - CCE-83434-1
+  - DISA-STIG-RHEL-08-010740
+  - file_groupownership_home_directories
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Ensure interactive local users are the group-owners of their respective home directories
+  ansible.builtin.file:
+    path: '{{ item.0.value[4] }}'
+    group: '{{ item.0.value[2] }}'
+  loop: '{{ local_users|zip(path_exists.results)|list }}'
+  when:
+  - file_groupownership_home_directories | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - item.1.stat is defined and item.1.stat.exists
+  tags:
+  - CCE-83434-1
+  - DISA-STIG-RHEL-08-010740
+  - file_groupownership_home_directories
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Get all local users from /etc/passwd
+  ansible.builtin.getent:
+    database: passwd
+    split: ':'
+  tags:
+  - CCE-84038-9
+  - DISA-STIG-RHEL-08-010730
+  - file_permissions_home_directories
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - file_permissions_home_directories | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Create local_users variable from the getent output
+  ansible.builtin.set_fact:
+    local_users: '{{ ansible_facts.getent_passwd|dict2items }}'
+  tags:
+  - CCE-84038-9
+  - DISA-STIG-RHEL-08-010730
+  - file_permissions_home_directories
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - file_permissions_home_directories | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Test for existence home directories to avoid creating them, but only fixing group ownership
+  ansible.builtin.stat:
+    path: '{{ item.value[4] }}'
+  register: path_exists
+  loop: '{{ local_users }}'
+  when:
+  - file_permissions_home_directories | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - item.value[2]|int >= 1000
+  - item.value[2]|int != 65534
+  tags:
+  - CCE-84038-9
+  - DISA-STIG-RHEL-08-010730
+  - file_permissions_home_directories
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Ensure interactive local users are the group-owners of their respective home directories
+  ansible.builtin.file:
+    path: '{{ item.0.value[4] }}'
+    mode: '0700'
+  loop: '{{ local_users|zip(path_exists.results)|list }}'
+  when:
+  - file_permissions_home_directories | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - item.1.stat is defined and item.1.stat.exists
+  tags:
+  - CCE-84038-9
+  - DISA-STIG-RHEL-08-010730
+  - file_permissions_home_directories
+  - low_complexity
+  - low_disruption
+  - medium_severity
   - no_reboot_needed
   - restrict_strategy
 
@@ -22658,6 +22844,7 @@
   tags:
   - CCE-82233-8
   - DISA-STIG-RHEL-08-030061
+  - NIST-800-53-CM-6
   - auditd_local_events
   - low_complexity
   - low_disruption
@@ -22708,6 +22895,7 @@
   tags:
   - CCE-82233-8
   - DISA-STIG-RHEL-08-030061
+  - NIST-800-53-CM-6
   - auditd_local_events
   - low_complexity
   - low_disruption
@@ -22721,6 +22909,8 @@
   tags:
   - CCE-82201-5
   - DISA-STIG-RHEL-08-030063
+  - NIST-800-53-AU-3
+  - NIST-800-53-CM-6
   - auditd_log_format
   - low_complexity
   - low_disruption
@@ -22771,6 +22961,8 @@
   tags:
   - CCE-82201-5
   - DISA-STIG-RHEL-08-030063
+  - NIST-800-53-AU-3
+  - NIST-800-53-CM-6
   - auditd_log_format
   - low_complexity
   - low_disruption
@@ -22784,6 +22976,8 @@
   tags:
   - CCE-82897-0
   - DISA-STIG-RHEL-08-030062
+  - NIST-800-53-AU-3
+  - NIST-800-53-CM-6
   - auditd_name_format
   - low_complexity
   - low_disruption
@@ -22834,6 +23028,8 @@
   tags:
   - CCE-82897-0
   - DISA-STIG-RHEL-08-030062
+  - NIST-800-53-AU-3
+  - NIST-800-53-CM-6
   - auditd_name_format
   - low_complexity
   - low_disruption
@@ -22883,7 +23079,7 @@
   - name: Insert correct line to /etc/audit/auditd.conf
     lineinfile:
       path: /etc/audit/auditd.conf
-      create: false
+      create: true
       regexp: (?i)^\s*overflow_action\s*=\s*
       line: overflow_action = syslog
       state: present
@@ -23184,7 +23380,7 @@
     lineinfile:
       path: /etc/rsyslog.conf
       create: false
-      regexp: ^\s*$ActionSendStreamDriverAuthMode\s
+      regexp: ^\s*{{ "$ActionSendStreamDriverAuthMode"| regex_escape }}\s
       state: absent
     check_mode: true
     changed_when: false
@@ -23193,7 +23389,7 @@
     lineinfile:
       path: /etc/rsyslog.conf
       create: false
-      regexp: ^\s*$ActionSendStreamDriverAuthMode\s
+      regexp: ^\s*{{ "$ActionSendStreamDriverAuthMode"| regex_escape }}\s
       state: absent
     when: dupes.found is defined and dupes.found > 1
   - name: Check if /etc/rsyslog.d exists
@@ -23205,14 +23401,14 @@
       paths: /etc/rsyslog.d
       recurse: 'yes'
       follow: 'no'
-      contains: ^\s*$ActionSendStreamDriverAuthMode\s
+      contains: ^\s*{{ "$ActionSendStreamDriverAuthMode"| regex_escape }}\s
     register: _etc_rsyslog_d_has_parameter
     when: _etc_rsyslog_d_exists.stat.isdir is defined and _etc_rsyslog_d_exists.stat.isdir
   - name: Remove parameter from files in /etc/rsyslog.d
     lineinfile:
       path: '{{ item.path }}'
       create: false
-      regexp: ^\s*$ActionSendStreamDriverAuthMode\s
+      regexp: ^\s*{{ "$ActionSendStreamDriverAuthMode"| regex_escape }}\s
       state: absent
     with_items: '{{ _etc_rsyslog_d_has_parameter.files }}'
     when: _etc_rsyslog_d_has_parameter.matched
@@ -23220,7 +23416,7 @@
     lineinfile:
       path: /etc/rsyslog.conf
       create: true
-      regexp: ^\s*$ActionSendStreamDriverAuthMode\s
+      regexp: ^\s*{{ "$ActionSendStreamDriverAuthMode"| regex_escape }}\s
       line: $ActionSendStreamDriverAuthMode x509/name
       state: present
   when:
@@ -23246,25 +23442,45 @@
   block:
   - name: Check for duplicate values
     lineinfile:
-      path: /etc/rsyslog.d/encrypt.conf
+      path: /etc/rsyslog.conf
       create: false
-      regexp: '^\s*$ActionSendStreamDriverMode '
+      regexp: '^\s*{{ "$ActionSendStreamDriverMode"| regex_escape }} '
       state: absent
     check_mode: true
     changed_when: false
     register: dupes
-  - name: Deduplicate values from /etc/rsyslog.d/encrypt.conf
+  - name: Deduplicate values from /etc/rsyslog.conf
     lineinfile:
-      path: /etc/rsyslog.d/encrypt.conf
+      path: /etc/rsyslog.conf
       create: false
-      regexp: '^\s*$ActionSendStreamDriverMode '
+      regexp: '^\s*{{ "$ActionSendStreamDriverMode"| regex_escape }} '
       state: absent
     when: dupes.found is defined and dupes.found > 1
-  - name: Insert correct line to /etc/rsyslog.d/encrypt.conf
+  - name: Check if /etc/rsyslog.d exists
+    stat:
+      path: /etc/rsyslog.d
+    register: _etc_rsyslog_d_exists
+  - name: Check if the parameter $ActionSendStreamDriverMode is present in /etc/rsyslog.d
+    find:
+      paths: /etc/rsyslog.d
+      recurse: 'yes'
+      follow: 'no'
+      contains: '^\s*{{ "$ActionSendStreamDriverMode"| regex_escape }} '
+    register: _etc_rsyslog_d_has_parameter
+    when: _etc_rsyslog_d_exists.stat.isdir is defined and _etc_rsyslog_d_exists.stat.isdir
+  - name: Remove parameter from files in /etc/rsyslog.d
     lineinfile:
-      path: /etc/rsyslog.d/encrypt.conf
+      path: '{{ item.path }}'
+      create: false
+      regexp: '^\s*{{ "$ActionSendStreamDriverMode"| regex_escape }} '
+      state: absent
+    with_items: '{{ _etc_rsyslog_d_has_parameter.files }}'
+    when: _etc_rsyslog_d_has_parameter.matched
+  - name: Insert correct line to /etc/rsyslog.conf
+    lineinfile:
+      path: /etc/rsyslog.conf
       create: true
-      regexp: '^\s*$ActionSendStreamDriverMode '
+      regexp: '^\s*{{ "$ActionSendStreamDriverMode"| regex_escape }} '
       line: $ActionSendStreamDriverMode 1
       state: present
   when:
@@ -23290,25 +23506,45 @@
   block:
   - name: Check for duplicate values
     lineinfile:
-      path: /etc/rsyslog.d/encrypt.conf
+      path: /etc/rsyslog.conf
       create: false
-      regexp: '^\s*$DefaultNetstreamDriver '
+      regexp: '^\s*{{ "$DefaultNetstreamDriver"| regex_escape }} '
       state: absent
     check_mode: true
     changed_when: false
     register: dupes
-  - name: Deduplicate values from /etc/rsyslog.d/encrypt.conf
+  - name: Deduplicate values from /etc/rsyslog.conf
     lineinfile:
-      path: /etc/rsyslog.d/encrypt.conf
+      path: /etc/rsyslog.conf
       create: false
-      regexp: '^\s*$DefaultNetstreamDriver '
+      regexp: '^\s*{{ "$DefaultNetstreamDriver"| regex_escape }} '
       state: absent
     when: dupes.found is defined and dupes.found > 1
-  - name: Insert correct line to /etc/rsyslog.d/encrypt.conf
+  - name: Check if /etc/rsyslog.d exists
+    stat:
+      path: /etc/rsyslog.d
+    register: _etc_rsyslog_d_exists
+  - name: Check if the parameter $DefaultNetstreamDriver is present in /etc/rsyslog.d
+    find:
+      paths: /etc/rsyslog.d
+      recurse: 'yes'
+      follow: 'no'
+      contains: '^\s*{{ "$DefaultNetstreamDriver"| regex_escape }} '
+    register: _etc_rsyslog_d_has_parameter
+    when: _etc_rsyslog_d_exists.stat.isdir is defined and _etc_rsyslog_d_exists.stat.isdir
+  - name: Remove parameter from files in /etc/rsyslog.d
     lineinfile:
-      path: /etc/rsyslog.d/encrypt.conf
+      path: '{{ item.path }}'
+      create: false
+      regexp: '^\s*{{ "$DefaultNetstreamDriver"| regex_escape }} '
+      state: absent
+    with_items: '{{ _etc_rsyslog_d_has_parameter.files }}'
+    when: _etc_rsyslog_d_has_parameter.matched
+  - name: Insert correct line to /etc/rsyslog.conf
+    lineinfile:
+      path: /etc/rsyslog.conf
       create: true
-      regexp: '^\s*$DefaultNetstreamDriver '
+      regexp: '^\s*{{ "$DefaultNetstreamDriver"| regex_escape }} '
       line: $DefaultNetstreamDriver gtls
       state: present
   when:
@@ -24035,6 +24271,7 @@
   tags:
   - CCE-82028-2
   - DISA-STIG-RHEL-08-040021
+  - NIST-800-53-AC-18
   - disable_strategy
   - kernel_module_atm_disabled
   - low_complexity
@@ -24059,6 +24296,7 @@
   tags:
   - CCE-82059-7
   - DISA-STIG-RHEL-08-040022
+  - NIST-800-53-AC-18
   - disable_strategy
   - kernel_module_can_disabled
   - low_complexity
@@ -24082,6 +24320,7 @@
   tags:
   - CCE-82005-0
   - DISA-STIG-RHEL-08-040026
+  - NIST-800-53-AC-18
   - disable_strategy
   - kernel_module_firewire-core_disabled
   - low_complexity
@@ -24177,6 +24416,33 @@
   - medium_severity
   - reboot_required
 
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+  tags:
+  - CCE-83501-7
+  - DISA-STIG-RHEL-08-040110
+  - NIST-800-171-3.1.16
+  - NIST-800-53-AC-18(3)
+  - NIST-800-53-AC-18(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-MP-7
+  - low_complexity
+  - medium_disruption
+  - medium_severity
+  - no_reboot_needed
+  - unknown_strategy
+  - wireless_disable_interfaces
+  when:
+  - low_complexity | bool
+  - medium_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - unknown_strategy | bool
+  - wireless_disable_interfaces | bool
+
 - name: Deactivate Wireless Network Interfaces
   command: nmcli radio wifi off
   when:
@@ -24186,7 +24452,7 @@
   - no_reboot_needed | bool
   - unknown_strategy | bool
   - wireless_disable_interfaces | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - '"wifi-iface" in ansible_facts.packages'
   tags:
   - CCE-83501-7
   - DISA-STIG-RHEL-08-040110
@@ -24808,61 +25074,105 @@
   - medium_severity
   - no_reboot_needed
 
-- name: Read list libraries without root ownership
-  find:
-    paths:
-    - /usr/lib
-    - /usr/lib64
-    - /lib
-    - /lib64
-    file_type: directory
-  register: library_dirs_not_group_owned_by_root
-  tags:
-  - CCE-85894-4
-  - DISA-STIG-RHEL-08-010350
-  - NIST-800-53-CM-5(6)
-  - NIST-800-53-CM-5(6).1
-  - dir_group_ownership_library_dirs
-  - medium_complexity
-  - medium_disruption
-  - medium_severity
-  - no_reboot_needed
-  - restrict_strategy
-  when:
-  - dir_group_ownership_library_dirs | bool
-  - medium_complexity | bool
-  - medium_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-
-- name: Set group ownership of system library dirs to root
+- name: Ensure group owner on /lib/ recursively
   file:
-    path: '{{ item.path }}'
-    group: root
+    path: /lib/
     state: directory
-    mode: '{{ item.mode }}'
-  with_items: '{{ library_dirs_not_group_owned_by_root.files }}'
-  when:
-  - dir_group_ownership_library_dirs | bool
-  - medium_complexity | bool
-  - medium_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - library_dirs_not_group_owned_by_root.matched > 0
-  - item.gid != 0
+    recurse: true
+    group: '0'
   tags:
   - CCE-85894-4
   - DISA-STIG-RHEL-08-010350
   - NIST-800-53-CM-5(6)
   - NIST-800-53-CM-5(6).1
+  - configure_strategy
   - dir_group_ownership_library_dirs
-  - medium_complexity
-  - medium_disruption
+  - low_complexity
+  - low_disruption
   - medium_severity
   - no_reboot_needed
-  - restrict_strategy
+  when:
+  - configure_strategy | bool
+  - dir_group_ownership_library_dirs | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+
+- name: Ensure group owner on /lib64/ recursively
+  file:
+    path: /lib64/
+    state: directory
+    recurse: true
+    group: '0'
+  tags:
+  - CCE-85894-4
+  - DISA-STIG-RHEL-08-010350
+  - NIST-800-53-CM-5(6)
+  - NIST-800-53-CM-5(6).1
+  - configure_strategy
+  - dir_group_ownership_library_dirs
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  when:
+  - configure_strategy | bool
+  - dir_group_ownership_library_dirs | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+
+- name: Ensure group owner on /usr/lib/ recursively
+  file:
+    path: /usr/lib/
+    state: directory
+    recurse: true
+    group: '0'
+  tags:
+  - CCE-85894-4
+  - DISA-STIG-RHEL-08-010350
+  - NIST-800-53-CM-5(6)
+  - NIST-800-53-CM-5(6).1
+  - configure_strategy
+  - dir_group_ownership_library_dirs
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  when:
+  - configure_strategy | bool
+  - dir_group_ownership_library_dirs | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+
+- name: Ensure group owner on /usr/lib64/ recursively
+  file:
+    path: /usr/lib64/
+    state: directory
+    recurse: true
+    group: '0'
+  tags:
+  - CCE-85894-4
+  - DISA-STIG-RHEL-08-010350
+  - NIST-800-53-CM-5(6)
+  - NIST-800-53-CM-5(6).1
+  - configure_strategy
+  - dir_group_ownership_library_dirs
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  when:
+  - configure_strategy | bool
+  - dir_group_ownership_library_dirs | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
 
 - name: Retrieve the system command files and set their group ownership to root
   command: find -L {{ item }}  ! -group root -type f -exec chgrp root '{}' \;
@@ -28207,6 +28517,7 @@
   tags:
   - CCE-82215-5
   - DISA-STIG-RHEL-08-010671
+  - NIST-800-53-SC-7(10)
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -28258,6 +28569,7 @@
   tags:
   - CCE-80952-5
   - DISA-STIG-RHEL-08-010372
+  - NIST-800-53-CM-6
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -28282,6 +28594,7 @@
   tags:
   - CCE-81054-9
   - DISA-STIG-RHEL-08-010376
+  - NIST-800-53-AC-6
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -28306,6 +28619,8 @@
   tags:
   - CCE-82974-7
   - DISA-STIG-RHEL-08-040281
+  - NIST-800-53-AC-6
+  - NIST-800-53-SC-7(10)
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -28330,6 +28645,7 @@
   tags:
   - CCE-80953-3
   - DISA-STIG-RHEL-08-040282
+  - NIST-800-53-SC-7(10)
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -28354,7 +28670,8 @@
   tags:
   - CCE-82934-1
   - DISA-STIG-RHEL-08-040286
-  - NIST-800-53-CM-6b
+  - NIST-800-53-CM-6
+  - NIST-800-53-SC-7(10)
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -28409,6 +28726,7 @@
   tags:
   - CCE-82881-4
   - DISA-STIG-RHEL-08-010672
+  - NIST-800-53-SC-7(10)
   - disable_strategy
   - low_complexity
   - low_disruption
@@ -28434,6 +28752,7 @@
   tags:
   - CCE-82881-4
   - DISA-STIG-RHEL-08-010672
+  - NIST-800-53-SC-7(10)
   - disable_strategy
   - low_complexity
   - low_disruption
@@ -28458,6 +28777,7 @@
   tags:
   - CCE-82881-4
   - DISA-STIG-RHEL-08-010672
+  - NIST-800-53-SC-7(10)
   - disable_strategy
   - low_complexity
   - low_disruption
@@ -28493,6 +28813,7 @@
   tags:
   - CCE-82251-0
   - DISA-STIG-RHEL-08-010675
+  - NIST-800-53-CM-6
   - coredump_disable_backtraces
   - low_complexity
   - low_disruption
@@ -28535,6 +28856,7 @@
   tags:
   - CCE-82252-8
   - DISA-STIG-RHEL-08-010674
+  - NIST-800-53-CM-6
   - coredump_disable_storage
   - low_complexity
   - low_disruption
@@ -28555,6 +28877,8 @@
   tags:
   - CCE-81038-2
   - DISA-STIG-RHEL-08-010673
+  - NIST-800-53-CM-6
+  - NIST-800-53-SC-7(10)
   - disable_users_coredumps
   - low_complexity
   - low_disruption
@@ -28586,6 +28910,8 @@
   tags:
   - CCE-81038-2
   - DISA-STIG-RHEL-08-010673
+  - NIST-800-53-CM-6
+  - NIST-800-53-SC-7(10)
   - disable_users_coredumps
   - low_complexity
   - low_disruption
@@ -29606,7 +29932,7 @@
 - name: Set permissions for /etc/ssh/ file(s)
   file:
     path: '{{ item.path }}'
-    mode: '0640'
+    mode: '0600'
   with_items:
   - '{{ files_found.files }}'
   when:
@@ -29933,7 +30259,6 @@
   - DISA-STIG-RHEL-08-010550
   - NIST-800-171-3.1.1
   - NIST-800-171-3.1.5
-  - NIST-800-53-
   - NIST-800-53-AC-17(a)
   - NIST-800-53-AC-6(2)
   - NIST-800-53-CM-6(a)
@@ -30815,6 +31140,8 @@
   tags:
   - CCE-82959-8
   - DISA-STIG-RHEL-08-040139
+  - NIST-800-53-CM-8(3)
+  - NIST-800-53-IA-3
   - enable_strategy
   - low_complexity
   - low_disruption
