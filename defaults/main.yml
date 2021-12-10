@@ -198,6 +198,7 @@ ensure_gpgcheck_globally_activated: true
 ensure_gpgcheck_local_packages: true
 file_groupowner_var_log: true
 file_groupowner_var_log_messages: true
+file_groupownership_home_directories: true
 file_groupownership_system_commands_dirs: true
 file_owner_var_log: true
 file_owner_var_log_messages: true
@@ -206,6 +207,7 @@ file_ownership_library_dirs: true
 file_permissions_binary_dirs: true
 file_permissions_etc_audit_auditd: true
 file_permissions_etc_audit_rulesd: true
+file_permissions_home_directories: true
 file_permissions_library_dirs: true
 file_permissions_sshd_private_key: true
 file_permissions_sshd_pub_key: true
