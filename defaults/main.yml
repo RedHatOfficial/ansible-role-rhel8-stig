@@ -52,6 +52,8 @@ sysctl_net_ipv4_conf_default_accept_redirects_value: '0'
 sysctl_net_ipv4_conf_default_accept_source_route_value: '0'
 sysctl_net_ipv4_icmp_echo_ignore_broadcasts_value: '1'
 var_removable_partition: /dev/cdrom
+sysctl_kernel_kptr_restrict_value: '1'
+var_slub_debug_options: P
 var_selinux_policy_name: targeted
 var_selinux_state: enforcing
 var_postfix_root_mail_alias: system.administrator@mail.mil
@@ -60,7 +62,6 @@ var_tftpd_secure_directory: /var/lib/tftpboot
 var_sshd_disable_compression: 'no'
 var_rekey_limit_size: 1G
 var_rekey_limit_time: 1h
-sshd_idle_timeout_value: '600'
 account_disable_post_pw_expiration: true
 accounts_have_homedir_login_defs: true
 accounts_logon_fail_delay: true
@@ -79,6 +80,8 @@ accounts_password_pam_minlen: true
 accounts_password_pam_ocredit: true
 accounts_password_pam_pwhistory_remember_password_auth: true
 accounts_password_pam_pwhistory_remember_system_auth: true
+accounts_password_pam_pwquality_password_auth: true
+accounts_password_pam_pwquality_system_auth: true
 accounts_password_pam_retry: true
 accounts_password_pam_ucredit: true
 accounts_password_pam_unix_rounds_password_auth: true
@@ -193,6 +196,8 @@ dconf_gnome_login_banner_text: true
 dconf_gnome_screensaver_idle_delay: true
 dconf_gnome_screensaver_lock_enabled: true
 dir_group_ownership_library_dirs: true
+dir_ownership_library_dirs: true
+dir_permissions_library_dirs: true
 dir_perms_world_writable_root_owned: true
 dir_perms_world_writable_sticky_bits: true
 disable_ctrlaltdel_burstaction: true
@@ -327,8 +332,6 @@ sshd_enable_strictmodes: true
 sshd_enable_warning_banner: true
 sshd_print_last_log: true
 sshd_rekey_limit: true
-sshd_set_idle_timeout: true
-sshd_set_keepalive_0: true
 sshd_use_strong_rng: true
 sshd_x11_use_localhost: true
 sssd_certificate_verification: true
@@ -337,6 +340,7 @@ sssd_offline_cred_expiration: true
 sudo_remove_no_authenticate: true
 sudo_remove_nopasswd: true
 sudo_require_reauthentication: true
+sudoers_default_includedir: true
 sudoers_validate_passwd: true
 sysctl_fs_protected_hardlinks: true
 sysctl_fs_protected_symlinks: true
@@ -370,3 +374,4 @@ unknown_strategy: true
 usbguard_generate_policy: true
 wireless_disable_interfaces: true
 xwindows_remove_packages: true
+xwindows_runlevel_target: true
