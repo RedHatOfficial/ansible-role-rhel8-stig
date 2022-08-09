@@ -1,4 +1,3 @@
-DISA STIG for Red Hat Enterprise Linux 8
 =========
 
 Ansible Role for DISA STIG for Red Hat Enterprise Linux 8  
