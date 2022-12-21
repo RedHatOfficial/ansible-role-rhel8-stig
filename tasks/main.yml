@@ -1634,6 +1634,7 @@
   - NIST-800-53-SC-12(2)
   - NIST-800-53-SC-12(3)
   - NIST-800-53-SC-13
+  - PCI-DSS-Req-2.2
   - configure_libreswan_crypto_policy
   - high_severity
   - low_complexity
@@ -1665,6 +1666,7 @@
   - NIST-800-53-SC-12(2)
   - NIST-800-53-SC-12(3)
   - NIST-800-53-SC-13
+  - PCI-DSS-Req-2.2
   - configure_openssl_crypto_policy
   - low_complexity
   - medium_disruption
@@ -1706,6 +1708,7 @@
   - NIST-800-53-SC-12(2)
   - NIST-800-53-SC-12(3)
   - NIST-800-53-SC-13
+  - PCI-DSS-Req-2.2
   - configure_openssl_crypto_policy
   - low_complexity
   - medium_disruption
@@ -1740,6 +1743,7 @@
   - NIST-800-53-SC-12(2)
   - NIST-800-53-SC-12(3)
   - NIST-800-53-SC-13
+  - PCI-DSS-Req-2.2
   - configure_openssl_crypto_policy
   - low_complexity
   - medium_disruption
@@ -1760,6 +1764,7 @@
   - NIST-800-53-CM-6(a)
   - NIST-800-53-MA-4(6)
   - NIST-800-53-SC-13
+  - PCI-DSS-Req-2.2
   - configure_ssh_crypto_policy
   - disable_strategy
   - low_complexity
@@ -2965,6 +2970,7 @@
   - DISA-STIG-RHEL-08-020081
   - NIST-800-171-3.1.10
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.1.8
   - dconf_gnome_session_idle_user_locks
   - low_complexity
   - medium_disruption
@@ -3001,6 +3007,7 @@
   - DISA-STIG-RHEL-08-020081
   - NIST-800-171-3.1.10
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.1.8
   - dconf_gnome_session_idle_user_locks
   - low_complexity
   - medium_disruption
@@ -3025,6 +3032,7 @@
   - DISA-STIG-RHEL-08-020081
   - NIST-800-171-3.1.10
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.1.8
   - dconf_gnome_session_idle_user_locks
   - low_complexity
   - medium_disruption
@@ -4588,8 +4596,6 @@
 
 - name: Read signatures in GPG key
   command: gpg --show-keys --with-fingerprint --with-colons "/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release"
-  args:
-    warn: false
   changed_when: false
   register: gpg_fingerprints
   check_mode: false
@@ -4761,8 +4767,6 @@
     cmd: rpm -qV pam
   register: result_altered_authselect
   ignore_errors: true
-  args:
-    warn: false
   when:
   - configure_strategy | bool
   - enable_authselect | bool
@@ -5143,8 +5147,8 @@
   - CCE-80788-3
   - CJIS-5.5.2
   - DISA-STIG-RHEL-08-020340
+  - NIST-800-53-AC-9
   - NIST-800-53-AC-9(1)
-  - NIST-800-53-CM-6(a)
   - PCI-DSS-Req-10.2.4
   - configure_strategy
   - display_login_attempts
@@ -5178,8 +5182,8 @@
   - CCE-80788-3
   - CJIS-5.5.2
   - DISA-STIG-RHEL-08-020340
+  - NIST-800-53-AC-9
   - NIST-800-53-AC-9(1)
-  - NIST-800-53-CM-6(a)
   - PCI-DSS-Req-10.2.4
   - configure_strategy
   - display_login_attempts
@@ -5392,8 +5396,8 @@
   - CCE-80788-3
   - CJIS-5.5.2
   - DISA-STIG-RHEL-08-020340
+  - NIST-800-53-AC-9
   - NIST-800-53-AC-9(1)
-  - NIST-800-53-CM-6(a)
   - PCI-DSS-Req-10.2.4
   - configure_strategy
   - display_login_attempts
@@ -5419,8 +5423,8 @@
   - CCE-80788-3
   - CJIS-5.5.2
   - DISA-STIG-RHEL-08-020340
+  - NIST-800-53-AC-9
   - NIST-800-53-AC-9(1)
-  - NIST-800-53-CM-6(a)
   - PCI-DSS-Req-10.2.4
   - configure_strategy
   - display_login_attempts
@@ -5571,8 +5575,8 @@
   - CCE-80788-3
   - CJIS-5.5.2
   - DISA-STIG-RHEL-08-020340
+  - NIST-800-53-AC-9
   - NIST-800-53-AC-9(1)
-  - NIST-800-53-CM-6(a)
   - PCI-DSS-Req-10.2.4
   - configure_strategy
   - display_login_attempts
@@ -5580,525 +5584,6 @@
   - low_disruption
   - low_severity
   - no_reboot_needed
-
-- name: Account Lockouts Must Be Logged - Check if system relies on authselect tool
-  ansible.builtin.stat:
-    path: /usr/bin/authselect
-  register: result_authselect_present
-  tags:
-  - CCE-86107-0
-  - DISA-STIG-RHEL-08-020021
-  - NIST-800-53-AC-7 (a)
-  - account_passwords_pam_faillock_audit
-  - low_complexity
-  - low_disruption
-  - medium_severity
-  - no_reboot_needed
-  - restrict_strategy
-  when:
-  - DISA_STIG_RHEL_08_020021 | bool
-  - account_passwords_pam_faillock_audit | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-
-- name: Account Lockouts Must Be Logged - Remediation where authselect tool is present
-  block:
-  - name: Account Lockouts Must Be Logged - Check integrity of authselect current profile
-    ansible.builtin.command:
-      cmd: authselect check
-    register: result_authselect_check_cmd
-    changed_when: false
-    ignore_errors: true
-  - name: Account Lockouts Must Be Logged - Informative message based on the authselect integrity check result
-    ansible.builtin.assert:
-      that:
-      - result_authselect_check_cmd is success
-      fail_msg:
-      - authselect integrity check failed. Remediation aborted!
-      - This remediation could not be applied because an authselect profile was not selected or the selected profile is not
-        intact.
-      - It is not recommended to manually edit the PAM files when authselect tool is available.
-      - In cases where the default authselect profile does not cover a specific demand, a custom authselect profile is recommended.
-      success_msg:
-      - authselect integrity check passed
-  - name: Account Lockouts Must Be Logged - Get authselect current features
-    ansible.builtin.shell:
-      cmd: authselect current | tail -n+3 | awk '{ print $2 }'
-    register: result_authselect_features
-    changed_when: false
-    when:
-    - result_authselect_check_cmd is success
-  - name: Account Lockouts Must Be Logged - Ensure "with-faillock" feature is enabled using authselect tool
-    ansible.builtin.command:
-      cmd: authselect enable-feature with-faillock
-    register: result_authselect_enable_feature_cmd
-    when:
-    - result_authselect_check_cmd is success
-    - result_authselect_features.stdout is not search("with-faillock")
-  - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
-    ansible.builtin.command:
-      cmd: authselect apply-changes -b
-    when:
-    - result_authselect_enable_feature_cmd is not skipped
-    - result_authselect_enable_feature_cmd is success
-  when:
-  - DISA_STIG_RHEL_08_020021 | bool
-  - account_passwords_pam_faillock_audit | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - result_authselect_present.stat.exists
-  tags:
-  - CCE-86107-0
-  - DISA-STIG-RHEL-08-020021
-  - NIST-800-53-AC-7 (a)
-  - account_passwords_pam_faillock_audit
-  - low_complexity
-  - low_disruption
-  - medium_severity
-  - no_reboot_needed
-  - restrict_strategy
-
-- name: Account Lockouts Must Be Logged - Remediation where authselect tool is not present
-  block:
-  - name: Account Lockouts Must Be Logged - Check if pam_faillock.so is already enabled
-    ansible.builtin.lineinfile:
-      path: /etc/pam.d/system-auth
-      regexp: .*auth.*pam_faillock\.so (preauth|authfail)
-      state: absent
-    check_mode: true
-    changed_when: false
-    register: result_pam_faillock_is_enabled
-  - name: Account Lockouts Must Be Logged - Enable pam_faillock.so preauth editing PAM files
-    ansible.builtin.lineinfile:
-      path: '{{ item }}'
-      line: auth        required      pam_faillock.so preauth
-      insertbefore: ^auth.*sufficient.*pam_unix\.so.*
-      state: present
-    loop:
-    - /etc/pam.d/system-auth
-    - /etc/pam.d/password-auth
-    when:
-    - result_pam_faillock_is_enabled.found == 0
-  - name: Account Lockouts Must Be Logged - Enable pam_faillock.so authfail editing PAM files
-    ansible.builtin.lineinfile:
-      path: '{{ item }}'
-      line: auth        required      pam_faillock.so authfail
-      insertbefore: ^auth.*required.*pam_deny\.so.*
-      state: present
-    loop:
-    - /etc/pam.d/system-auth
-    - /etc/pam.d/password-auth
-    when:
-    - result_pam_faillock_is_enabled.found == 0
-  - name: Account Lockouts Must Be Logged - Enable pam_faillock.so account section editing PAM files
-    ansible.builtin.lineinfile:
-      path: '{{ item }}'
-      line: account     required      pam_faillock.so
-      insertbefore: ^account.*required.*pam_unix\.so.*
-      state: present
-    loop:
-    - /etc/pam.d/system-auth
-    - /etc/pam.d/password-auth
-    when:
-    - result_pam_faillock_is_enabled.found == 0
-  when:
-  - DISA_STIG_RHEL_08_020021 | bool
-  - account_passwords_pam_faillock_audit | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - not result_authselect_present.stat.exists
-  tags:
-  - CCE-86107-0
-  - DISA-STIG-RHEL-08-020021
-  - NIST-800-53-AC-7 (a)
-  - account_passwords_pam_faillock_audit
-  - low_complexity
-  - low_disruption
-  - medium_severity
-  - no_reboot_needed
-  - restrict_strategy
-
-- name: Account Lockouts Must Be Logged - Check the presence of /etc/security/faillock.conf file
-  ansible.builtin.stat:
-    path: /etc/security/faillock.conf
-  register: result_faillock_conf_check
-  tags:
-  - CCE-86107-0
-  - DISA-STIG-RHEL-08-020021
-  - NIST-800-53-AC-7 (a)
-  - account_passwords_pam_faillock_audit
-  - low_complexity
-  - low_disruption
-  - medium_severity
-  - no_reboot_needed
-  - restrict_strategy
-  when:
-  - DISA_STIG_RHEL_08_020021 | bool
-  - account_passwords_pam_faillock_audit | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-
-- name: Account Lockouts Must Be Logged - Ensure the pam_faillock.so audit parameter in /etc/security/faillock.conf
-  ansible.builtin.lineinfile:
-    path: /etc/security/faillock.conf
-    regexp: ^\s*audit
-    line: audit
-    state: present
-  when:
-  - DISA_STIG_RHEL_08_020021 | bool
-  - account_passwords_pam_faillock_audit | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - result_faillock_conf_check.stat.exists
-  tags:
-  - CCE-86107-0
-  - DISA-STIG-RHEL-08-020021
-  - NIST-800-53-AC-7 (a)
-  - account_passwords_pam_faillock_audit
-  - low_complexity
-  - low_disruption
-  - medium_severity
-  - no_reboot_needed
-  - restrict_strategy
-
-- name: Account Lockouts Must Be Logged - Ensure the pam_faillock.so audit parameter not in PAM files
-  block:
-  - name: Account Lockouts Must Be Logged - Check if /etc/pam.d/system-auth file is present
-    ansible.builtin.stat:
-      path: /etc/pam.d/system-auth
-    register: result_pam_file_present
-  - name: Account Lockouts Must Be Logged - Check the proper remediation for the system
-    block:
-    - name: Account Lockouts Must Be Logged - Define the PAM file to be edited as a local fact
-      ansible.builtin.set_fact:
-        pam_file_path: /etc/pam.d/system-auth
-    - name: Account Lockouts Must Be Logged - Check if system relies on authselect
-      ansible.builtin.stat:
-        path: /usr/bin/authselect
-      register: result_authselect_present
-    - name: Account Lockouts Must Be Logged - Remediate using authselect
-      block:
-      - name: Account Lockouts Must Be Logged - Check integrity of authselect current profile
-        ansible.builtin.command:
-          cmd: authselect check
-        register: result_authselect_check_cmd
-        changed_when: false
-        ignore_errors: true
-      - name: Account Lockouts Must Be Logged - Informative message based on the authselect integrity check result
-        ansible.builtin.assert:
-          that:
-          - result_authselect_check_cmd is success
-          fail_msg:
-          - authselect integrity check failed. Remediation aborted!
-          - This remediation could not be applied because an authselect profile was not selected or the selected profile is
-            not intact.
-          - It is not recommended to manually edit the PAM files when authselect tool is available.
-          - In cases where the default authselect profile does not cover a specific demand, a custom authselect profile is
-            recommended.
-          success_msg:
-          - authselect integrity check passed
-      - name: Account Lockouts Must Be Logged - Get authselect current profile
-        ansible.builtin.shell:
-          cmd: authselect current -r | awk '{ print $1 }'
-        register: result_authselect_profile
-        changed_when: false
-        when:
-        - result_authselect_check_cmd is success
-      - name: Account Lockouts Must Be Logged - Define the current authselect profile as a local fact
-        ansible.builtin.set_fact:
-          authselect_current_profile: '{{ result_authselect_profile.stdout }}'
-          authselect_custom_profile: '{{ result_authselect_profile.stdout }}'
-        when:
-        - result_authselect_profile is not skipped
-        - result_authselect_profile.stdout is match("custom/")
-      - name: Account Lockouts Must Be Logged - Define the new authselect custom profile as a local fact
-        ansible.builtin.set_fact:
-          authselect_current_profile: '{{ result_authselect_profile.stdout }}'
-          authselect_custom_profile: custom/hardening
-        when:
-        - result_authselect_profile is not skipped
-        - result_authselect_profile.stdout is not match("custom/")
-      - name: Account Lockouts Must Be Logged - Get authselect current features to also enable them in the custom profile
-        ansible.builtin.shell:
-          cmd: authselect current | tail -n+3 | awk '{ print $2 }'
-        register: result_authselect_features
-        changed_when: false
-        when:
-        - result_authselect_profile is not skipped
-        - authselect_current_profile is not match("custom/")
-      - name: Account Lockouts Must Be Logged - Check if any custom profile with the same name was already created
-        ansible.builtin.stat:
-          path: /etc/authselect/{{ authselect_custom_profile }}
-        register: result_authselect_custom_profile_present
-        changed_when: false
-        when:
-        - authselect_current_profile is not match("custom/")
-      - name: Account Lockouts Must Be Logged - Create an authselect custom profile based on the current profile
-        ansible.builtin.command:
-          cmd: authselect create-profile hardening -b {{ authselect_current_profile }}
-        when:
-        - result_authselect_check_cmd is success
-        - authselect_current_profile is not match("custom/")
-        - not result_authselect_custom_profile_present.stat.exists
-      - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
-        ansible.builtin.command:
-          cmd: authselect apply-changes -b --backup=before-hardening-custom-profile
-        when:
-        - result_authselect_check_cmd is success
-        - result_authselect_profile is not skipped
-        - authselect_current_profile is not match("custom/")
-        - authselect_custom_profile is not match(authselect_current_profile)
-      - name: Account Lockouts Must Be Logged - Ensure the authselect custom profile is selected
-        ansible.builtin.command:
-          cmd: authselect select {{ authselect_custom_profile }}
-        register: result_pam_authselect_select_profile
-        when:
-        - result_authselect_check_cmd is success
-        - result_authselect_profile is not skipped
-        - authselect_current_profile is not match("custom/")
-        - authselect_custom_profile is not match(authselect_current_profile)
-      - name: Account Lockouts Must Be Logged - Restore the authselect features in the custom profile
-        ansible.builtin.command:
-          cmd: authselect enable-feature {{ item }}
-        loop: '{{ result_authselect_features.stdout_lines }}'
-        register: result_pam_authselect_restore_features
-        when:
-        - result_authselect_profile is not skipped
-        - result_authselect_features is not skipped
-        - result_pam_authselect_select_profile is not skipped
-      - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
-        ansible.builtin.command:
-          cmd: authselect apply-changes -b --backup=after-hardening-custom-profile
-        when:
-        - result_authselect_check_cmd is success
-        - result_authselect_profile is not skipped
-        - result_pam_authselect_restore_features is not skipped
-      - name: Account Lockouts Must Be Logged - Change the PAM file to be edited according to the custom authselect profile
-        ansible.builtin.set_fact:
-          pam_file_path: /etc/authselect/{{ authselect_custom_profile }}/{{ pam_file_path | basename }}
-      when:
-      - result_authselect_present.stat.exists
-    - name: Account Lockouts Must Be Logged - Ensure the "audit" option from "pam_faillock.so" is not present in {{ pam_file_path
-        }}
-      ansible.builtin.replace:
-        dest: '{{ pam_file_path }}'
-        regexp: (.*auth.*pam_faillock.so.*)\baudit\b=?[0-9a-zA-Z]*(.*)
-        replace: \1\2
-      register: result_pam_option_removal
-    - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
-      ansible.builtin.command:
-        cmd: authselect apply-changes -b
-      when:
-      - result_authselect_present.stat.exists
-      - result_pam_option_removal is changed
-    when:
-    - result_pam_file_present.stat.exists
-  - name: Account Lockouts Must Be Logged - Check if /etc/pam.d/password-auth file is present
-    ansible.builtin.stat:
-      path: /etc/pam.d/password-auth
-    register: result_pam_file_present
-  - name: Account Lockouts Must Be Logged - Check the proper remediation for the system
-    block:
-    - name: Account Lockouts Must Be Logged - Define the PAM file to be edited as a local fact
-      ansible.builtin.set_fact:
-        pam_file_path: /etc/pam.d/password-auth
-    - name: Account Lockouts Must Be Logged - Check if system relies on authselect
-      ansible.builtin.stat:
-        path: /usr/bin/authselect
-      register: result_authselect_present
-    - name: Account Lockouts Must Be Logged - Remediate using authselect
-      block:
-      - name: Account Lockouts Must Be Logged - Check integrity of authselect current profile
-        ansible.builtin.command:
-          cmd: authselect check
-        register: result_authselect_check_cmd
-        changed_when: false
-        ignore_errors: true
-      - name: Account Lockouts Must Be Logged - Informative message based on the authselect integrity check result
-        ansible.builtin.assert:
-          that:
-          - result_authselect_check_cmd is success
-          fail_msg:
-          - authselect integrity check failed. Remediation aborted!
-          - This remediation could not be applied because an authselect profile was not selected or the selected profile is
-            not intact.
-          - It is not recommended to manually edit the PAM files when authselect tool is available.
-          - In cases where the default authselect profile does not cover a specific demand, a custom authselect profile is
-            recommended.
-          success_msg:
-          - authselect integrity check passed
-      - name: Account Lockouts Must Be Logged - Get authselect current profile
-        ansible.builtin.shell:
-          cmd: authselect current -r | awk '{ print $1 }'
-        register: result_authselect_profile
-        changed_when: false
-        when:
-        - result_authselect_check_cmd is success
-      - name: Account Lockouts Must Be Logged - Define the current authselect profile as a local fact
-        ansible.builtin.set_fact:
-          authselect_current_profile: '{{ result_authselect_profile.stdout }}'
-          authselect_custom_profile: '{{ result_authselect_profile.stdout }}'
-        when:
-        - result_authselect_profile is not skipped
-        - result_authselect_profile.stdout is match("custom/")
-      - name: Account Lockouts Must Be Logged - Define the new authselect custom profile as a local fact
-        ansible.builtin.set_fact:
-          authselect_current_profile: '{{ result_authselect_profile.stdout }}'
-          authselect_custom_profile: custom/hardening
-        when:
-        - result_authselect_profile is not skipped
-        - result_authselect_profile.stdout is not match("custom/")
-      - name: Account Lockouts Must Be Logged - Get authselect current features to also enable them in the custom profile
-        ansible.builtin.shell:
-          cmd: authselect current | tail -n+3 | awk '{ print $2 }'
-        register: result_authselect_features
-        changed_when: false
-        when:
-        - result_authselect_profile is not skipped
-        - authselect_current_profile is not match("custom/")
-      - name: Account Lockouts Must Be Logged - Check if any custom profile with the same name was already created
-        ansible.builtin.stat:
-          path: /etc/authselect/{{ authselect_custom_profile }}
-        register: result_authselect_custom_profile_present
-        changed_when: false
-        when:
-        - authselect_current_profile is not match("custom/")
-      - name: Account Lockouts Must Be Logged - Create an authselect custom profile based on the current profile
-        ansible.builtin.command:
-          cmd: authselect create-profile hardening -b {{ authselect_current_profile }}
-        when:
-        - result_authselect_check_cmd is success
-        - authselect_current_profile is not match("custom/")
-        - not result_authselect_custom_profile_present.stat.exists
-      - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
-        ansible.builtin.command:
-          cmd: authselect apply-changes -b --backup=before-hardening-custom-profile
-        when:
-        - result_authselect_check_cmd is success
-        - result_authselect_profile is not skipped
-        - authselect_current_profile is not match("custom/")
-        - authselect_custom_profile is not match(authselect_current_profile)
-      - name: Account Lockouts Must Be Logged - Ensure the authselect custom profile is selected
-        ansible.builtin.command:
-          cmd: authselect select {{ authselect_custom_profile }}
-        register: result_pam_authselect_select_profile
-        when:
-        - result_authselect_check_cmd is success
-        - result_authselect_profile is not skipped
-        - authselect_current_profile is not match("custom/")
-        - authselect_custom_profile is not match(authselect_current_profile)
-      - name: Account Lockouts Must Be Logged - Restore the authselect features in the custom profile
-        ansible.builtin.command:
-          cmd: authselect enable-feature {{ item }}
-        loop: '{{ result_authselect_features.stdout_lines }}'
-        register: result_pam_authselect_restore_features
-        when:
-        - result_authselect_profile is not skipped
-        - result_authselect_features is not skipped
-        - result_pam_authselect_select_profile is not skipped
-      - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
-        ansible.builtin.command:
-          cmd: authselect apply-changes -b --backup=after-hardening-custom-profile
-        when:
-        - result_authselect_check_cmd is success
-        - result_authselect_profile is not skipped
-        - result_pam_authselect_restore_features is not skipped
-      - name: Account Lockouts Must Be Logged - Change the PAM file to be edited according to the custom authselect profile
-        ansible.builtin.set_fact:
-          pam_file_path: /etc/authselect/{{ authselect_custom_profile }}/{{ pam_file_path | basename }}
-      when:
-      - result_authselect_present.stat.exists
-    - name: Account Lockouts Must Be Logged - Ensure the "audit" option from "pam_faillock.so" is not present in {{ pam_file_path
-        }}
-      ansible.builtin.replace:
-        dest: '{{ pam_file_path }}'
-        regexp: (.*auth.*pam_faillock.so.*)\baudit\b=?[0-9a-zA-Z]*(.*)
-        replace: \1\2
-      register: result_pam_option_removal
-    - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
-      ansible.builtin.command:
-        cmd: authselect apply-changes -b
-      when:
-      - result_authselect_present.stat.exists
-      - result_pam_option_removal is changed
-    when:
-    - result_pam_file_present.stat.exists
-  when:
-  - DISA_STIG_RHEL_08_020021 | bool
-  - account_passwords_pam_faillock_audit | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - result_faillock_conf_check.stat.exists
-  tags:
-  - CCE-86107-0
-  - DISA-STIG-RHEL-08-020021
-  - NIST-800-53-AC-7 (a)
-  - account_passwords_pam_faillock_audit
-  - low_complexity
-  - low_disruption
-  - medium_severity
-  - no_reboot_needed
-  - restrict_strategy
-
-- name: Account Lockouts Must Be Logged - Ensure the pam_faillock.so audit parameter in PAM files
-  block:
-  - name: Account Lockouts Must Be Logged - Check if pam_faillock.so audit parameter is already enabled in pam files
-    ansible.builtin.lineinfile:
-      path: /etc/pam.d/system-auth
-      regexp: .*auth.*pam_faillock\.so (preauth|authfail).*audit
-      state: absent
-    check_mode: true
-    changed_when: false
-    register: result_pam_faillock_audit_parameter_is_present
-  - name: Account Lockouts Must Be Logged - Ensure the inclusion of pam_faillock.so preauth audit parameter in auth section
-    ansible.builtin.lineinfile:
-      path: '{{ item }}'
-      backrefs: true
-      regexp: (^\s*auth\s+)([\w\[].*\b)(\s+pam_faillock.so preauth.*)
-      line: \1required\3 audit
-      state: present
-    loop:
-    - /etc/pam.d/system-auth
-    - /etc/pam.d/password-auth
-    when:
-    - result_pam_faillock_audit_parameter_is_present.found == 0
-  when:
-  - DISA_STIG_RHEL_08_020021 | bool
-  - account_passwords_pam_faillock_audit | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - not result_faillock_conf_check.stat.exists
-  tags:
-  - CCE-86107-0
-  - DISA-STIG-RHEL-08-020021
-  - NIST-800-53-AC-7 (a)
-  - account_passwords_pam_faillock_audit
-  - low_complexity
-  - low_disruption
-  - medium_severity
-  - no_reboot_needed
-  - restrict_strategy
 
 - name: Gather the package facts
   package_facts:
@@ -6641,6 +6126,525 @@
   - medium_disruption
   - medium_severity
   - no_reboot_needed
+
+- name: Account Lockouts Must Be Logged - Check if system relies on authselect tool
+  ansible.builtin.stat:
+    path: /usr/bin/authselect
+  register: result_authselect_present
+  tags:
+  - CCE-86099-9
+  - DISA-STIG-RHEL-08-020021
+  - NIST-800-53-AC-7 (a)
+  - accounts_passwords_pam_faillock_audit
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_020021 | bool
+  - accounts_passwords_pam_faillock_audit | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Account Lockouts Must Be Logged - Remediation where authselect tool is present
+  block:
+  - name: Account Lockouts Must Be Logged - Check integrity of authselect current profile
+    ansible.builtin.command:
+      cmd: authselect check
+    register: result_authselect_check_cmd
+    changed_when: false
+    ignore_errors: true
+  - name: Account Lockouts Must Be Logged - Informative message based on the authselect integrity check result
+    ansible.builtin.assert:
+      that:
+      - result_authselect_check_cmd is success
+      fail_msg:
+      - authselect integrity check failed. Remediation aborted!
+      - This remediation could not be applied because an authselect profile was not selected or the selected profile is not
+        intact.
+      - It is not recommended to manually edit the PAM files when authselect tool is available.
+      - In cases where the default authselect profile does not cover a specific demand, a custom authselect profile is recommended.
+      success_msg:
+      - authselect integrity check passed
+  - name: Account Lockouts Must Be Logged - Get authselect current features
+    ansible.builtin.shell:
+      cmd: authselect current | tail -n+3 | awk '{ print $2 }'
+    register: result_authselect_features
+    changed_when: false
+    when:
+    - result_authselect_check_cmd is success
+  - name: Account Lockouts Must Be Logged - Ensure "with-faillock" feature is enabled using authselect tool
+    ansible.builtin.command:
+      cmd: authselect enable-feature with-faillock
+    register: result_authselect_enable_feature_cmd
+    when:
+    - result_authselect_check_cmd is success
+    - result_authselect_features.stdout is not search("with-faillock")
+  - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
+    ansible.builtin.command:
+      cmd: authselect apply-changes -b
+    when:
+    - result_authselect_enable_feature_cmd is not skipped
+    - result_authselect_enable_feature_cmd is success
+  when:
+  - DISA_STIG_RHEL_08_020021 | bool
+  - accounts_passwords_pam_faillock_audit | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - result_authselect_present.stat.exists
+  tags:
+  - CCE-86099-9
+  - DISA-STIG-RHEL-08-020021
+  - NIST-800-53-AC-7 (a)
+  - accounts_passwords_pam_faillock_audit
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Account Lockouts Must Be Logged - Remediation where authselect tool is not present
+  block:
+  - name: Account Lockouts Must Be Logged - Check if pam_faillock.so is already enabled
+    ansible.builtin.lineinfile:
+      path: /etc/pam.d/system-auth
+      regexp: .*auth.*pam_faillock\.so (preauth|authfail)
+      state: absent
+    check_mode: true
+    changed_when: false
+    register: result_pam_faillock_is_enabled
+  - name: Account Lockouts Must Be Logged - Enable pam_faillock.so preauth editing PAM files
+    ansible.builtin.lineinfile:
+      path: '{{ item }}'
+      line: auth        required      pam_faillock.so preauth
+      insertbefore: ^auth.*sufficient.*pam_unix\.so.*
+      state: present
+    loop:
+    - /etc/pam.d/system-auth
+    - /etc/pam.d/password-auth
+    when:
+    - result_pam_faillock_is_enabled.found == 0
+  - name: Account Lockouts Must Be Logged - Enable pam_faillock.so authfail editing PAM files
+    ansible.builtin.lineinfile:
+      path: '{{ item }}'
+      line: auth        required      pam_faillock.so authfail
+      insertbefore: ^auth.*required.*pam_deny\.so.*
+      state: present
+    loop:
+    - /etc/pam.d/system-auth
+    - /etc/pam.d/password-auth
+    when:
+    - result_pam_faillock_is_enabled.found == 0
+  - name: Account Lockouts Must Be Logged - Enable pam_faillock.so account section editing PAM files
+    ansible.builtin.lineinfile:
+      path: '{{ item }}'
+      line: account     required      pam_faillock.so
+      insertbefore: ^account.*required.*pam_unix\.so.*
+      state: present
+    loop:
+    - /etc/pam.d/system-auth
+    - /etc/pam.d/password-auth
+    when:
+    - result_pam_faillock_is_enabled.found == 0
+  when:
+  - DISA_STIG_RHEL_08_020021 | bool
+  - accounts_passwords_pam_faillock_audit | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - not result_authselect_present.stat.exists
+  tags:
+  - CCE-86099-9
+  - DISA-STIG-RHEL-08-020021
+  - NIST-800-53-AC-7 (a)
+  - accounts_passwords_pam_faillock_audit
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Account Lockouts Must Be Logged - Check the presence of /etc/security/faillock.conf file
+  ansible.builtin.stat:
+    path: /etc/security/faillock.conf
+  register: result_faillock_conf_check
+  tags:
+  - CCE-86099-9
+  - DISA-STIG-RHEL-08-020021
+  - NIST-800-53-AC-7 (a)
+  - accounts_passwords_pam_faillock_audit
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_020021 | bool
+  - accounts_passwords_pam_faillock_audit | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Account Lockouts Must Be Logged - Ensure the pam_faillock.so audit parameter in /etc/security/faillock.conf
+  ansible.builtin.lineinfile:
+    path: /etc/security/faillock.conf
+    regexp: ^\s*audit
+    line: audit
+    state: present
+  when:
+  - DISA_STIG_RHEL_08_020021 | bool
+  - accounts_passwords_pam_faillock_audit | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - result_faillock_conf_check.stat.exists
+  tags:
+  - CCE-86099-9
+  - DISA-STIG-RHEL-08-020021
+  - NIST-800-53-AC-7 (a)
+  - accounts_passwords_pam_faillock_audit
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Account Lockouts Must Be Logged - Ensure the pam_faillock.so audit parameter not in PAM files
+  block:
+  - name: Account Lockouts Must Be Logged - Check if /etc/pam.d/system-auth file is present
+    ansible.builtin.stat:
+      path: /etc/pam.d/system-auth
+    register: result_pam_file_present
+  - name: Account Lockouts Must Be Logged - Check the proper remediation for the system
+    block:
+    - name: Account Lockouts Must Be Logged - Define the PAM file to be edited as a local fact
+      ansible.builtin.set_fact:
+        pam_file_path: /etc/pam.d/system-auth
+    - name: Account Lockouts Must Be Logged - Check if system relies on authselect
+      ansible.builtin.stat:
+        path: /usr/bin/authselect
+      register: result_authselect_present
+    - name: Account Lockouts Must Be Logged - Remediate using authselect
+      block:
+      - name: Account Lockouts Must Be Logged - Check integrity of authselect current profile
+        ansible.builtin.command:
+          cmd: authselect check
+        register: result_authselect_check_cmd
+        changed_when: false
+        ignore_errors: true
+      - name: Account Lockouts Must Be Logged - Informative message based on the authselect integrity check result
+        ansible.builtin.assert:
+          that:
+          - result_authselect_check_cmd is success
+          fail_msg:
+          - authselect integrity check failed. Remediation aborted!
+          - This remediation could not be applied because an authselect profile was not selected or the selected profile is
+            not intact.
+          - It is not recommended to manually edit the PAM files when authselect tool is available.
+          - In cases where the default authselect profile does not cover a specific demand, a custom authselect profile is
+            recommended.
+          success_msg:
+          - authselect integrity check passed
+      - name: Account Lockouts Must Be Logged - Get authselect current profile
+        ansible.builtin.shell:
+          cmd: authselect current -r | awk '{ print $1 }'
+        register: result_authselect_profile
+        changed_when: false
+        when:
+        - result_authselect_check_cmd is success
+      - name: Account Lockouts Must Be Logged - Define the current authselect profile as a local fact
+        ansible.builtin.set_fact:
+          authselect_current_profile: '{{ result_authselect_profile.stdout }}'
+          authselect_custom_profile: '{{ result_authselect_profile.stdout }}'
+        when:
+        - result_authselect_profile is not skipped
+        - result_authselect_profile.stdout is match("custom/")
+      - name: Account Lockouts Must Be Logged - Define the new authselect custom profile as a local fact
+        ansible.builtin.set_fact:
+          authselect_current_profile: '{{ result_authselect_profile.stdout }}'
+          authselect_custom_profile: custom/hardening
+        when:
+        - result_authselect_profile is not skipped
+        - result_authselect_profile.stdout is not match("custom/")
+      - name: Account Lockouts Must Be Logged - Get authselect current features to also enable them in the custom profile
+        ansible.builtin.shell:
+          cmd: authselect current | tail -n+3 | awk '{ print $2 }'
+        register: result_authselect_features
+        changed_when: false
+        when:
+        - result_authselect_profile is not skipped
+        - authselect_current_profile is not match("custom/")
+      - name: Account Lockouts Must Be Logged - Check if any custom profile with the same name was already created
+        ansible.builtin.stat:
+          path: /etc/authselect/{{ authselect_custom_profile }}
+        register: result_authselect_custom_profile_present
+        changed_when: false
+        when:
+        - authselect_current_profile is not match("custom/")
+      - name: Account Lockouts Must Be Logged - Create an authselect custom profile based on the current profile
+        ansible.builtin.command:
+          cmd: authselect create-profile hardening -b {{ authselect_current_profile }}
+        when:
+        - result_authselect_check_cmd is success
+        - authselect_current_profile is not match("custom/")
+        - not result_authselect_custom_profile_present.stat.exists
+      - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
+        ansible.builtin.command:
+          cmd: authselect apply-changes -b --backup=before-hardening-custom-profile
+        when:
+        - result_authselect_check_cmd is success
+        - result_authselect_profile is not skipped
+        - authselect_current_profile is not match("custom/")
+        - authselect_custom_profile is not match(authselect_current_profile)
+      - name: Account Lockouts Must Be Logged - Ensure the authselect custom profile is selected
+        ansible.builtin.command:
+          cmd: authselect select {{ authselect_custom_profile }}
+        register: result_pam_authselect_select_profile
+        when:
+        - result_authselect_check_cmd is success
+        - result_authselect_profile is not skipped
+        - authselect_current_profile is not match("custom/")
+        - authselect_custom_profile is not match(authselect_current_profile)
+      - name: Account Lockouts Must Be Logged - Restore the authselect features in the custom profile
+        ansible.builtin.command:
+          cmd: authselect enable-feature {{ item }}
+        loop: '{{ result_authselect_features.stdout_lines }}'
+        register: result_pam_authselect_restore_features
+        when:
+        - result_authselect_profile is not skipped
+        - result_authselect_features is not skipped
+        - result_pam_authselect_select_profile is not skipped
+      - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
+        ansible.builtin.command:
+          cmd: authselect apply-changes -b --backup=after-hardening-custom-profile
+        when:
+        - result_authselect_check_cmd is success
+        - result_authselect_profile is not skipped
+        - result_pam_authselect_restore_features is not skipped
+      - name: Account Lockouts Must Be Logged - Change the PAM file to be edited according to the custom authselect profile
+        ansible.builtin.set_fact:
+          pam_file_path: /etc/authselect/{{ authselect_custom_profile }}/{{ pam_file_path | basename }}
+      when:
+      - result_authselect_present.stat.exists
+    - name: Account Lockouts Must Be Logged - Ensure the "audit" option from "pam_faillock.so" is not present in {{ pam_file_path
+        }}
+      ansible.builtin.replace:
+        dest: '{{ pam_file_path }}'
+        regexp: (.*auth.*pam_faillock.so.*)\baudit\b=?[0-9a-zA-Z]*(.*)
+        replace: \1\2
+      register: result_pam_option_removal
+    - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
+      ansible.builtin.command:
+        cmd: authselect apply-changes -b
+      when:
+      - result_authselect_present.stat.exists
+      - result_pam_option_removal is changed
+    when:
+    - result_pam_file_present.stat.exists
+  - name: Account Lockouts Must Be Logged - Check if /etc/pam.d/password-auth file is present
+    ansible.builtin.stat:
+      path: /etc/pam.d/password-auth
+    register: result_pam_file_present
+  - name: Account Lockouts Must Be Logged - Check the proper remediation for the system
+    block:
+    - name: Account Lockouts Must Be Logged - Define the PAM file to be edited as a local fact
+      ansible.builtin.set_fact:
+        pam_file_path: /etc/pam.d/password-auth
+    - name: Account Lockouts Must Be Logged - Check if system relies on authselect
+      ansible.builtin.stat:
+        path: /usr/bin/authselect
+      register: result_authselect_present
+    - name: Account Lockouts Must Be Logged - Remediate using authselect
+      block:
+      - name: Account Lockouts Must Be Logged - Check integrity of authselect current profile
+        ansible.builtin.command:
+          cmd: authselect check
+        register: result_authselect_check_cmd
+        changed_when: false
+        ignore_errors: true
+      - name: Account Lockouts Must Be Logged - Informative message based on the authselect integrity check result
+        ansible.builtin.assert:
+          that:
+          - result_authselect_check_cmd is success
+          fail_msg:
+          - authselect integrity check failed. Remediation aborted!
+          - This remediation could not be applied because an authselect profile was not selected or the selected profile is
+            not intact.
+          - It is not recommended to manually edit the PAM files when authselect tool is available.
+          - In cases where the default authselect profile does not cover a specific demand, a custom authselect profile is
+            recommended.
+          success_msg:
+          - authselect integrity check passed
+      - name: Account Lockouts Must Be Logged - Get authselect current profile
+        ansible.builtin.shell:
+          cmd: authselect current -r | awk '{ print $1 }'
+        register: result_authselect_profile
+        changed_when: false
+        when:
+        - result_authselect_check_cmd is success
+      - name: Account Lockouts Must Be Logged - Define the current authselect profile as a local fact
+        ansible.builtin.set_fact:
+          authselect_current_profile: '{{ result_authselect_profile.stdout }}'
+          authselect_custom_profile: '{{ result_authselect_profile.stdout }}'
+        when:
+        - result_authselect_profile is not skipped
+        - result_authselect_profile.stdout is match("custom/")
+      - name: Account Lockouts Must Be Logged - Define the new authselect custom profile as a local fact
+        ansible.builtin.set_fact:
+          authselect_current_profile: '{{ result_authselect_profile.stdout }}'
+          authselect_custom_profile: custom/hardening
+        when:
+        - result_authselect_profile is not skipped
+        - result_authselect_profile.stdout is not match("custom/")
+      - name: Account Lockouts Must Be Logged - Get authselect current features to also enable them in the custom profile
+        ansible.builtin.shell:
+          cmd: authselect current | tail -n+3 | awk '{ print $2 }'
+        register: result_authselect_features
+        changed_when: false
+        when:
+        - result_authselect_profile is not skipped
+        - authselect_current_profile is not match("custom/")
+      - name: Account Lockouts Must Be Logged - Check if any custom profile with the same name was already created
+        ansible.builtin.stat:
+          path: /etc/authselect/{{ authselect_custom_profile }}
+        register: result_authselect_custom_profile_present
+        changed_when: false
+        when:
+        - authselect_current_profile is not match("custom/")
+      - name: Account Lockouts Must Be Logged - Create an authselect custom profile based on the current profile
+        ansible.builtin.command:
+          cmd: authselect create-profile hardening -b {{ authselect_current_profile }}
+        when:
+        - result_authselect_check_cmd is success
+        - authselect_current_profile is not match("custom/")
+        - not result_authselect_custom_profile_present.stat.exists
+      - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
+        ansible.builtin.command:
+          cmd: authselect apply-changes -b --backup=before-hardening-custom-profile
+        when:
+        - result_authselect_check_cmd is success
+        - result_authselect_profile is not skipped
+        - authselect_current_profile is not match("custom/")
+        - authselect_custom_profile is not match(authselect_current_profile)
+      - name: Account Lockouts Must Be Logged - Ensure the authselect custom profile is selected
+        ansible.builtin.command:
+          cmd: authselect select {{ authselect_custom_profile }}
+        register: result_pam_authselect_select_profile
+        when:
+        - result_authselect_check_cmd is success
+        - result_authselect_profile is not skipped
+        - authselect_current_profile is not match("custom/")
+        - authselect_custom_profile is not match(authselect_current_profile)
+      - name: Account Lockouts Must Be Logged - Restore the authselect features in the custom profile
+        ansible.builtin.command:
+          cmd: authselect enable-feature {{ item }}
+        loop: '{{ result_authselect_features.stdout_lines }}'
+        register: result_pam_authselect_restore_features
+        when:
+        - result_authselect_profile is not skipped
+        - result_authselect_features is not skipped
+        - result_pam_authselect_select_profile is not skipped
+      - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
+        ansible.builtin.command:
+          cmd: authselect apply-changes -b --backup=after-hardening-custom-profile
+        when:
+        - result_authselect_check_cmd is success
+        - result_authselect_profile is not skipped
+        - result_pam_authselect_restore_features is not skipped
+      - name: Account Lockouts Must Be Logged - Change the PAM file to be edited according to the custom authselect profile
+        ansible.builtin.set_fact:
+          pam_file_path: /etc/authselect/{{ authselect_custom_profile }}/{{ pam_file_path | basename }}
+      when:
+      - result_authselect_present.stat.exists
+    - name: Account Lockouts Must Be Logged - Ensure the "audit" option from "pam_faillock.so" is not present in {{ pam_file_path
+        }}
+      ansible.builtin.replace:
+        dest: '{{ pam_file_path }}'
+        regexp: (.*auth.*pam_faillock.so.*)\baudit\b=?[0-9a-zA-Z]*(.*)
+        replace: \1\2
+      register: result_pam_option_removal
+    - name: Account Lockouts Must Be Logged - Ensure authselect changes are applied
+      ansible.builtin.command:
+        cmd: authselect apply-changes -b
+      when:
+      - result_authselect_present.stat.exists
+      - result_pam_option_removal is changed
+    when:
+    - result_pam_file_present.stat.exists
+  when:
+  - DISA_STIG_RHEL_08_020021 | bool
+  - accounts_passwords_pam_faillock_audit | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - result_faillock_conf_check.stat.exists
+  tags:
+  - CCE-86099-9
+  - DISA-STIG-RHEL-08-020021
+  - NIST-800-53-AC-7 (a)
+  - accounts_passwords_pam_faillock_audit
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Account Lockouts Must Be Logged - Ensure the pam_faillock.so audit parameter in PAM files
+  block:
+  - name: Account Lockouts Must Be Logged - Check if pam_faillock.so audit parameter is already enabled in pam files
+    ansible.builtin.lineinfile:
+      path: /etc/pam.d/system-auth
+      regexp: .*auth.*pam_faillock\.so (preauth|authfail).*audit
+      state: absent
+    check_mode: true
+    changed_when: false
+    register: result_pam_faillock_audit_parameter_is_present
+  - name: Account Lockouts Must Be Logged - Ensure the inclusion of pam_faillock.so preauth audit parameter in auth section
+    ansible.builtin.lineinfile:
+      path: '{{ item }}'
+      backrefs: true
+      regexp: (^\s*auth\s+)([\w\[].*\b)(\s+pam_faillock.so preauth.*)
+      line: \1required\3 audit
+      state: present
+    loop:
+    - /etc/pam.d/system-auth
+    - /etc/pam.d/password-auth
+    when:
+    - result_pam_faillock_audit_parameter_is_present.found == 0
+  when:
+  - DISA_STIG_RHEL_08_020021 | bool
+  - accounts_passwords_pam_faillock_audit | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - not result_faillock_conf_check.stat.exists
+  tags:
+  - CCE-86099-9
+  - DISA-STIG-RHEL-08-020021
+  - NIST-800-53-AC-7 (a)
+  - accounts_passwords_pam_faillock_audit
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
 
 - name: Gather the package facts
   package_facts:
@@ -11188,8 +11192,6 @@
 
 - name: Unit Socket Exists - debug-shell.socket
   command: systemctl list-unit-files debug-shell.socket
-  args:
-    warn: false
   register: socket_file_exists
   changed_when: false
   ignore_errors: true
@@ -11550,6 +11552,7 @@
   - CCE-84029-8
   - DISA-STIG-RHEL-08-010390
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.3
   - enable_strategy
   - install_smartcard_packages
   - low_complexity
@@ -11684,6 +11687,7 @@
   - NIST-800-53-CM-6(a)
   - NIST-800-53-IA-5(1)(d)
   - NIST-800-53-IA-5(f)
+  - PCI-DSS-Req-8.3.9
   - accounts_minimum_age_login_defs
   - low_complexity
   - low_disruption
@@ -11722,6 +11726,7 @@
   - NIST-800-53-CM-6(a)
   - NIST-800-53-IA-5(1)(d)
   - NIST-800-53-IA-5(f)
+  - PCI-DSS-Req-8.3.9
   - accounts_minimum_age_login_defs
   - low_complexity
   - low_disruption
@@ -12651,17 +12656,20 @@
   - no_reboot_needed
   - restrict_strategy
 
-- name: Replace user umask in /etc/bashrc
-  replace:
+- name: Check if umask in /etc/bashrc is already set
+  ansible.builtin.lineinfile:
     path: /etc/bashrc
-    regexp: umask.*
-    replace: umask {{ var_accounts_user_umask }}
+    regexp: ^(\s*)umask\s+.*
+    state: absent
+  check_mode: true
+  changed_when: false
   register: umask_replace
   tags:
   - CCE-81036-6
   - DISA-STIG-RHEL-08-020353
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.6.1
   - accounts_umask_etc_bashrc
   - low_complexity
   - low_disruption
@@ -12677,8 +12685,35 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
 
-- name: Append user umask in /etc/bashrc
-  lineinfile:
+- name: Replace user umask in /etc/bashrc
+  ansible.builtin.replace:
+    path: /etc/bashrc
+    regexp: ^(\s*)umask(\s+).*
+    replace: \g<1>umask\g<2>{{ var_accounts_user_umask }}
+  when:
+  - DISA_STIG_RHEL_08_020353 | bool
+  - accounts_umask_etc_bashrc | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - umask_replace.found > 0
+  tags:
+  - CCE-81036-6
+  - DISA-STIG-RHEL-08-020353
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.6.1
+  - accounts_umask_etc_bashrc
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Ensure the Default umask is Appended Correctly
+  ansible.builtin.lineinfile:
     create: true
     path: /etc/bashrc
     line: umask {{ var_accounts_user_umask }}
@@ -12690,12 +12725,13 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - restrict_strategy | bool
-  - umask_replace is not changed
+  - umask_replace.found == 0
   tags:
   - CCE-81036-6
   - DISA-STIG-RHEL-08-020353
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.6.1
   - accounts_umask_etc_bashrc
   - low_complexity
   - low_disruption
@@ -12703,11 +12739,13 @@
   - no_reboot_needed
   - restrict_strategy
 
-- name: Replace user umask in /etc/csh.cshrc
-  replace:
+- name: Check if umask in /etc/csh.cshrc is already set
+  ansible.builtin.lineinfile:
     path: /etc/csh.cshrc
-    regexp: umask.*
-    replace: umask {{ var_accounts_user_umask }}
+    regexp: ^(\s*)umask\s+.*
+    state: absent
+  check_mode: true
+  changed_when: false
   register: umask_replace
   tags:
   - CCE-81037-4
@@ -12729,8 +12767,34 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
 
-- name: Append user umask in /etc/csh.cshrc
-  lineinfile:
+- name: Replace user umask in /etc/csh.cshrc
+  ansible.builtin.replace:
+    path: /etc/csh.cshrc
+    regexp: ^(\s*)umask(\s+).*
+    replace: \g<1>umask\g<2>{{ var_accounts_user_umask }}
+  when:
+  - DISA_STIG_RHEL_08_020353 | bool
+  - accounts_umask_etc_csh_cshrc | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - umask_replace.found > 0
+  tags:
+  - CCE-81037-4
+  - DISA-STIG-RHEL-08-020353
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-CM-6(a)
+  - accounts_umask_etc_csh_cshrc
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Ensure the Default umask is Appended Correctly
+  ansible.builtin.lineinfile:
     create: true
     path: /etc/csh.cshrc
     line: umask {{ var_accounts_user_umask }}
@@ -12742,7 +12806,7 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - restrict_strategy | bool
-  - umask_replace is not changed
+  - umask_replace.found == 0
   tags:
   - CCE-81037-4
   - DISA-STIG-RHEL-08-020353
@@ -12763,6 +12827,7 @@
   - DISA-STIG-RHEL-08-020351
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.6.1
   - accounts_umask_etc_login_defs
   - low_complexity
   - low_disruption
@@ -12778,12 +12843,14 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
 
-- name: Ensure the Default UMASK is Set Correctly
-  replace:
+- name: Check if UMASK is already set
+  ansible.builtin.lineinfile:
     path: /etc/login.defs
-    regexp: ^UMASK
-    replace: UMASK {{ var_accounts_user_umask }}
-  register: umask_replace
+    regexp: ^(\s*)UMASK\s+.*
+    state: absent
+  check_mode: true
+  changed_when: false
+  register: result_umask_is_set
   when:
   - DISA_STIG_RHEL_08_020351 | bool
   - accounts_umask_etc_login_defs | bool
@@ -12798,6 +12865,35 @@
   - DISA-STIG-RHEL-08-020351
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.6.1
+  - accounts_umask_etc_login_defs
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Replace user UMASK in /etc/login.defs
+  ansible.builtin.replace:
+    path: /etc/login.defs
+    regexp: ^(\s*)UMASK(\s+).*
+    replace: \g<1>UMASK\g<2>{{ var_accounts_user_umask }}
+  when:
+  - DISA_STIG_RHEL_08_020351 | bool
+  - accounts_umask_etc_login_defs | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - '"shadow-utils" in ansible_facts.packages'
+  - result_umask_is_set.found > 0
+  tags:
+  - CCE-82888-9
+  - DISA-STIG-RHEL-08-020351
+  - NIST-800-53-AC-6(1)
+  - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.6.1
   - accounts_umask_etc_login_defs
   - low_complexity
   - low_disruption
@@ -12806,7 +12902,7 @@
   - restrict_strategy
 
 - name: Ensure the Default UMASK is Appended Correctly
-  lineinfile:
+  ansible.builtin.lineinfile:
     create: true
     path: /etc/login.defs
     line: UMASK {{ var_accounts_user_umask }}
@@ -12819,12 +12915,13 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
   - '"shadow-utils" in ansible_facts.packages'
-  - umask_replace is not changed
+  - result_umask_is_set.found == 0
   tags:
   - CCE-82888-9
   - DISA-STIG-RHEL-08-020351
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.6.1
   - accounts_umask_etc_login_defs
   - low_complexity
   - low_disruption
@@ -12845,6 +12942,7 @@
   - DISA-STIG-RHEL-08-020353
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.6.1
   - accounts_umask_etc_profile
   - low_complexity
   - low_disruption
@@ -12870,6 +12968,7 @@
   - DISA-STIG-RHEL-08-020353
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.6.1
   - accounts_umask_etc_profile
   - low_complexity
   - low_disruption
@@ -12904,6 +13003,7 @@
   - DISA-STIG-RHEL-08-020353
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-8.6.1
   - accounts_umask_etc_profile
   - low_complexity
   - low_disruption
@@ -12914,7 +13014,8 @@
 - name: Ensure interactive local users are the owners of their respective initialization files
   ansible.builtin.shell:
     cmd: "for dir in $(awk -F':' '{ if ($3 >= 1000 && $3 != 65534) print $6}' /etc/passwd); do\n  for file in $(find $dir\
-      \ -maxdepth 1 -type f -name \".*\"); do\n    sed -i 's/^\\([\\s]*umask\\s*\\)/#\\1/g' $file\n  done\ndone"
+      \ -maxdepth 1 -type f -name \".*\"); do\n    if [ \"$(basename $file)\" != \".bash_history\" ]; then\n      sed -i 's/^\\\
+      ([\\s]*umask\\s*\\)/#\\1/g' $file\n    fi\n  done\ndone"
   tags:
   - CCE-84044-7
   - DISA-STIG-RHEL-08-020352
@@ -12956,6 +13057,7 @@
   - NIST-800-53-AU-7(1)
   - NIST-800-53-AU-7(2)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-10.2.1
   - enable_strategy
   - low_complexity
   - low_disruption
@@ -13061,16 +13163,16 @@
   - PCI-DSS-Req-10.3
   - grub2_audit_argument
   - low_disruption
+  - low_severity
   - medium_complexity
-  - medium_severity
   - reboot_required
   - restrict_strategy
   when:
   - DISA_STIG_RHEL_08_030601 | bool
   - grub2_audit_argument | bool
   - low_disruption | bool
+  - low_severity | bool
   - medium_complexity | bool
-  - medium_severity | bool
   - reboot_required | bool
   - restrict_strategy | bool
 
@@ -13080,8 +13182,8 @@
   - DISA_STIG_RHEL_08_030601 | bool
   - grub2_audit_argument | bool
   - low_disruption | bool
+  - low_severity | bool
   - medium_complexity | bool
-  - medium_severity | bool
   - reboot_required | bool
   - restrict_strategy | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -13099,8 +13201,8 @@
   - PCI-DSS-Req-10.3
   - grub2_audit_argument
   - low_disruption
+  - low_severity
   - medium_complexity
-  - medium_severity
   - reboot_required
   - restrict_strategy
 
@@ -13304,7 +13406,7 @@
 
 - name: Set architecture for audit mount tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030302 | bool
   - audit_rules_media_export | bool
@@ -13315,6 +13417,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80722-2
   - CJIS-5.4.1.1
@@ -13332,7 +13436,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for mount for x86 platform
+- name: Perform remediation of Audit rules for mount for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -13448,7 +13552,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for mount for x86_64 platform
+- name: Perform remediation of Audit rules for mount for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -14168,8 +14272,6 @@
 
 - name: Restart Auditd
   command: /usr/sbin/service auditd restart
-  args:
-    warn: false
   when:
   - DISA_STIG_RHEL_08_030000 | bool
   - audit_rules_suid_privilege_function | bool
@@ -15582,7 +15684,7 @@
 
 - name: Set architecture for audit chmod tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030490 | bool
   - audit_rules_dac_modification_chmod | bool
@@ -15593,6 +15695,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80685-1
   - CJIS-5.4.1.1
@@ -15609,7 +15713,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for chmod for x86 platform
+- name: Perform remediation of Audit rules for chmod for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -15730,7 +15834,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for chmod for x86_64 platform
+- name: Perform remediation of Audit rules for chmod for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -15881,7 +15985,7 @@
 
 - name: Set architecture for audit chown tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030480 | bool
   - audit_rules_dac_modification_chown | bool
@@ -15892,6 +15996,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80686-9
   - CJIS-5.4.1.1
@@ -15908,7 +16014,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for chown for x86 platform
+- name: Perform remediation of Audit rules for chown for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -16031,7 +16137,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for chown for x86_64 platform
+- name: Perform remediation of Audit rules for chown for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -16184,7 +16290,7 @@
 
 - name: Set architecture for audit fchmod tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030490 | bool
   - audit_rules_dac_modification_fchmod | bool
@@ -16195,6 +16301,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80687-7
   - CJIS-5.4.1.1
@@ -16211,7 +16319,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fchmod for x86 platform
+- name: Perform remediation of Audit rules for fchmod for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -16332,7 +16440,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fchmod for x86_64 platform
+- name: Perform remediation of Audit rules for fchmod for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -16483,7 +16591,7 @@
 
 - name: Set architecture for audit fchmodat tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030490 | bool
   - audit_rules_dac_modification_fchmodat | bool
@@ -16494,6 +16602,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80688-5
   - CJIS-5.4.1.1
@@ -16510,7 +16620,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fchmodat for x86 platform
+- name: Perform remediation of Audit rules for fchmodat for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -16631,7 +16741,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fchmodat for x86_64 platform
+- name: Perform remediation of Audit rules for fchmodat for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -16782,7 +16892,7 @@
 
 - name: Set architecture for audit fchown tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030480 | bool
   - audit_rules_dac_modification_fchown | bool
@@ -16793,6 +16903,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80689-3
   - CJIS-5.4.1.1
@@ -16809,7 +16921,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fchown for x86 platform
+- name: Perform remediation of Audit rules for fchown for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -16932,7 +17044,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fchown for x86_64 platform
+- name: Perform remediation of Audit rules for fchown for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -17085,7 +17197,7 @@
 
 - name: Set architecture for audit fchownat tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030480 | bool
   - audit_rules_dac_modification_fchownat | bool
@@ -17096,6 +17208,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80690-1
   - CJIS-5.4.1.1
@@ -17112,7 +17226,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fchownat for x86 platform
+- name: Perform remediation of Audit rules for fchownat for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -17235,7 +17349,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fchownat for x86_64 platform
+- name: Perform remediation of Audit rules for fchownat for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -17388,7 +17502,7 @@
 
 - name: Set architecture for audit fremovexattr tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030200 | bool
   - audit_rules_dac_modification_fremovexattr | bool
@@ -17399,6 +17513,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80691-9
   - CJIS-5.4.1.1
@@ -17415,7 +17531,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fremovexattr for x86 platform
+- name: Perform remediation of Audit rules for fremovexattr for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -17641,7 +17757,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fremovexattr for x86_64 platform
+- name: Perform remediation of Audit rules for fremovexattr for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -17897,7 +18013,7 @@
 
 - name: Set architecture for audit fsetxattr tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030200 | bool
   - audit_rules_dac_modification_fsetxattr | bool
@@ -17908,6 +18024,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80692-7
   - CJIS-5.4.1.1
@@ -17924,7 +18042,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fsetxattr for x86 platform
+- name: Perform remediation of Audit rules for fsetxattr for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -18150,7 +18268,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for fsetxattr for x86_64 platform
+- name: Perform remediation of Audit rules for fsetxattr for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -18406,7 +18524,7 @@
 
 - name: Set architecture for audit lchown tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030480 | bool
   - audit_rules_dac_modification_lchown | bool
@@ -18417,6 +18535,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80693-5
   - CJIS-5.4.1.1
@@ -18433,7 +18553,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for lchown for x86 platform
+- name: Perform remediation of Audit rules for lchown for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -18556,7 +18676,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for lchown for x86_64 platform
+- name: Perform remediation of Audit rules for lchown for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -18709,7 +18829,7 @@
 
 - name: Set architecture for audit lremovexattr tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030200 | bool
   - audit_rules_dac_modification_lremovexattr | bool
@@ -18720,6 +18840,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80694-3
   - CJIS-5.4.1.1
@@ -18736,7 +18858,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for lremovexattr for x86 platform
+- name: Perform remediation of Audit rules for lremovexattr for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -18962,7 +19084,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for lremovexattr for x86_64 platform
+- name: Perform remediation of Audit rules for lremovexattr for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -19218,7 +19340,7 @@
 
 - name: Set architecture for audit lsetxattr tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030200 | bool
   - audit_rules_dac_modification_lsetxattr | bool
@@ -19229,6 +19351,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80695-0
   - CJIS-5.4.1.1
@@ -19245,7 +19369,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for lsetxattr for x86 platform
+- name: Perform remediation of Audit rules for lsetxattr for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -19471,7 +19595,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for lsetxattr for x86_64 platform
+- name: Perform remediation of Audit rules for lsetxattr for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -19727,7 +19851,7 @@
 
 - name: Set architecture for audit removexattr tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030200 | bool
   - audit_rules_dac_modification_removexattr | bool
@@ -19738,6 +19862,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80696-8
   - CJIS-5.4.1.1
@@ -19754,7 +19880,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for removexattr for x86 platform
+- name: Perform remediation of Audit rules for removexattr for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -19980,7 +20106,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for removexattr for x86_64 platform
+- name: Perform remediation of Audit rules for removexattr for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -20236,7 +20362,7 @@
 
 - name: Set architecture for audit setxattr tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030200 | bool
   - audit_rules_dac_modification_setxattr | bool
@@ -20247,6 +20373,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80697-6
   - CJIS-5.4.1.1
@@ -20263,7 +20391,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for setxattr for x86 platform
+- name: Perform remediation of Audit rules for setxattr for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -20489,7 +20617,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for setxattr for x86_64 platform
+- name: Perform remediation of Audit rules for setxattr for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -21570,7 +21698,7 @@
 
 - name: Set architecture for audit rename tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030361 | bool
   - audit_rules_file_deletion_events_rename | bool
@@ -21581,6 +21709,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80703-2
   - DISA-STIG-RHEL-08-030361
@@ -21596,7 +21726,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for rename for x86 platform
+- name: Perform remediation of Audit rules for rename for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -21720,7 +21850,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for rename for x86_64 platform
+- name: Perform remediation of Audit rules for rename for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -21873,7 +22003,7 @@
 
 - name: Set architecture for audit renameat tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030361 | bool
   - audit_rules_file_deletion_events_renameat | bool
@@ -21884,6 +22014,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80704-0
   - DISA-STIG-RHEL-08-030361
@@ -21899,7 +22031,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for renameat for x86 platform
+- name: Perform remediation of Audit rules for renameat for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -22023,7 +22155,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for renameat for x86_64 platform
+- name: Perform remediation of Audit rules for renameat for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -22176,7 +22308,7 @@
 
 - name: Set architecture for audit rmdir tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030361 | bool
   - audit_rules_file_deletion_events_rmdir | bool
@@ -22187,6 +22319,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80705-7
   - DISA-STIG-RHEL-08-030361
@@ -22202,7 +22336,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for rmdir for x86 platform
+- name: Perform remediation of Audit rules for rmdir for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -22326,7 +22460,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for rmdir for x86_64 platform
+- name: Perform remediation of Audit rules for rmdir for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -22479,7 +22613,7 @@
 
 - name: Set architecture for audit unlink tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030361 | bool
   - audit_rules_file_deletion_events_unlink | bool
@@ -22490,6 +22624,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80706-5
   - DISA-STIG-RHEL-08-030361
@@ -22505,7 +22641,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for unlink for x86 platform
+- name: Perform remediation of Audit rules for unlink for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -22629,7 +22765,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for unlink for x86_64 platform
+- name: Perform remediation of Audit rules for unlink for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -22782,7 +22918,7 @@
 
 - name: Set architecture for audit unlinkat tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030361 | bool
   - audit_rules_file_deletion_events_unlinkat | bool
@@ -22793,6 +22929,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80707-3
   - DISA-STIG-RHEL-08-030361
@@ -22808,7 +22946,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for unlinkat for x86 platform
+- name: Perform remediation of Audit rules for unlinkat for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -22932,7 +23070,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for unlinkat for x86_64 platform
+- name: Perform remediation of Audit rules for unlinkat for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -23086,7 +23224,7 @@
 
 - name: Set architecture for audit creat tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030420 | bool
   - audit_rules_unsuccessful_file_modification_creat | bool
@@ -23097,6 +23235,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80751-1
   - DISA-STIG-RHEL-08-030420
@@ -23113,7 +23253,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for creat EACCES for x86 platform
+- name: Perform remediation of Audit rules for creat EACCES for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -23242,7 +23382,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for creat EACCES for x86_64 platform
+- name: Perform remediation of Audit rules for creat EACCES for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -23372,7 +23512,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for creat EPERM for x86 platform
+- name: Perform remediation of Audit rules for creat EPERM for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -23501,7 +23641,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for creat EPERM for x86_64 platform
+- name: Perform remediation of Audit rules for creat EPERM for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -23660,7 +23800,7 @@
 
 - name: Set architecture for audit ftruncate tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030420 | bool
   - audit_rules_unsuccessful_file_modification_ftruncate | bool
@@ -23671,6 +23811,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80752-9
   - DISA-STIG-RHEL-08-030420
@@ -23687,7 +23829,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for ftruncate EACCES for x86 platform
+- name: Perform remediation of Audit rules for ftruncate EACCES for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -23816,7 +23958,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for ftruncate EACCES for x86_64 platform
+- name: Perform remediation of Audit rules for ftruncate EACCES for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -23946,7 +24088,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for ftruncate EPERM for x86 platform
+- name: Perform remediation of Audit rules for ftruncate EPERM for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -24075,7 +24217,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for ftruncate EPERM for x86_64 platform
+- name: Perform remediation of Audit rules for ftruncate EPERM for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -24234,7 +24376,7 @@
 
 - name: Set architecture for audit open tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030420 | bool
   - audit_rules_unsuccessful_file_modification_open | bool
@@ -24245,6 +24387,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80753-7
   - DISA-STIG-RHEL-08-030420
@@ -24261,7 +24405,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for open EACCES for x86 platform
+- name: Perform remediation of Audit rules for open EACCES for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -24390,7 +24534,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for open EACCES for x86_64 platform
+- name: Perform remediation of Audit rules for open EACCES for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -24520,7 +24664,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for open EPERM for x86 platform
+- name: Perform remediation of Audit rules for open EPERM for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -24649,7 +24793,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for open EPERM for x86_64 platform
+- name: Perform remediation of Audit rules for open EPERM for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -24808,7 +24952,7 @@
 
 - name: Set architecture for audit open_by_handle_at tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030420 | bool
   - audit_rules_unsuccessful_file_modification_open_by_handle_at | bool
@@ -24819,6 +24963,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80755-2
   - DISA-STIG-RHEL-08-030420
@@ -24835,7 +24981,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for open_by_handle_at EACCES for x86 platform
+- name: Perform remediation of Audit rules for open_by_handle_at EACCES for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -24964,7 +25110,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for open_by_handle_at EACCES for x86_64 platform
+- name: Perform remediation of Audit rules for open_by_handle_at EACCES for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -25094,7 +25240,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for open_by_handle_at EPERM for x86 platform
+- name: Perform remediation of Audit rules for open_by_handle_at EPERM for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -25223,7 +25369,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for open_by_handle_at EPERM for x86_64 platform
+- name: Perform remediation of Audit rules for open_by_handle_at EPERM for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -25382,7 +25528,7 @@
 
 - name: Set architecture for audit openat tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030420 | bool
   - audit_rules_unsuccessful_file_modification_openat | bool
@@ -25393,6 +25539,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80754-5
   - DISA-STIG-RHEL-08-030420
@@ -25409,7 +25557,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for openat EACCES for x86 platform
+- name: Perform remediation of Audit rules for openat EACCES for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -25538,7 +25686,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for openat EACCES for x86_64 platform
+- name: Perform remediation of Audit rules for openat EACCES for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -25668,7 +25816,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for openat EPERM for x86 platform
+- name: Perform remediation of Audit rules for openat EPERM for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -25797,7 +25945,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for openat EPERM for x86_64 platform
+- name: Perform remediation of Audit rules for openat EPERM for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -25956,7 +26104,7 @@
 
 - name: Set architecture for audit truncate tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030420 | bool
   - audit_rules_unsuccessful_file_modification_truncate | bool
@@ -25967,6 +26115,8 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80756-0
   - DISA-STIG-RHEL-08-030420
@@ -25983,7 +26133,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for truncate EACCES for x86 platform
+- name: Perform remediation of Audit rules for truncate EACCES for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -26112,7 +26262,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for truncate EACCES for x86_64 platform
+- name: Perform remediation of Audit rules for truncate EACCES for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -26242,7 +26392,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for truncate EPERM for x86 platform
+- name: Perform remediation of Audit rules for truncate EPERM for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -26371,7 +26521,7 @@
   - reboot_required
   - restrict_strategy
 
-- name: Perform remediation of Audit rules for truncate EPERM for x86_64 platform
+- name: Perform remediation of Audit rules for truncate EPERM for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -26530,7 +26680,7 @@
 
 - name: Set architecture for audit delete_module tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030390 | bool
   - audit_rules_kernel_module_loading_delete | bool
@@ -26541,6 +26691,8 @@
   - no_reboot_needed | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80711-5
   - DISA-STIG-RHEL-08-030390
@@ -26557,7 +26709,7 @@
   - medium_severity
   - no_reboot_needed
 
-- name: Perform remediation of Audit rules for delete_module for x86 platform
+- name: Perform remediation of Audit rules for delete_module for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -26672,7 +26824,7 @@
   - medium_severity
   - no_reboot_needed
 
-- name: Perform remediation of Audit rules for delete_module for x86_64 platform
+- name: Perform remediation of Audit rules for delete_module for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -26817,7 +26969,7 @@
 
 - name: Set architecture for audit finit_module tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030360 | bool
   - audit_rules_kernel_module_loading_finit | bool
@@ -26828,6 +26980,8 @@
   - no_reboot_needed | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80712-3
   - DISA-STIG-RHEL-08-030360
@@ -27112,7 +27266,7 @@
 
 - name: Set architecture for audit init_module tasks
   set_fact:
-    audit_arch: b{{ ansible_architecture | regex_replace('.*(\d\d$)','\1') }}
+    audit_arch: b64
   when:
   - DISA_STIG_RHEL_08_030360 | bool
   - audit_rules_kernel_module_loading_init | bool
@@ -27123,6 +27277,8 @@
   - no_reboot_needed | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_architecture == "aarch64" or ansible_architecture == "ppc64" or ansible_architecture == "ppc64le" or ansible_architecture
+    == "s390x" or ansible_architecture == "x86_64"
   tags:
   - CCE-80713-1
   - DISA-STIG-RHEL-08-030360
@@ -27139,7 +27295,7 @@
   - medium_severity
   - no_reboot_needed
 
-- name: Perform remediation of Audit rules for init_module for x86 platform
+- name: Perform remediation of Audit rules for init_module for 32bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -27258,7 +27414,7 @@
   - medium_severity
   - no_reboot_needed
 
-- name: Perform remediation of Audit rules for init_module for x86_64 platform
+- name: Perform remediation of Audit rules for init_module for 64bit platform
   block:
   - name: Declare list of syscalls
     set_fact:
@@ -30823,7 +30979,7 @@
   - auditd_log_format
   - low_complexity
   - low_disruption
-  - medium_severity
+  - low_severity
   - no_reboot_needed
   - restrict_strategy
   when:
@@ -30831,7 +30987,7 @@
   - auditd_log_format | bool
   - low_complexity | bool
   - low_disruption | bool
-  - medium_severity | bool
+  - low_severity | bool
   - no_reboot_needed | bool
   - restrict_strategy | bool
 
@@ -30865,7 +31021,7 @@
   - auditd_log_format | bool
   - low_complexity | bool
   - low_disruption | bool
-  - medium_severity | bool
+  - low_severity | bool
   - no_reboot_needed | bool
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
@@ -30878,7 +31034,7 @@
   - auditd_log_format
   - low_complexity
   - low_disruption
-  - medium_severity
+  - low_severity
   - no_reboot_needed
   - restrict_strategy
 
@@ -31670,6 +31826,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv6.conf.all.accept_ra.*$
     patterns: '*.conf'
     file_type: any
@@ -31697,7 +31854,7 @@
   - reboot_required
   - sysctl_net_ipv6_conf_all_accept_ra
 
-- name: Comment out any occurrences of net.ipv6.conf.all.accept_ra from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv6.conf.all.accept_ra from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv6.conf.all.accept_ra
@@ -31760,6 +31917,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv6.conf.all.accept_redirects.*$
     patterns: '*.conf'
     file_type: any
@@ -31789,7 +31947,7 @@
   - reboot_required
   - sysctl_net_ipv6_conf_all_accept_redirects
 
-- name: Comment out any occurrences of net.ipv6.conf.all.accept_redirects from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv6.conf.all.accept_redirects from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv6.conf.all.accept_redirects
@@ -31856,6 +32014,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv6.conf.all.accept_source_route.*$
     patterns: '*.conf'
     file_type: any
@@ -31883,7 +32042,7 @@
   - reboot_required
   - sysctl_net_ipv6_conf_all_accept_source_route
 
-- name: Comment out any occurrences of net.ipv6.conf.all.accept_source_route from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv6.conf.all.accept_source_route from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv6.conf.all.accept_source_route
@@ -31946,6 +32105,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv6.conf.all.forwarding.*$
     patterns: '*.conf'
     file_type: any
@@ -31974,7 +32134,7 @@
   - reboot_required
   - sysctl_net_ipv6_conf_all_forwarding
 
-- name: Comment out any occurrences of net.ipv6.conf.all.forwarding from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv6.conf.all.forwarding from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv6.conf.all.forwarding
@@ -32039,6 +32199,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv6.conf.default.accept_ra.*$
     patterns: '*.conf'
     file_type: any
@@ -32066,7 +32227,7 @@
   - reboot_required
   - sysctl_net_ipv6_conf_default_accept_ra
 
-- name: Comment out any occurrences of net.ipv6.conf.default.accept_ra from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv6.conf.default.accept_ra from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv6.conf.default.accept_ra
@@ -32129,6 +32290,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv6.conf.default.accept_redirects.*$
     patterns: '*.conf'
     file_type: any
@@ -32156,7 +32318,7 @@
   - reboot_required
   - sysctl_net_ipv6_conf_default_accept_redirects
 
-- name: Comment out any occurrences of net.ipv6.conf.default.accept_redirects from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv6.conf.default.accept_redirects from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv6.conf.default.accept_redirects
@@ -32219,6 +32381,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv6.conf.default.accept_source_route.*$
     patterns: '*.conf'
     file_type: any
@@ -32241,6 +32404,7 @@
   - NIST-800-53-CM-6.1(iv)
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32248,7 +32412,7 @@
   - reboot_required
   - sysctl_net_ipv6_conf_default_accept_source_route
 
-- name: Comment out any occurrences of net.ipv6.conf.default.accept_source_route from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv6.conf.default.accept_source_route from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv6.conf.default.accept_source_route
@@ -32272,6 +32436,7 @@
   - NIST-800-53-CM-6.1(iv)
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32303,6 +32468,7 @@
   - NIST-800-53-CM-6.1(iv)
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32315,6 +32481,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv4.conf.all.accept_redirects.*$
     patterns: '*.conf'
     file_type: any
@@ -32344,7 +32511,7 @@
   - reboot_required
   - sysctl_net_ipv4_conf_all_accept_redirects
 
-- name: Comment out any occurrences of net.ipv4.conf.all.accept_redirects from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv4.conf.all.accept_redirects from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv4.conf.all.accept_redirects
@@ -32411,6 +32578,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv4.conf.all.accept_source_route.*$
     patterns: '*.conf'
     file_type: any
@@ -32440,7 +32608,7 @@
   - reboot_required
   - sysctl_net_ipv4_conf_all_accept_source_route
 
-- name: Comment out any occurrences of net.ipv4.conf.all.accept_source_route from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv4.conf.all.accept_source_route from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv4.conf.all.accept_source_route
@@ -32507,6 +32675,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv4.conf.all.forwarding.*$
     patterns: '*.conf'
     file_type: any
@@ -32531,7 +32700,7 @@
   - reboot_required
   - sysctl_net_ipv4_conf_all_forwarding
 
-- name: Comment out any occurrences of net.ipv4.conf.all.forwarding from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv4.conf.all.forwarding from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv4.conf.all.forwarding
@@ -32588,6 +32757,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv4.conf.all.rp_filter.*$
     patterns: '*.conf'
     file_type: any
@@ -32609,6 +32779,7 @@
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
   - NIST-800-53-SC-7(a)
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32616,7 +32787,7 @@
   - reboot_required
   - sysctl_net_ipv4_conf_all_rp_filter
 
-- name: Comment out any occurrences of net.ipv4.conf.all.rp_filter from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv4.conf.all.rp_filter from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv4.conf.all.rp_filter
@@ -32639,6 +32810,7 @@
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
   - NIST-800-53-SC-7(a)
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32669,6 +32841,7 @@
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
   - NIST-800-53-SC-7(a)
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32681,6 +32854,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv4.conf.default.accept_redirects.*$
     patterns: '*.conf'
     file_type: any
@@ -32703,6 +32877,7 @@
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
   - NIST-800-53-SC-7(a)
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32710,7 +32885,7 @@
   - reboot_required
   - sysctl_net_ipv4_conf_default_accept_redirects
 
-- name: Comment out any occurrences of net.ipv4.conf.default.accept_redirects from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv4.conf.default.accept_redirects from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv4.conf.default.accept_redirects
@@ -32734,6 +32909,7 @@
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
   - NIST-800-53-SC-7(a)
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32765,6 +32941,7 @@
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
   - NIST-800-53-SC-7(a)
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32777,6 +32954,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv4.conf.default.accept_source_route.*$
     patterns: '*.conf'
     file_type: any
@@ -32806,7 +32984,7 @@
   - reboot_required
   - sysctl_net_ipv4_conf_default_accept_source_route
 
-- name: Comment out any occurrences of net.ipv4.conf.default.accept_source_route from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv4.conf.default.accept_source_route from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv4.conf.default.accept_source_route
@@ -32873,6 +33051,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv4.icmp_echo_ignore_broadcasts.*$
     patterns: '*.conf'
     file_type: any
@@ -32894,6 +33073,7 @@
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
   - NIST-800-53-SC-5
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32901,7 +33081,7 @@
   - reboot_required
   - sysctl_net_ipv4_icmp_echo_ignore_broadcasts
 
-- name: Comment out any occurrences of net.ipv4.icmp_echo_ignore_broadcasts from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv4.icmp_echo_ignore_broadcasts from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv4.icmp_echo_ignore_broadcasts
@@ -32924,6 +33104,7 @@
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
   - NIST-800-53-SC-5
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32954,6 +33135,7 @@
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
   - NIST-800-53-SC-5
+  - PCI-DSS-Req-1.4.3
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -32966,6 +33148,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv4.conf.all.send_redirects.*$
     patterns: '*.conf'
     file_type: any
@@ -32996,7 +33179,7 @@
   - reboot_required
   - sysctl_net_ipv4_conf_all_send_redirects
 
-- name: Comment out any occurrences of net.ipv4.conf.all.send_redirects from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv4.conf.all.send_redirects from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv4.conf.all.send_redirects
@@ -33065,6 +33248,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.ipv4.conf.default.send_redirects.*$
     patterns: '*.conf'
     file_type: any
@@ -33095,7 +33279,7 @@
   - reboot_required
   - sysctl_net_ipv4_conf_default_send_redirects
 
-- name: Comment out any occurrences of net.ipv4.conf.default.send_redirects from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.ipv4.conf.default.send_redirects from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.ipv4.conf.default.send_redirects
@@ -33336,6 +33520,7 @@
   - NIST-800-53-CM-6(a)
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
+  - PCI-DSS-Req-1.4.2
   - disable_strategy
   - kernel_module_sctp_disabled
   - low_complexity
@@ -33366,6 +33551,7 @@
   - NIST-800-53-CM-6(a)
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
+  - PCI-DSS-Req-1.4.2
   - disable_strategy
   - kernel_module_sctp_disabled
   - low_complexity
@@ -33495,8 +33681,9 @@
   - medium_severity
   - reboot_required
 
-- name: Deactivate Wireless Network Interfaces
-  command: nmcli radio wifi off
+- name: Gather the package facts
+  package_facts:
+    manager: auto
   tags:
   - CCE-83501-7
   - DISA-STIG-RHEL-08-040110
@@ -33507,6 +33694,7 @@
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
   - NIST-800-53-MP-7
+  - PCI-DSS-Req-1.3.3
   - low_complexity
   - medium_disruption
   - medium_severity
@@ -33521,6 +33709,94 @@
   - no_reboot_needed | bool
   - unknown_strategy | bool
   - wireless_disable_interfaces | bool
+
+- name: Check if NetworkManager is installed
+  ansible.builtin.package_facts:
+    manager: auto
+  tags:
+  - CCE-83501-7
+  - DISA-STIG-RHEL-08-040110
+  - NIST-800-171-3.1.16
+  - NIST-800-53-AC-18(3)
+  - NIST-800-53-AC-18(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-MP-7
+  - PCI-DSS-Req-1.3.3
+  - low_complexity
+  - medium_disruption
+  - medium_severity
+  - no_reboot_needed
+  - unknown_strategy
+  - wireless_disable_interfaces
+  when:
+  - DISA_STIG_RHEL_08_040110 | bool
+  - low_complexity | bool
+  - medium_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - unknown_strategy | bool
+  - wireless_disable_interfaces | bool
+
+- name: Error message when NetworkManager not installed
+  fail:
+    msg: NetworkManager package not installed
+  when:
+  - DISA_STIG_RHEL_08_040110 | bool
+  - low_complexity | bool
+  - medium_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - unknown_strategy | bool
+  - wireless_disable_interfaces | bool
+  - '''NetworkManager'' not in ansible_facts.packages'
+  tags:
+  - CCE-83501-7
+  - DISA-STIG-RHEL-08-040110
+  - NIST-800-171-3.1.16
+  - NIST-800-53-AC-18(3)
+  - NIST-800-53-AC-18(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-MP-7
+  - PCI-DSS-Req-1.3.3
+  - low_complexity
+  - medium_disruption
+  - medium_severity
+  - no_reboot_needed
+  - unknown_strategy
+  - wireless_disable_interfaces
+
+- name: Deactivate Wireless Network Interfaces
+  command: nmcli radio wifi off
+  when:
+  - DISA_STIG_RHEL_08_040110 | bool
+  - low_complexity | bool
+  - medium_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - unknown_strategy | bool
+  - wireless_disable_interfaces | bool
+  - '''NetworkManager'' in ansible_facts.packages'
+  tags:
+  - CCE-83501-7
+  - DISA-STIG-RHEL-08-040110
+  - NIST-800-171-3.1.16
+  - NIST-800-53-AC-18(3)
+  - NIST-800-53-AC-18(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-MP-7
+  - PCI-DSS-Req-1.3.3
+  - low_complexity
+  - medium_disruption
+  - medium_severity
+  - no_reboot_needed
+  - unknown_strategy
+  - wireless_disable_interfaces
 
 - name: Configure excluded (non local) file systems
   set_fact:
@@ -33834,6 +34110,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*fs.protected_hardlinks.*$
     patterns: '*.conf'
     file_type: any
@@ -33859,7 +34136,7 @@
   - reboot_required
   - sysctl_fs_protected_hardlinks
 
-- name: Comment out any occurrences of fs.protected_hardlinks from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of fs.protected_hardlinks from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*fs.protected_hardlinks
@@ -33918,6 +34195,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*fs.protected_symlinks.*$
     patterns: '*.conf'
     file_type: any
@@ -33943,7 +34221,7 @@
   - reboot_required
   - sysctl_fs_protected_symlinks
 
-- name: Comment out any occurrences of fs.protected_symlinks from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of fs.protected_symlinks from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*fs.protected_symlinks
@@ -35117,12 +35395,12 @@
   - medium_severity | bool
   - no_reboot_needed | bool
 
-- name: Ensure group owner on /lib/ recursively
-  file:
-    path: /lib/
-    state: directory
-    recurse: true
-    group: '0'
+- name: Find /lib/ file(s) matching ^.*$ recursively
+  command: find -H /lib/  -type f ! -gid 0 -regex "^.*$"
+  register: files_found
+  changed_when: false
+  failed_when: false
+  check_mode: false
   tags:
   - CCE-86523-8
   - DISA-STIG-RHEL-08-010350
@@ -35143,12 +35421,13 @@
   - no_reboot_needed | bool
   - root_permissions_syslibrary_files | bool
 
-- name: Ensure group owner on /lib64/ recursively
+- name: Ensure group owner on /lib/ file(s) matching ^.*$
   file:
-    path: /lib64/
-    state: directory
-    recurse: true
+    path: '{{ item }}'
     group: '0'
+    state: file
+  with_items:
+  - '{{ files_found.stdout_lines }}'
   tags:
   - CCE-86523-8
   - DISA-STIG-RHEL-08-010350
@@ -35169,12 +35448,12 @@
   - no_reboot_needed | bool
   - root_permissions_syslibrary_files | bool
 
-- name: Ensure group owner on /usr/lib/ recursively
-  file:
-    path: /usr/lib/
-    state: directory
-    recurse: true
-    group: '0'
+- name: Find /lib64/ file(s) matching ^.*$ recursively
+  command: find -H /lib64/  -type f ! -gid 0 -regex "^.*$"
+  register: files_found
+  changed_when: false
+  failed_when: false
+  check_mode: false
   tags:
   - CCE-86523-8
   - DISA-STIG-RHEL-08-010350
@@ -35195,12 +35474,119 @@
   - no_reboot_needed | bool
   - root_permissions_syslibrary_files | bool
 
-- name: Ensure group owner on /usr/lib64/ recursively
+- name: Ensure group owner on /lib64/ file(s) matching ^.*$
   file:
-    path: /usr/lib64/
-    state: directory
-    recurse: true
+    path: '{{ item }}'
     group: '0'
+    state: file
+  with_items:
+  - '{{ files_found.stdout_lines }}'
+  tags:
+  - CCE-86523-8
+  - DISA-STIG-RHEL-08-010350
+  - NIST-800-53-CM-5(6)
+  - NIST-800-53-CM-5(6).1
+  - configure_strategy
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - root_permissions_syslibrary_files
+  when:
+  - DISA_STIG_RHEL_08_010350 | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - root_permissions_syslibrary_files | bool
+
+- name: Find /usr/lib/ file(s) matching ^.*$ recursively
+  command: find -H /usr/lib/  -type f ! -gid 0 -regex "^.*$"
+  register: files_found
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  tags:
+  - CCE-86523-8
+  - DISA-STIG-RHEL-08-010350
+  - NIST-800-53-CM-5(6)
+  - NIST-800-53-CM-5(6).1
+  - configure_strategy
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - root_permissions_syslibrary_files
+  when:
+  - DISA_STIG_RHEL_08_010350 | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - root_permissions_syslibrary_files | bool
+
+- name: Ensure group owner on /usr/lib/ file(s) matching ^.*$
+  file:
+    path: '{{ item }}'
+    group: '0'
+    state: file
+  with_items:
+  - '{{ files_found.stdout_lines }}'
+  tags:
+  - CCE-86523-8
+  - DISA-STIG-RHEL-08-010350
+  - NIST-800-53-CM-5(6)
+  - NIST-800-53-CM-5(6).1
+  - configure_strategy
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - root_permissions_syslibrary_files
+  when:
+  - DISA_STIG_RHEL_08_010350 | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - root_permissions_syslibrary_files | bool
+
+- name: Find /usr/lib64/ file(s) matching ^.*$ recursively
+  command: find -H /usr/lib64/  -type f ! -gid 0 -regex "^.*$"
+  register: files_found
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  tags:
+  - CCE-86523-8
+  - DISA-STIG-RHEL-08-010350
+  - NIST-800-53-CM-5(6)
+  - NIST-800-53-CM-5(6).1
+  - configure_strategy
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - root_permissions_syslibrary_files
+  when:
+  - DISA_STIG_RHEL_08_010350 | bool
+  - configure_strategy | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - root_permissions_syslibrary_files | bool
+
+- name: Ensure group owner on /usr/lib64/ file(s) matching ^.*$
+  file:
+    path: '{{ item }}'
+    group: '0'
+    state: file
+  with_items:
+  - '{{ files_found.stdout_lines }}'
   tags:
   - CCE-86523-8
   - DISA-STIG-RHEL-08-010350
@@ -35256,8 +35642,6 @@
 
 - name: Unit Socket Exists - autofs.socket
   command: systemctl list-unit-files autofs.socket
-  args:
-    warn: false
   register: socket_file_exists
   changed_when: false
   ignore_errors: true
@@ -38583,6 +38967,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*kernel.core_pattern.*$
     patterns: '*.conf'
     file_type: any
@@ -38607,7 +38992,7 @@
   - reboot_required
   - sysctl_kernel_core_pattern
 
-- name: Comment out any occurrences of kernel.core_pattern from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of kernel.core_pattern from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*kernel.core_pattern
@@ -38664,6 +39049,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*kernel.dmesg_restrict.*$
     patterns: '*.conf'
     file_type: any
@@ -38690,7 +39076,7 @@
   - reboot_required
   - sysctl_kernel_dmesg_restrict
 
-- name: Comment out any occurrences of kernel.dmesg_restrict from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of kernel.dmesg_restrict from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*kernel.dmesg_restrict
@@ -38751,6 +39137,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*kernel.kexec_load_disabled.*$
     patterns: '*.conf'
     file_type: any
@@ -38775,7 +39162,7 @@
   - reboot_required
   - sysctl_kernel_kexec_load_disabled
 
-- name: Comment out any occurrences of kernel.kexec_load_disabled from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of kernel.kexec_load_disabled from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*kernel.kexec_load_disabled
@@ -38832,6 +39219,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*kernel.perf_event_paranoid.*$
     patterns: '*.conf'
     file_type: any
@@ -38856,7 +39244,7 @@
   - reboot_required
   - sysctl_kernel_perf_event_paranoid
 
-- name: Comment out any occurrences of kernel.perf_event_paranoid from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of kernel.perf_event_paranoid from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*kernel.perf_event_paranoid
@@ -38913,6 +39301,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*kernel.unprivileged_bpf_disabled.*$
     patterns: '*.conf'
     file_type: any
@@ -38938,7 +39327,7 @@
   - reboot_required
   - sysctl_kernel_unprivileged_bpf_disabled
 
-- name: Comment out any occurrences of kernel.unprivileged_bpf_disabled from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of kernel.unprivileged_bpf_disabled from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*kernel.unprivileged_bpf_disabled
@@ -38997,6 +39386,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*kernel.yama.ptrace_scope.*$
     patterns: '*.conf'
     file_type: any
@@ -39021,7 +39411,7 @@
   - reboot_required
   - sysctl_kernel_yama_ptrace_scope
 
-- name: Comment out any occurrences of kernel.yama.ptrace_scope from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of kernel.yama.ptrace_scope from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*kernel.yama.ptrace_scope
@@ -39078,6 +39468,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*net.core.bpf_jit_harden.*$
     patterns: '*.conf'
     file_type: any
@@ -39103,7 +39494,7 @@
   - reboot_required
   - sysctl_net_core_bpf_jit_harden
 
-- name: Comment out any occurrences of net.core.bpf_jit_harden from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of net.core.bpf_jit_harden from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*net.core.bpf_jit_harden
@@ -39162,6 +39553,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*user.max_user_namespaces.*$
     patterns: '*.conf'
     file_type: any
@@ -39187,7 +39579,7 @@
   - reboot_required
   - sysctl_user_max_user_namespaces
 
-- name: Comment out any occurrences of user.max_user_namespaces from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of user.max_user_namespaces from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*user.max_user_namespaces
@@ -39272,8 +39664,6 @@
 
 - name: Unit Socket Exists - systemd-coredump.socket
   command: systemctl list-unit-files systemd-coredump.socket
-  args:
-    warn: false
   register: socket_file_exists
   changed_when: false
   ignore_errors: true
@@ -39468,6 +39858,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*kernel.kptr_restrict.*$
     patterns: '*.conf'
     file_type: any
@@ -39495,7 +39886,7 @@
   - reboot_required
   - sysctl_kernel_kptr_restrict
 
-- name: Comment out any occurrences of kernel.kptr_restrict from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of kernel.kptr_restrict from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*kernel.kptr_restrict
@@ -39558,6 +39949,7 @@
     paths:
     - /etc/sysctl.d/
     - /run/sysctl.d/
+    - /usr/local/lib/sysctl.d/
     contains: ^[\s]*kernel.randomize_va_space.*$
     patterns: '*.conf'
     file_type: any
@@ -39578,6 +39970,7 @@
   - NIST-800-53-CM-6(a)
   - NIST-800-53-SC-30
   - NIST-800-53-SC-30(2)
+  - PCI-DSS-Req-2.2.1
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -39585,7 +39978,7 @@
   - reboot_required
   - sysctl_kernel_randomize_va_space
 
-- name: Comment out any occurrences of kernel.randomize_va_space from /etc/sysctl.d/*.conf files
+- name: Comment out any occurrences of kernel.randomize_va_space from config files
   replace:
     path: '{{ item.path }}'
     regexp: ^[\s]*kernel.randomize_va_space
@@ -39607,6 +40000,7 @@
   - NIST-800-53-CM-6(a)
   - NIST-800-53-SC-30
   - NIST-800-53-SC-30(2)
+  - PCI-DSS-Req-2.2.1
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -39636,6 +40030,7 @@
   - NIST-800-53-CM-6(a)
   - NIST-800-53-SC-30
   - NIST-800-53-SC-30(2)
+  - PCI-DSS-Req-2.2.1
   - disable_strategy
   - low_complexity
   - medium_disruption
@@ -39833,9 +40228,9 @@
       state: present
   when:
   - DISA_STIG_RHEL_08_010170 | bool
+  - high_severity | bool
   - low_complexity | bool
   - low_disruption | bool
-  - medium_severity | bool
   - no_reboot_needed | bool
   - restrict_strategy | bool
   - selinux_state | bool
@@ -39849,9 +40244,9 @@
   - NIST-800-53-AC-3(3)(a)
   - NIST-800-53-AU-9
   - NIST-800-53-SC-7(21)
+  - high_severity
   - low_complexity
   - low_disruption
-  - medium_severity
   - no_reboot_needed
   - restrict_strategy
   - selinux_state
@@ -39911,8 +40306,6 @@
 
 - name: Unit Socket Exists - kdump.socket
   command: systemctl list-unit-files kdump.socket
-  args:
-    warn: false
   register: socket_file_exists
   changed_when: false
   ignore_errors: true
@@ -40041,6 +40434,7 @@
   - NIST-800-53-CM-7.1(ii)
   - NIST-800-53-IA-5(1)(c)
   - NIST-800-53-IA-5(1).1(v)
+  - PCI-DSS-Req-2.2.4
   - disable_strategy
   - high_severity
   - low_complexity
@@ -40328,8 +40722,8 @@
   - no_reboot_needed | bool
   - postfix_prevent_unrestricted_relay | bool
   - restrict_strategy | bool
-  - '"postfix" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - '"postfix" in ansible_facts.packages'
   tags:
   - CCE-84054-6
   - DISA-STIG-RHEL-08-040290
@@ -40876,6 +41270,7 @@
   - NIST-800-53-CM-6(a)
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
+  - PCI-DSS-Req-2.2.4
   - disable_strategy
   - high_severity
   - low_complexity
@@ -40926,17 +41321,17 @@
   - NIST-800-53-CM-6(b)
   - NIST-800-53-CM-7(a)
   - configure_strategy
-  - high_severity
   - low_complexity
   - low_disruption
+  - medium_severity
   - no_reboot_needed
   - tftpd_uses_secure_mode
   when:
   - DISA_STIG_RHEL_08_040350 | bool
   - configure_strategy | bool
-  - high_severity | bool
   - low_complexity | bool
   - low_disruption | bool
+  - medium_severity | bool
   - no_reboot_needed | bool
   - tftpd_uses_secure_mode | bool
 
@@ -40949,9 +41344,9 @@
   when:
   - DISA_STIG_RHEL_08_040350 | bool
   - configure_strategy | bool
-  - high_severity | bool
   - low_complexity | bool
   - low_disruption | bool
+  - medium_severity | bool
   - no_reboot_needed | bool
   - tftpd_uses_secure_mode | bool
   - '"tftp-server" in ansible_facts.packages'
@@ -40962,9 +41357,9 @@
   - NIST-800-53-CM-6(b)
   - NIST-800-53-CM-7(a)
   - configure_strategy
-  - high_severity
   - low_complexity
   - low_disruption
+  - medium_severity
   - no_reboot_needed
   - tftpd_uses_secure_mode
 
@@ -40978,9 +41373,9 @@
   when:
   - DISA_STIG_RHEL_08_040350 | bool
   - configure_strategy | bool
-  - high_severity | bool
   - low_complexity | bool
   - low_disruption | bool
+  - medium_severity | bool
   - no_reboot_needed | bool
   - tftpd_uses_secure_mode | bool
   - '"tftp-server" in ansible_facts.packages'
@@ -40992,9 +41387,9 @@
   - NIST-800-53-CM-6(b)
   - NIST-800-53-CM-7(a)
   - configure_strategy
-  - high_severity
   - low_complexity
   - low_disruption
+  - medium_severity
   - no_reboot_needed
   - tftpd_uses_secure_mode
 
@@ -41007,9 +41402,9 @@
   when:
   - DISA_STIG_RHEL_08_040350 | bool
   - configure_strategy | bool
-  - high_severity | bool
   - low_complexity | bool
   - low_disruption | bool
+  - medium_severity | bool
   - no_reboot_needed | bool
   - tftpd_uses_secure_mode | bool
   - '"tftp-server" in ansible_facts.packages'
@@ -41021,9 +41416,9 @@
   - NIST-800-53-CM-6(b)
   - NIST-800-53-CM-7(a)
   - configure_strategy
-  - high_severity
   - low_complexity
   - low_disruption
+  - medium_severity
   - no_reboot_needed
   - tftpd_uses_secure_mode
 
@@ -41147,6 +41542,7 @@
   - NIST-800-53-AC-17(a)
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-2.2.6
   - configure_strategy
   - file_permissions_sshd_private_key
   - low_complexity
@@ -41178,6 +41574,7 @@
   - NIST-800-53-AC-17(a)
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-2.2.6
   - configure_strategy
   - file_permissions_sshd_private_key
   - low_complexity
@@ -41208,6 +41605,7 @@
   - NIST-800-53-AC-17(a)
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-2.2.6
   - configure_strategy
   - file_permissions_sshd_private_key
   - low_complexity
@@ -41239,6 +41637,7 @@
   - NIST-800-53-AC-17(a)
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-2.2.6
   - configure_strategy
   - file_permissions_sshd_private_key
   - low_complexity
@@ -41269,6 +41668,7 @@
   - NIST-800-53-AC-17(a)
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-2.2.6
   - configure_strategy
   - file_permissions_sshd_pub_key
   - low_complexity
@@ -41300,6 +41700,7 @@
   - NIST-800-53-AC-17(a)
   - NIST-800-53-AC-6(1)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-2.2.6
   - configure_strategy
   - file_permissions_sshd_pub_key
   - low_complexity
@@ -41307,7 +41708,7 @@
   - medium_severity
   - no_reboot_needed
 
-- name: Set SSH Client Alive Count Max to zero
+- name: Set SSH Client Alive Count Max
   block:
   - name: Check for duplicate values
     lineinfile:
@@ -41330,7 +41731,7 @@
       path: /etc/ssh/sshd_config
       create: true
       regexp: (?i)^\s*ClientAliveCountMax\s+
-      line: ClientAliveCountMax 0
+      line: ClientAliveCountMax {{ var_sshd_set_keepalive }}
       state: present
       insertbefore: ^[#\s]*Match
       validate: /usr/sbin/sshd -t -f %s
@@ -41341,10 +41742,10 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - restrict_strategy | bool
-  - sshd_set_keepalive_0 | bool
+  - sshd_set_keepalive | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
-  - CCE-83405-1
+  - CCE-80907-9
   - CJIS-5.5.6
   - DISA-STIG-RHEL-08-010200
   - NIST-800-171-3.1.11
@@ -41359,9 +41760,9 @@
   - medium_severity
   - no_reboot_needed
   - restrict_strategy
-  - sshd_set_keepalive_0
+  - sshd_set_keepalive
 
-- name: Set SSH Idle Timeout Interval
+- name: Set SSH Client Alive Interval
   block:
   - name: Check for duplicate values
     lineinfile:
@@ -41514,6 +41915,7 @@
   - NIST-800-53-CM-6(a)
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
+  - PCI-DSS-Req-2.2.6
   - high_severity
   - low_complexity
   - low_disruption
@@ -41672,6 +42074,7 @@
   - NIST-800-53-CM-7(b)
   - NIST-800-53-IA-2
   - NIST-800-53-IA-2(5)
+  - PCI-DSS-Req-2.2.6
   - low_complexity
   - low_disruption
   - medium_severity
@@ -41822,6 +42225,7 @@
   - NIST-800-53-CM-6(a)
   - NIST-800-53-CM-7(a)
   - NIST-800-53-CM-7(b)
+  - PCI-DSS-Req-2.2.6
   - low_complexity
   - low_disruption
   - medium_severity
@@ -41924,6 +42328,7 @@
   - NIST-800-53-AC-8(a)
   - NIST-800-53-AC-8(c)
   - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-2.2.6
   - low_complexity
   - low_disruption
   - medium_severity
@@ -41970,9 +42375,8 @@
   tags:
   - CCE-82281-7
   - DISA-STIG-RHEL-08-020350
-  - NIST-800-53-AC-17(a)
   - NIST-800-53-AC-9
-  - NIST-800-53-CM-6(a)
+  - NIST-800-53-AC-9(1)
   - low_complexity
   - low_disruption
   - medium_severity
@@ -42226,6 +42630,7 @@
   tags:
   - CCE-80909-5
   - DISA-STIG-RHEL-08-020250
+  - PCI-DSS-Req-8.3
   - configure_strategy
   - low_complexity
   - medium_disruption
@@ -42260,6 +42665,7 @@
   tags:
   - CCE-80909-5
   - DISA-STIG-RHEL-08-020250
+  - PCI-DSS-Req-8.3
   - configure_strategy
   - low_complexity
   - medium_disruption
@@ -42297,6 +42703,7 @@
   tags:
   - CCE-80909-5
   - DISA-STIG-RHEL-08-020250
+  - PCI-DSS-Req-8.3
   - configure_strategy
   - low_complexity
   - medium_disruption
@@ -42325,6 +42732,7 @@
   tags:
   - CCE-80909-5
   - DISA-STIG-RHEL-08-020250
+  - PCI-DSS-Req-8.3
   - configure_strategy
   - low_complexity
   - medium_disruption
@@ -42349,6 +42757,7 @@
   tags:
   - CCE-80909-5
   - DISA-STIG-RHEL-08-020250
+  - PCI-DSS-Req-8.3
   - configure_strategy
   - low_complexity
   - medium_disruption
@@ -42410,6 +42819,7 @@
   tags:
   - CCE-80909-5
   - DISA-STIG-RHEL-08-020250
+  - PCI-DSS-Req-8.3
   - configure_strategy
   - low_complexity
   - medium_disruption
@@ -42557,6 +42967,7 @@
   tags:
   - CCE-80909-5
   - DISA-STIG-RHEL-08-020250
+  - PCI-DSS-Req-8.3
   - configure_strategy
   - low_complexity
   - medium_disruption
