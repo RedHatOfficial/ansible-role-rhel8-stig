@@ -1341,7 +1341,8 @@
   - medium_disruption | bool
   - reboot_required | bool
   - restrict_strategy | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and not ( lookup("env", "container")
+    == "bwrap-osbuild" ) )
   tags:
   - CCE-82155-3
   - DISA-STIG-RHEL-08-010020
@@ -1368,7 +1369,8 @@
   - medium_disruption | bool
   - reboot_required | bool
   - restrict_strategy | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and not ( lookup("env", "container")
+    == "bwrap-osbuild" ) )
   - is_fips_enabled.stdout.find('FIPS mode is enabled.') == -1
   tags:
   - CCE-82155-3
@@ -1398,7 +1400,8 @@
   - medium_disruption | bool
   - reboot_required | bool
   - restrict_strategy | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and not ( lookup("env", "container")
+    == "bwrap-osbuild" ) )
   tags:
   - CCE-82155-3
   - DISA-STIG-RHEL-08-010020
@@ -1427,6 +1430,8 @@
   - medium_disruption | bool
   - reboot_required | bool
   - restrict_strategy | bool
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and not ( lookup("env", "container")
+    == "bwrap-osbuild" ) )
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
   - CCE-80942-6
@@ -1455,6 +1460,8 @@
   - medium_disruption | bool
   - reboot_required | bool
   - restrict_strategy | bool
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and not ( lookup("env", "container")
+    == "bwrap-osbuild" ) )
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   - is_fips_enabled.stdout.find('FIPS mode is enabled.') == -1
   tags:
@@ -1488,6 +1495,8 @@
   - medium_disruption | bool
   - reboot_required | bool
   - restrict_strategy | bool
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and not ( lookup("env", "container")
+    == "bwrap-osbuild" ) )
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
   - CCE-80942-6
@@ -1516,6 +1525,8 @@
   - medium_disruption | bool
   - reboot_required | bool
   - restrict_strategy | bool
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and not ( lookup("env", "container")
+    == "bwrap-osbuild" ) )
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
   - CCE-80942-6
@@ -3369,12 +3380,9 @@
   - restrict_strategy | bool
   - sudo_remove_nopasswd | bool
 
-- name: Find out if /etc/sudoers.d/* files contain 'Defaults timestamp_timeout' to be deduplicated
-  find:
-    path: /etc/sudoers.d
-    patterns: '*'
-    contains: ^[\s]*Defaults\s.*\btimestamp_timeout[\s]*=.*
-  register: sudoers_d_defaults_timestamp_timeout
+- name: Gather the package facts
+  package_facts:
+    manager: auto
   tags:
   - CCE-87838-9
   - DISA-STIG-RHEL-08-010384
@@ -3394,12 +3402,21 @@
   - restrict_strategy | bool
   - sudo_require_reauthentication | bool
 
-- name: Remove found occurrences of 'Defaults timestamp_timeout' from /etc/sudoers.d/* files
-  lineinfile:
-    path: '{{ item.path }}'
-    regexp: ^[\s]*Defaults\s.*\btimestamp_timeout[\s]*=.*
-    state: absent
-  with_items: '{{ sudoers_d_defaults_timestamp_timeout.files }}'
+- name: Find out if /etc/sudoers.d/* files contain 'Defaults timestamp_timeout' to be deduplicated
+  find:
+    path: /etc/sudoers.d
+    patterns: '*'
+    contains: ^[\s]*Defaults\s.*\btimestamp_timeout[\s]*=.*
+  register: sudoers_d_defaults_timestamp_timeout
+  when:
+  - DISA_STIG_RHEL_08_010384 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudo_require_reauthentication | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-87838-9
   - DISA-STIG-RHEL-08-010384
@@ -3410,6 +3427,13 @@
   - no_reboot_needed
   - restrict_strategy
   - sudo_require_reauthentication
+
+- name: Remove found occurrences of 'Defaults timestamp_timeout' from /etc/sudoers.d/* files
+  lineinfile:
+    path: '{{ item.path }}'
+    regexp: ^[\s]*Defaults\s.*\btimestamp_timeout[\s]*=.*
+    state: absent
+  with_items: '{{ sudoers_d_defaults_timestamp_timeout.files }}'
   when:
   - DISA_STIG_RHEL_08_010384 | bool
   - low_complexity | bool
@@ -3418,6 +3442,17 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
   - sudo_require_reauthentication | bool
+  - '"sudo" in ansible_facts.packages'
+  tags:
+  - CCE-87838-9
+  - DISA-STIG-RHEL-08-010384
+  - NIST-800-53-IA-11
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  - sudo_require_reauthentication
 
 - name: Ensure timestamp_timeout is enabled with the appropriate value in /etc/sudoers
   lineinfile:
@@ -3427,6 +3462,15 @@
     validate: /usr/sbin/visudo -cf %s
     backrefs: true
   register: edit_sudoers_timestamp_timeout_option
+  when:
+  - DISA_STIG_RHEL_08_010384 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudo_require_reauthentication | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-87838-9
   - DISA-STIG-RHEL-08-010384
@@ -3437,14 +3481,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudo_require_reauthentication
-  when:
-  - DISA_STIG_RHEL_08_010384 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudo_require_reauthentication | bool
 
 - name: Enable timestamp_timeout option with appropriate value in /etc/sudoers
   lineinfile:
@@ -3459,6 +3495,7 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
   - sudo_require_reauthentication | bool
+  - '"sudo" in ansible_facts.packages'
   - edit_sudoers_timestamp_timeout_option is defined and not edit_sudoers_timestamp_timeout_option.changed
   tags:
   - CCE-87838-9
@@ -14538,7 +14575,7 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
 
-- name: Test for existence home directories to avoid creating them, but only fixing ownership
+- name: Test for existence of home directories to avoid creating them, but only fixing ownership
   ansible.builtin.stat:
     path: '{{ item.value[4] }}'
   register: path_exists
@@ -14551,8 +14588,8 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - restrict_strategy | bool
-  - item.value[2]|int >= 1000
-  - item.value[2]|int != 65534
+  - item.value[1]|int >= 1000
+  - item.value[1]|int != 65534
   tags:
   - CCE-86534-5
   - DISA-STIG-RHEL-08-010741
@@ -14738,8 +14775,8 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - restrict_strategy | bool
-  - item.value[2]|int >= 1000
-  - item.value[2]|int != 65534
+  - item.value[1]|int >= 1000
+  - item.value[1]|int != 65534
   tags:
   - CCE-83434-1
   - DISA-STIG-RHEL-08-010740
@@ -35793,7 +35830,7 @@
   lineinfile:
     create: true
     dest: /etc/modprobe.d/atm.conf
-    regexp: atm
+    regexp: install\s+atm
     line: install atm /bin/true
   when:
   - DISA_STIG_RHEL_08_040021 | bool
@@ -35845,7 +35882,7 @@
   lineinfile:
     create: true
     dest: /etc/modprobe.d/can.conf
-    regexp: can
+    regexp: install\s+can
     line: install can /bin/true
   when:
   - DISA_STIG_RHEL_08_040022 | bool
@@ -35897,7 +35934,7 @@
   lineinfile:
     create: true
     dest: /etc/modprobe.d/firewire-core.conf
-    regexp: firewire-core
+    regexp: install\s+firewire-core
     line: install firewire-core /bin/true
   when:
   - DISA_STIG_RHEL_08_040026 | bool
@@ -35947,7 +35984,7 @@
   lineinfile:
     create: true
     dest: /etc/modprobe.d/sctp.conf
-    regexp: sctp
+    regexp: install\s+sctp
     line: install sctp /bin/true
   when:
   - DISA_STIG_RHEL_08_040023 | bool
@@ -36009,7 +36046,7 @@
   lineinfile:
     create: true
     dest: /etc/modprobe.d/tipc.conf
-    regexp: tipc
+    regexp: install\s+tipc
     line: install tipc /bin/true
   when:
   - DISA_STIG_RHEL_08_040024 | bool
@@ -36065,7 +36102,7 @@
   lineinfile:
     create: true
     dest: /etc/modprobe.d/bluetooth.conf
-    regexp: bluetooth
+    regexp: install\s+bluetooth
     line: install bluetooth /bin/true
   when:
   - DISA_STIG_RHEL_08_040111 | bool
@@ -37531,7 +37568,8 @@
   - no_reboot_needed | bool
 
 - name: Read list of world and group writable system executables
-  command: find /bin /usr/bin /usr/local/bin /sbin /usr/sbin /usr/local/sbin /usr/libexec -perm /022 -type f
+  ansible.builtin.command: find /bin /usr/bin /usr/local/bin /sbin /usr/sbin /usr/local/sbin /usr/libexec -perm /022 -type
+    f
   register: world_writable_library_files
   changed_when: false
   failed_when: false
@@ -37559,9 +37597,10 @@
   - restrict_strategy | bool
 
 - name: Remove world/group writability of system executables
-  file:
+  ansible.builtin.file:
     path: '{{ item }}'
     mode: go-w
+    state: file
   with_items: '{{ world_writable_library_files.stdout_lines }}'
   when:
   - DISA_STIG_RHEL_08_010300 | bool
@@ -38124,7 +38163,7 @@
   lineinfile:
     create: true
     dest: /etc/modprobe.d/cramfs.conf
-    regexp: cramfs
+    regexp: install\s+cramfs
     line: install cramfs /bin/true
   when:
   - DISA_STIG_RHEL_08_040025 | bool
@@ -38182,7 +38221,7 @@
   lineinfile:
     create: true
     dest: /etc/modprobe.d/usb-storage.conf
-    regexp: usb-storage
+    regexp: install\s+usb-storage
     line: install usb-storage /bin/true
   when:
   - DISA_STIG_RHEL_08_040080 | bool
@@ -38237,7 +38276,7 @@
   - reboot_required
 
 - name: 'Add nosuid Option to /boot/efi: Check information associated to mountpoint'
-  command: findmnt  '/boot/efi'
+  command: findmnt --fstab '/boot/efi'
   register: device_name
   failed_when: device_name.rc > 1
   changed_when: false
@@ -38315,7 +38354,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/boot/efi" in ansible_mounts
     | map(attribute="mount") | list )
-  - ("" | length == 0)
+  - ("--fstab" | length == 0)
   - (device_name.stdout | length == 0)
   tags:
   - CCE-86038-7
@@ -38372,7 +38411,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/boot/efi" in ansible_mounts
     | map(attribute="mount") | list )
-  - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("" | length == 0)
+  - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-86038-7
   - DISA-STIG-RHEL-08-010572
@@ -42134,6 +42173,28 @@
   - no_reboot_needed
   - service_systemd-coredump_disabled
 
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+  tags:
+  - CCE-82251-0
+  - DISA-STIG-RHEL-08-010675
+  - NIST-800-53-CM-6
+  - coredump_disable_backtraces
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010675 | bool
+  - coredump_disable_backtraces | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
 - name: Disable core dump backtraces
   block:
   - name: Check for duplicate values
@@ -42159,6 +42220,15 @@
       regexp: ^\s*ProcessSizeMax\s*=\s*
       line: ProcessSizeMax=0
       state: present
+  when:
+  - DISA_STIG_RHEL_08_010675 | bool
+  - coredump_disable_backtraces | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - '"systemd" in ansible_facts.packages'
   tags:
   - CCE-82251-0
   - DISA-STIG-RHEL-08-010675
@@ -42169,9 +42239,23 @@
   - medium_severity
   - no_reboot_needed
   - restrict_strategy
+
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+  tags:
+  - CCE-82252-8
+  - DISA-STIG-RHEL-08-010674
+  - NIST-800-53-CM-6
+  - coredump_disable_storage
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
   when:
-  - DISA_STIG_RHEL_08_010675 | bool
-  - coredump_disable_backtraces | bool
+  - DISA_STIG_RHEL_08_010674 | bool
+  - coredump_disable_storage | bool
   - low_complexity | bool
   - low_disruption | bool
   - medium_severity | bool
@@ -42203,6 +42287,15 @@
       regexp: ^\s*Storage\s*=\s*
       line: Storage=none
       state: present
+  when:
+  - DISA_STIG_RHEL_08_010674 | bool
+  - coredump_disable_storage | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - '"systemd" in ansible_facts.packages'
   tags:
   - CCE-82252-8
   - DISA-STIG-RHEL-08-010674
@@ -42213,14 +42306,6 @@
   - medium_severity
   - no_reboot_needed
   - restrict_strategy
-  when:
-  - DISA_STIG_RHEL_08_010674 | bool
-  - coredump_disable_storage | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
 
 - name: Gather the package facts
   package_facts:
@@ -45443,7 +45528,8 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - package_usbguard_installed | bool
-  - ansible_architecture != "s390x"
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and ansible_architecture != "s390x"
+    )
   tags:
   - CCE-82959-8
   - DISA-STIG-RHEL-08-040139
@@ -45477,8 +45563,8 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - service_usbguard_enabled | bool
-  - ansible_architecture != "s390x"
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and ansible_architecture != "s390x"
+    )
   tags:
   - CCE-82853-3
   - DISA-STIG-RHEL-08-040141
@@ -45553,8 +45639,8 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - usbguard_generate_policy | bool
-  - ansible_architecture != "s390x"
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and ansible_architecture != "s390x"
+    )
   - '"usbguard" in ansible_facts.packages'
   tags:
   - CCE-83774-0
