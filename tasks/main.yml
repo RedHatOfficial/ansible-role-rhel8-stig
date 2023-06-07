@@ -13736,7 +13736,7 @@
 - name: Insert correct line into /etc/tmux.conf
   lineinfile:
     path: /etc/tmux.conf
-    create: null
+    create: false
     regexp: \s*bind\s+\w\s+lock-session.*$
     mode: '0644'
     line: bind X lock-session
