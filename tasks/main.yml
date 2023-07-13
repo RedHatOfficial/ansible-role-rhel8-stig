@@ -13507,7 +13507,7 @@
   ansible.builtin.find:
     paths: /etc
     patterns: bashrc
-    contains: .*case "$name" in sshd|login) tmux ;; esac.*
+    contains: .*case "$name" in (sshd|login) tmux ;; esac.*
   register: tmux_in_bashrc
   when:
   - DISA_STIG_RHEL_08_020041 | bool
@@ -13532,7 +13532,7 @@
   ansible.builtin.find:
     paths: /etc/profile.d
     patterns: '*.sh'
-    contains: .*case "$name" in sshd|login) tmux ;; esac.*
+    contains: .*case "$name" in (sshd|login) tmux ;; esac.*
   register: tmux_in_profile_d
   when:
   - DISA_STIG_RHEL_08_020041 | bool
@@ -13556,7 +13556,7 @@
 - name: 'Support session locking with tmux (not enforcing): Insert the correct script into /etc/profile.d/tmux.sh'
   ansible.builtin.blockinfile:
     path: /etc/profile.d/tmux.sh
-    block: "if [ \"$PS1\" ]; then\n  parent=$(ps -o ppid= -p $$)\n  name=$(ps -o comm= -p $parent)\n  case \"$name\" in sshd|login)\
+    block: "if [ \"$PS1\" ]; then\n  parent=$(ps -o ppid= -p $$)\n  name=$(ps -o comm= -p $parent)\n  case \"$name\" in (sshd|login)\
       \ tmux ;; esac\nfi\n"
     create: true
   when:
