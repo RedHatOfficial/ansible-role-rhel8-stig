@@ -3,7 +3,7 @@
 var_aide_scan_notification_email: root@localhost
 var_system_crypto_policy: FIPS
 sshd_approved_ciphers: aes256-ctr,aes192-ctr,aes128-ctr
-sshd_approved_macs: hmac-sha2-512,hmac-sha2-256
+sshd_approved_macs: hmac-sha2-512,hmac-sha2-256,hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
 inactivity_timeout_value: '900'
 var_screensaver_lock_delay: '5'
 var_sudo_timestamp_timeout: '0'
@@ -27,11 +27,14 @@ var_password_pam_ocredit: '-1'
 var_password_pam_retry: '3'
 var_password_pam_ucredit: '-1'
 var_password_hashing_algorithm: SHA512
+var_logind_session_timeout: '300'
 var_account_disable_post_pw_expiration: '35'
 var_accounts_maximum_age_login_defs: '60'
 var_accounts_minimum_age_login_defs: '1'
+var_accounts_password_minlen_login_defs: '15'
 var_accounts_fail_delay: '4'
 var_accounts_max_concurrent_login_sessions: '10'
+var_user_initialization_files_regex: ^(\.bashrc|\.zshrc|\.cshrc|\.profile|\.bash_login|\.bash_profile)$
 var_accounts_user_umask: '077'
 var_auditd_disk_error_action: syslog|single|halt
 var_auditd_disk_full_action: syslog|single|halt
@@ -66,6 +69,7 @@ var_rekey_limit_size: 1G
 var_rekey_limit_time: 1h
 var_sssd_certificate_verification_digest_function: sha1
 DISA_STIG_RHEL_08_010010: true
+DISA_STIG_RHEL_08_010019: true
 DISA_STIG_RHEL_08_010020: true
 DISA_STIG_RHEL_08_010040: true
 DISA_STIG_RHEL_08_010049: true
@@ -73,6 +77,8 @@ DISA_STIG_RHEL_08_010050: true
 DISA_STIG_RHEL_08_010060: true
 DISA_STIG_RHEL_08_010070: true
 DISA_STIG_RHEL_08_010110: true
+DISA_STIG_RHEL_08_010121: true
+DISA_STIG_RHEL_08_010130: true
 DISA_STIG_RHEL_08_010151: true
 DISA_STIG_RHEL_08_010152: true
 DISA_STIG_RHEL_08_010159: true
@@ -106,6 +112,7 @@ DISA_STIG_RHEL_08_010340: true
 DISA_STIG_RHEL_08_010341: true
 DISA_STIG_RHEL_08_010350: true
 DISA_STIG_RHEL_08_010351: true
+DISA_STIG_RHEL_08_010358: true
 DISA_STIG_RHEL_08_010359: true
 DISA_STIG_RHEL_08_010360: true
 DISA_STIG_RHEL_08_010370: true
@@ -120,6 +127,7 @@ DISA_STIG_RHEL_08_010380: true
 DISA_STIG_RHEL_08_010381: true
 DISA_STIG_RHEL_08_010383: true
 DISA_STIG_RHEL_08_010384: true
+DISA_STIG_RHEL_08_010385: true
 DISA_STIG_RHEL_08_010390: true
 DISA_STIG_RHEL_08_010400: true
 DISA_STIG_RHEL_08_010410: true
@@ -129,6 +137,8 @@ DISA_STIG_RHEL_08_010423: true
 DISA_STIG_RHEL_08_010430: true
 DISA_STIG_RHEL_08_010440: true
 DISA_STIG_RHEL_08_010450: true
+DISA_STIG_RHEL_08_010460: true
+DISA_STIG_RHEL_08_010470: true
 DISA_STIG_RHEL_08_010472: true
 DISA_STIG_RHEL_08_010480: true
 DISA_STIG_RHEL_08_010490: true
@@ -163,19 +173,22 @@ DISA_STIG_RHEL_08_010740: true
 DISA_STIG_RHEL_08_010741: true
 DISA_STIG_RHEL_08_010750: true
 DISA_STIG_RHEL_08_010760: true
+DISA_STIG_RHEL_08_010770: true
 DISA_STIG_RHEL_08_010820: true
 DISA_STIG_RHEL_08_010830: true
 DISA_STIG_RHEL_08_020011: true
 DISA_STIG_RHEL_08_020012: true
-DISA_STIG_RHEL_08_020016: true
+DISA_STIG_RHEL_08_020013: true
+DISA_STIG_RHEL_08_020015: true
 DISA_STIG_RHEL_08_020017: true
 DISA_STIG_RHEL_08_020019: true
 DISA_STIG_RHEL_08_020021: true
-DISA_STIG_RHEL_08_020022: true
+DISA_STIG_RHEL_08_020023: true
 DISA_STIG_RHEL_08_020024: true
 DISA_STIG_RHEL_08_020030: true
 DISA_STIG_RHEL_08_020031: true
 DISA_STIG_RHEL_08_020032: true
+DISA_STIG_RHEL_08_020035: true
 DISA_STIG_RHEL_08_020039: true
 DISA_STIG_RHEL_08_020040: true
 DISA_STIG_RHEL_08_020041: true
@@ -194,12 +207,14 @@ DISA_STIG_RHEL_08_020140: true
 DISA_STIG_RHEL_08_020150: true
 DISA_STIG_RHEL_08_020160: true
 DISA_STIG_RHEL_08_020170: true
+DISA_STIG_RHEL_08_020180: true
 DISA_STIG_RHEL_08_020190: true
 DISA_STIG_RHEL_08_020200: true
 DISA_STIG_RHEL_08_020210: true
 DISA_STIG_RHEL_08_020220: true
 DISA_STIG_RHEL_08_020221: true
 DISA_STIG_RHEL_08_020230: true
+DISA_STIG_RHEL_08_020231: true
 DISA_STIG_RHEL_08_020250: true
 DISA_STIG_RHEL_08_020260: true
 DISA_STIG_RHEL_08_020280: true
@@ -267,6 +282,7 @@ DISA_STIG_RHEL_08_030550: true
 DISA_STIG_RHEL_08_030560: true
 DISA_STIG_RHEL_08_030570: true
 DISA_STIG_RHEL_08_030580: true
+DISA_STIG_RHEL_08_030590: true
 DISA_STIG_RHEL_08_030600: true
 DISA_STIG_RHEL_08_030601: true
 DISA_STIG_RHEL_08_030602: true
@@ -331,6 +347,7 @@ DISA_STIG_RHEL_08_040171: true
 DISA_STIG_RHEL_08_040172: true
 DISA_STIG_RHEL_08_040180: true
 DISA_STIG_RHEL_08_040190: true
+DISA_STIG_RHEL_08_040200: true
 DISA_STIG_RHEL_08_040209: true
 DISA_STIG_RHEL_08_040210: true
 DISA_STIG_RHEL_08_040220: true
@@ -353,8 +370,11 @@ DISA_STIG_RHEL_08_040284: true
 DISA_STIG_RHEL_08_040285: true
 DISA_STIG_RHEL_08_040286: true
 DISA_STIG_RHEL_08_040290: true
+DISA_STIG_RHEL_08_040300: true
+DISA_STIG_RHEL_08_040310: true
 DISA_STIG_RHEL_08_040320: true
 DISA_STIG_RHEL_08_040321: true
+DISA_STIG_RHEL_08_040330: true
 DISA_STIG_RHEL_08_040340: true
 DISA_STIG_RHEL_08_040341: true
 DISA_STIG_RHEL_08_040350: true
@@ -368,6 +388,8 @@ accounts_logon_fail_delay: true
 accounts_max_concurrent_login_sessions: true
 accounts_maximum_age_login_defs: true
 accounts_minimum_age_login_defs: true
+accounts_no_uid_except_zero: true
+accounts_password_minlen_login_defs: true
 accounts_password_pam_dcredit: true
 accounts_password_pam_dictcheck: true
 accounts_password_pam_difok: true
@@ -384,6 +406,7 @@ accounts_password_pam_pwquality_system_auth: true
 accounts_password_pam_retry: true
 accounts_password_pam_ucredit: true
 accounts_password_set_max_life_existing: true
+accounts_password_set_min_life_existing: true
 accounts_passwords_pam_faillock_audit: true
 accounts_passwords_pam_faillock_deny: true
 accounts_passwords_pam_faillock_deny_root: true
@@ -403,6 +426,8 @@ accounts_users_home_files_permissions: true
 aide_build_database: true
 aide_check_audit_tools: true
 aide_scan_notification: true
+aide_verify_acls: true
+aide_verify_ext_attributes: true
 audit_rules_dac_modification_chmod: true
 audit_rules_dac_modification_chown: true
 audit_rules_dac_modification_fchmod: true
@@ -432,6 +457,7 @@ audit_rules_immutable_login_uids: true
 audit_rules_kernel_module_loading_delete: true
 audit_rules_kernel_module_loading_finit: true
 audit_rules_kernel_module_loading_init: true
+audit_rules_login_events_faillock: true
 audit_rules_login_events_lastlog: true
 audit_rules_media_export: true
 audit_rules_privileged_commands_chage: true
@@ -514,6 +540,7 @@ disable_ctrlaltdel_burstaction: true
 disable_ctrlaltdel_reboot: true
 disable_strategy: true
 disable_users_coredumps: true
+disallow_bypass_password_sudo: true
 display_login_attempts: true
 enable_authselect: true
 enable_dracut_fips_module: true
@@ -534,6 +561,7 @@ file_owner_var_log: true
 file_owner_var_log_messages: true
 file_ownership_binary_dirs: true
 file_ownership_library_dirs: true
+file_permission_user_init_files: true
 file_permissions_binary_dirs: true
 file_permissions_etc_audit_auditd: true
 file_permissions_etc_audit_rulesd: true
@@ -565,6 +593,7 @@ kernel_module_can_disabled: true
 kernel_module_cramfs_disabled: true
 kernel_module_sctp_disabled: true
 kernel_module_tipc_disabled: true
+logind_session_timeout: true
 low_complexity: true
 low_disruption: true
 low_severity: true
@@ -597,8 +626,12 @@ mount_option_var_log_nosuid: true
 mount_option_var_tmp_nodev: true
 mount_option_var_tmp_noexec: true
 mount_option_var_tmp_nosuid: true
+network_sniffer_disabled: true
 no_empty_passwords: true
+no_empty_passwords_etc_shadow: true
+no_host_based_files: true
 no_reboot_needed: true
+no_user_host_based_files: true
 package_abrt_addon_ccpp_removed: true
 package_abrt_addon_kerneloops_removed: true
 package_abrt_cli_removed: true
@@ -614,6 +647,7 @@ package_krb5_server_removed: true
 package_krb5_workstation_removed: true
 package_libreport_plugin_logger_removed: true
 package_libreport_plugin_rhtsupport_removed: true
+package_mailx_installed: true
 package_opensc_installed: true
 package_openssh_server_installed: true
 package_policycoreutils_installed: true
@@ -652,6 +686,7 @@ service_debug_shell_disabled: true
 service_fapolicyd_enabled: true
 service_firewalld_enabled: true
 service_kdump_disabled: true
+service_rngd_enabled: true
 service_rsyslog_enabled: true
 service_sshd_enabled: true
 service_systemd_coredump_disabled: true
@@ -659,6 +694,7 @@ service_usbguard_enabled: true
 set_password_hashing_algorithm_logindefs: true
 set_password_hashing_algorithm_passwordauth: true
 set_password_hashing_algorithm_systemauth: true
+set_password_hashing_min_rounds_logindefs: true
 skip_ansible_lint: true
 sshd_disable_empty_passwords: true
 sshd_disable_gssapi_auth: true
