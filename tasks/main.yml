@@ -250,10 +250,10 @@
 
 - name: Ensure AIDE is installed
   package:
-    name:
-    - aide
-    - crontabs
+    name: '{{ item }}'
     state: present
+  with_items:
+  - aide
   when:
   - DISA_STIG_RHEL_08_010360 | bool
   - aide_scan_notification | bool
@@ -301,6 +301,178 @@
   - low_complexity
   - low_disruption
   - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Gather list of packages
+  package_facts:
+    manager: auto
+  when:
+  - DISA_STIG_RHEL_08_040310 | bool
+  - aide_verify_acls | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ''
+  tags:
+  - CCE-84220-3
+  - DISA-STIG-RHEL-08-040310
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SI-7(1)
+  - aide_verify_acls
+  - low_complexity
+  - low_disruption
+  - low_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Get rules groups
+  shell: 'set -o pipefail
+
+    LC_ALL=C grep "^[A-Z][A-Za-z_]*" /etc/aide.conf | grep -v "^ALLXTRAHASHES" | cut -f1 -d ''='' | tr -d '' '' | sort -u
+    || true
+
+    '
+  when:
+  - DISA_STIG_RHEL_08_040310 | bool
+  - aide_verify_acls | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - '''aide'' in ansible_facts.packages'
+  register: find_rules_groups_results
+  tags:
+  - CCE-84220-3
+  - DISA-STIG-RHEL-08-040310
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SI-7(1)
+  - aide_verify_acls
+  - low_complexity
+  - low_disruption
+  - low_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Ensure the acl rule is present when aide is installed.
+  replace:
+    path: /etc/aide.conf
+    regexp: (^\s*{{ item }}\s*=\s*)(?!.*acl)([^\s]*)
+    replace: \g<1>\g<2>+acl
+  when:
+  - DISA_STIG_RHEL_08_040310 | bool
+  - aide_verify_acls | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - '''aide'' in ansible_facts.packages'
+  with_items: '{{ find_rules_groups_results.stdout_lines | map(''trim'') | list }}'
+  tags:
+  - CCE-84220-3
+  - DISA-STIG-RHEL-08-040310
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SI-7(1)
+  - aide_verify_acls
+  - low_complexity
+  - low_disruption
+  - low_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Gather list of packages
+  package_facts:
+    manager: auto
+  when:
+  - DISA_STIG_RHEL_08_040300 | bool
+  - aide_verify_ext_attributes | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ''
+  tags:
+  - CCE-83733-6
+  - DISA-STIG-RHEL-08-040300
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SI-7(1)
+  - aide_verify_ext_attributes
+  - low_complexity
+  - low_disruption
+  - low_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Get rules groups
+  shell: 'set -o pipefail
+
+    LC_ALL=C grep "^[A-Z][A-Za-z_]*" /etc/aide.conf | grep -v "^ALLXTRAHASHES" | cut -f1 -d ''='' | tr -d '' '' | sort -u
+    || true
+
+    '
+  when:
+  - DISA_STIG_RHEL_08_040300 | bool
+  - aide_verify_ext_attributes | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - '''aide'' in ansible_facts.packages'
+  register: find_rules_groups_results
+  tags:
+  - CCE-83733-6
+  - DISA-STIG-RHEL-08-040300
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SI-7(1)
+  - aide_verify_ext_attributes
+  - low_complexity
+  - low_disruption
+  - low_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Ensure the xattrs rule is present when aide is installed.
+  replace:
+    path: /etc/aide.conf
+    regexp: (^\s*{{ item }}\s*=\s*)(?!.*xattrs)([^\s]*)
+    replace: \g<1>\g<2>+xattrs
+  when:
+  - DISA_STIG_RHEL_08_040300 | bool
+  - aide_verify_ext_attributes | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - '''aide'' in ansible_facts.packages'
+  with_items: '{{ find_rules_groups_results.stdout_lines | map(''trim'') | list }}'
+  tags:
+  - CCE-83733-6
+  - DISA-STIG-RHEL-08-040300
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SI-7
+  - NIST-800-53-SI-7(1)
+  - aide_verify_ext_attributes
+  - low_complexity
+  - low_disruption
+  - low_severity
   - no_reboot_needed
   - restrict_strategy
 
@@ -1426,6 +1598,7 @@
 - name: Check to see the current status of FIPS mode
   command: /usr/bin/fips-mode-setup --check
   register: is_fips_enabled
+  ignore_errors: true
   changed_when: false
   when:
   - DISA_STIG_RHEL_08_010020 | bool
@@ -1775,12 +1948,12 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
 
-- name: Test for crypto_policy group
-  command: grep '^\s*\[\s*crypto_policy\s*]' /etc/pki/tls/openssl.cnf
+- name: Configure OpenSSL library to use System Crypto Policy - Search for crypto_policy Section
+  ansible.builtin.find:
+    paths: /etc/pki/tls
+    patterns: openssl.cnf
+    contains: ^\s*\[\s*crypto_policy\s*]
   register: test_crypto_policy_group
-  failed_when: test_crypto_policy_group.rc not in [0, 1]
-  changed_when: false
-  check_mode: false
   tags:
   - CCE-80938-4
   - DISA-STIG-RHEL-08-010293
@@ -1808,11 +1981,44 @@
   - no_reboot_needed | bool
   - unknown_strategy | bool
 
-- name: Add .include for opensslcnf.config to crypto_policy section
-  lineinfile:
+- name: Configure OpenSSL library to use System Crypto Policy - Search for crypto_policy Section Together With .include Directive
+  ansible.builtin.find:
+    paths: /etc/pki/tls
+    patterns: openssl.cnf
+    contains: ^\s*\.include\s*(?:=\s*)?/etc/crypto-policies/back-ends/opensslcnf.config$
+  register: test_crypto_policy_include_directive
+  tags:
+  - CCE-80938-4
+  - DISA-STIG-RHEL-08-010293
+  - NIST-800-53-AC-17(2)
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-MA-4(6)
+  - NIST-800-53-SC-12(2)
+  - NIST-800-53-SC-12(3)
+  - NIST-800-53-SC-13
+  - PCI-DSS-Req-2.2
+  - PCI-DSSv4-2.2
+  - configure_openssl_crypto_policy
+  - low_complexity
+  - medium_disruption
+  - medium_severity
+  - no_reboot_needed
+  - unknown_strategy
+  when:
+  - DISA_STIG_RHEL_08_010293 | bool
+  - configure_openssl_crypto_policy | bool
+  - low_complexity | bool
+  - medium_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - unknown_strategy | bool
+
+- name: '{{ rule_title }} - Add .include Line for opensslcnf.config File in crypto_policy Section'
+  ansible.builtin.lineinfile:
     create: true
     insertafter: ^\s*\[\s*crypto_policy\s*]\s*
-    line: .include = /etc/crypto-policies/back-ends/opensslcnf.config
+    line: .include /etc/crypto-policies/back-ends/opensslcnf.config
     path: /etc/pki/tls/openssl.cnf
   when:
   - DISA_STIG_RHEL_08_010293 | bool
@@ -1822,8 +2028,8 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - unknown_strategy | bool
-  - test_crypto_policy_group.stdout is defined
-  - test_crypto_policy_group.stdout | length > 0
+  - test_crypto_policy_group.matched > 0
+  - test_crypto_policy_include_directive.matched == 0
   tags:
   - CCE-80938-4
   - DISA-STIG-RHEL-08-010293
@@ -1843,12 +2049,13 @@
   - no_reboot_needed
   - unknown_strategy
 
-- name: Add crypto_policy group and set include opensslcnf.config
-  lineinfile:
+- name: Configure OpenSSL library to use System Crypto Policy - Add crypto_policy Section With .include for opensslcnf.config
+    File
+  ansible.builtin.lineinfile:
     create: true
     line: '[crypto_policy]
 
-      .include = /etc/crypto-policies/back-ends/opensslcnf.config'
+      .include /etc/crypto-policies/back-ends/opensslcnf.config'
     path: /etc/pki/tls/openssl.cnf
   when:
   - DISA_STIG_RHEL_08_010293 | bool
@@ -1858,8 +2065,7 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - unknown_strategy | bool
-  - test_crypto_policy_group.stdout is defined
-  - test_crypto_policy_group.stdout | length < 1
+  - test_crypto_policy_group.matched == 0
   tags:
   - CCE-80938-4
   - DISA-STIG-RHEL-08-010293
@@ -3706,12 +3912,9 @@
   - no_reboot_needed | bool
   - sudoers_default_includedir | bool
 
-- name: Find out if /etc/sudoers.d/* files contain Defaults targetpw to be deduplicated
-  find:
-    path: /etc/sudoers.d
-    patterns: '*'
-    contains: ^Defaults targetpw$
-  register: sudoers_d_defaults
+- name: Gather the package facts
+  package_facts:
+    manager: auto
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -3731,6 +3934,33 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
   - sudoers_validate_passwd | bool
+
+- name: Find out if /etc/sudoers.d/* files contain Defaults targetpw to be deduplicated
+  find:
+    path: /etc/sudoers.d
+    patterns: '*'
+    contains: ^Defaults targetpw$
+  register: sudoers_d_defaults
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
+  tags:
+  - CCE-83422-6
+  - DISA-STIG-RHEL-08-010383
+  - NIST-800-53-CM-6(b)
+  - NIST-800-53-CM-6.1(iv)
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  - sudoers_validate_passwd
 
 - name: Remove found occurrences of Defaults targetpw from /etc/sudoers.d/* files
   lineinfile:
@@ -3738,6 +3968,15 @@
     regexp: ^Defaults targetpw$
     state: absent
   with_items: '{{ sudoers_d_defaults.files }}'
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -3749,14 +3988,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Find out if /etc/sudoers.d/* files contain Defaults rootpw to be deduplicated
   find:
@@ -3764,6 +3995,15 @@
     patterns: '*'
     contains: ^Defaults rootpw$
   register: sudoers_d_defaults
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -3775,14 +4015,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Remove found occurrences of Defaults rootpw from /etc/sudoers.d/* files
   lineinfile:
@@ -3790,6 +4022,15 @@
     regexp: ^Defaults rootpw$
     state: absent
   with_items: '{{ sudoers_d_defaults.files }}'
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -3801,14 +4042,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Find out if /etc/sudoers.d/* files contain Defaults runaspw to be deduplicated
   find:
@@ -3816,6 +4049,15 @@
     patterns: '*'
     contains: ^Defaults runaspw$
   register: sudoers_d_defaults
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -3827,14 +4069,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Remove found occurrences of Defaults runaspw from /etc/sudoers.d/* files
   lineinfile:
@@ -3842,6 +4076,15 @@
     regexp: ^Defaults runaspw$
     state: absent
   with_items: '{{ sudoers_d_defaults.files }}'
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -3853,14 +4096,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Remove any ocurrences of Defaults targetpw in /etc/sudoers
   lineinfile:
@@ -3869,6 +4104,15 @@
     validate: /usr/sbin/visudo -cf %s
     state: absent
   register: sudoers_file_defaults
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -3880,14 +4124,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Remove any ocurrences of Defaults rootpw in /etc/sudoers
   lineinfile:
@@ -3896,6 +4132,15 @@
     validate: /usr/sbin/visudo -cf %s
     state: absent
   register: sudoers_file_defaults
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -3907,14 +4152,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Remove any ocurrences of Defaults runaspw in /etc/sudoers
   lineinfile:
@@ -3923,6 +4160,15 @@
     validate: /usr/sbin/visudo -cf %s
     state: absent
   register: sudoers_file_defaults
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -3934,14 +4180,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Check for duplicate values
   lineinfile:
@@ -3952,6 +4190,15 @@
   check_mode: true
   changed_when: false
   register: dupes
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -3963,14 +4210,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Deduplicate values from /etc/sudoers
   lineinfile:
@@ -3986,6 +4225,7 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
   - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   - dupes.found is defined and dupes.found > 1
   tags:
   - CCE-83422-6
@@ -4006,6 +4246,15 @@
     regexp: ^Defaults !targetpw$
     line: Defaults !targetpw
     state: present
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -4017,14 +4266,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Check for duplicate values
   lineinfile:
@@ -4035,6 +4276,15 @@
   check_mode: true
   changed_when: false
   register: dupes
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -4046,14 +4296,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Deduplicate values from /etc/sudoers
   lineinfile:
@@ -4069,6 +4311,7 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
   - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   - dupes.found is defined and dupes.found > 1
   tags:
   - CCE-83422-6
@@ -4089,6 +4332,15 @@
     regexp: ^Defaults !rootpw$
     line: Defaults !rootpw
     state: present
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -4100,14 +4352,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Check for duplicate values
   lineinfile:
@@ -4118,6 +4362,15 @@
   check_mode: true
   changed_when: false
   register: dupes
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -4129,14 +4382,6 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Deduplicate values from /etc/sudoers
   lineinfile:
@@ -4152,6 +4397,7 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
   - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   - dupes.found is defined and dupes.found > 1
   tags:
   - CCE-83422-6
@@ -4172,6 +4418,15 @@
     regexp: ^Defaults !runaspw$
     line: Defaults !runaspw
     state: present
+  when:
+  - DISA_STIG_RHEL_08_010383 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - sudoers_validate_passwd | bool
+  - '"sudo" in ansible_facts.packages'
   tags:
   - CCE-83422-6
   - DISA-STIG-RHEL-08-010383
@@ -4183,19 +4438,20 @@
   - no_reboot_needed
   - restrict_strategy
   - sudoers_validate_passwd
-  when:
-  - DISA_STIG_RHEL_08_010383 | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
-  - sudoers_validate_passwd | bool
 
 - name: Ensure rng-tools is installed
   package:
     name: rng-tools
     state: present
+  when:
+  - DISA_STIG_RHEL_08_010472 | bool
+  - enable_strategy | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - package_rng_tools_installed | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
   - CCE-82968-9
   - DISA-STIG-RHEL-08-010472
@@ -4205,14 +4461,6 @@
   - low_severity
   - no_reboot_needed
   - package_rng-tools_installed
-  when:
-  - DISA_STIG_RHEL_08_010472 | bool
-  - enable_strategy | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - low_severity | bool
-  - no_reboot_needed | bool
-  - package_rng_tools_installed | bool
 
 - name: Ensure abrt-addon-ccpp is removed
   package:
@@ -4747,6 +4995,7 @@
   tags:
   - CCE-80795-8
   - CJIS-5.10.4.1
+  - DISA-STIG-RHEL-08-010019
   - NIST-800-171-3.4.8
   - NIST-800-53-CM-5(3)
   - NIST-800-53-CM-6(a)
@@ -4761,6 +5010,7 @@
   - no_reboot_needed
   - restrict_strategy
   when:
+  - DISA_STIG_RHEL_08_010019 | bool
   - ensure_redhat_gpgkey_installed | bool
   - high_severity | bool
   - medium_complexity | bool
@@ -4776,6 +5026,7 @@
   tags:
   - CCE-80795-8
   - CJIS-5.10.4.1
+  - DISA-STIG-RHEL-08-010019
   - NIST-800-171-3.4.8
   - NIST-800-53-CM-5(3)
   - NIST-800-53-CM-6(a)
@@ -4790,6 +5041,7 @@
   - no_reboot_needed
   - restrict_strategy
   when:
+  - DISA_STIG_RHEL_08_010019 | bool
   - ensure_redhat_gpgkey_installed | bool
   - high_severity | bool
   - medium_complexity | bool
@@ -4805,6 +5057,7 @@
   tags:
   - CCE-80795-8
   - CJIS-5.10.4.1
+  - DISA-STIG-RHEL-08-010019
   - NIST-800-171-3.4.8
   - NIST-800-53-CM-5(3)
   - NIST-800-53-CM-6(a)
@@ -4819,6 +5072,7 @@
   - no_reboot_needed
   - restrict_strategy
   when:
+  - DISA_STIG_RHEL_08_010019 | bool
   - ensure_redhat_gpgkey_installed | bool
   - high_severity | bool
   - medium_complexity | bool
@@ -4832,6 +5086,7 @@
   tags:
   - CCE-80795-8
   - CJIS-5.10.4.1
+  - DISA-STIG-RHEL-08-010019
   - NIST-800-171-3.4.8
   - NIST-800-53-CM-5(3)
   - NIST-800-53-CM-6(a)
@@ -4846,6 +5101,7 @@
   - no_reboot_needed
   - restrict_strategy
   when:
+  - DISA_STIG_RHEL_08_010019 | bool
   - ensure_redhat_gpgkey_installed | bool
   - high_severity | bool
   - medium_complexity | bool
@@ -4858,6 +5114,7 @@
     state: present
     key: /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
   when:
+  - DISA_STIG_RHEL_08_010019 | bool
   - ensure_redhat_gpgkey_installed | bool
   - high_severity | bool
   - medium_complexity | bool
@@ -4871,6 +5128,7 @@
   tags:
   - CCE-80795-8
   - CJIS-5.10.4.1
+  - DISA-STIG-RHEL-08-010019
   - NIST-800-171-3.4.8
   - NIST-800-53-CM-5(3)
   - NIST-800-53-CM-6(a)
@@ -5005,7 +5263,7 @@
   - medium_severity
   - no_reboot_needed
 
-- name: Modify the System Login Banner - ensure correct banner
+- name: Modify the System Login Banner - Ensure Correct Banner
   copy:
     dest: /etc/issue
     content: '{{ login_banner_text | regex_replace("^\^(.*)\$$", "\1") | regex_replace("^\((.*\.)\|.*\)$", "\1") | regex_replace("\[\\s\\n\]\+","
@@ -5314,6 +5572,54 @@
   - medium_severity
   - no_reboot_needed
   - unknown_strategy
+
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+  tags:
+  - CCE-86319-1
+  - DISA-STIG-RHEL-08-010385
+  - NIST-800-53-IA-11
+  - disallow_bypass_password_sudo
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010385 | bool
+  - disallow_bypass_password_sudo | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Check for pam_succeed_if entry
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/sudo
+    create: false
+    regexp: pam_succeed_if
+    state: absent
+  when:
+  - DISA_STIG_RHEL_08_010385 | bool
+  - disallow_bypass_password_sudo | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - '"pam" in ansible_facts.packages'
+  tags:
+  - CCE-86319-1
+  - DISA-STIG-RHEL-08-010385
+  - NIST-800-53-IA-11
+  - disallow_bypass_password_sudo
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
 
 - name: Gather the package facts
   package_facts:
@@ -8415,7 +8721,7 @@
     manager: auto
   tags:
   - CCE-80668-7
-  - DISA-STIG-RHEL-08-020022
+  - DISA-STIG-RHEL-08-020023
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
   - NIST-800-53-IA-5(c)
@@ -8426,7 +8732,7 @@
   - no_reboot_needed
   - restrict_strategy
   when:
-  - DISA_STIG_RHEL_08_020022 | bool
+  - DISA_STIG_RHEL_08_020023 | bool
   - accounts_passwords_pam_faillock_deny_root | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -8439,7 +8745,7 @@
     path: /usr/bin/authselect
   register: result_authselect_present
   when:
-  - DISA_STIG_RHEL_08_020022 | bool
+  - DISA_STIG_RHEL_08_020023 | bool
   - accounts_passwords_pam_faillock_deny_root | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -8449,7 +8755,7 @@
   - '"pam" in ansible_facts.packages'
   tags:
   - CCE-80668-7
-  - DISA-STIG-RHEL-08-020022
+  - DISA-STIG-RHEL-08-020023
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
   - NIST-800-53-IA-5(c)
@@ -8503,7 +8809,7 @@
     - result_authselect_enable_feature_cmd is not skipped
     - result_authselect_enable_feature_cmd is success
   when:
-  - DISA_STIG_RHEL_08_020022 | bool
+  - DISA_STIG_RHEL_08_020023 | bool
   - accounts_passwords_pam_faillock_deny_root | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -8514,7 +8820,7 @@
   - result_authselect_present.stat.exists
   tags:
   - CCE-80668-7
-  - DISA-STIG-RHEL-08-020022
+  - DISA-STIG-RHEL-08-020023
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
   - NIST-800-53-IA-5(c)
@@ -8569,7 +8875,7 @@
     when:
     - result_pam_faillock_is_enabled.found == 0
   when:
-  - DISA_STIG_RHEL_08_020022 | bool
+  - DISA_STIG_RHEL_08_020023 | bool
   - accounts_passwords_pam_faillock_deny_root | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -8580,7 +8886,7 @@
   - not result_authselect_present.stat.exists
   tags:
   - CCE-80668-7
-  - DISA-STIG-RHEL-08-020022
+  - DISA-STIG-RHEL-08-020023
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
   - NIST-800-53-IA-5(c)
@@ -8596,7 +8902,7 @@
     path: /etc/security/faillock.conf
   register: result_faillock_conf_check
   when:
-  - DISA_STIG_RHEL_08_020022 | bool
+  - DISA_STIG_RHEL_08_020023 | bool
   - accounts_passwords_pam_faillock_deny_root | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -8606,7 +8912,7 @@
   - '"pam" in ansible_facts.packages'
   tags:
   - CCE-80668-7
-  - DISA-STIG-RHEL-08-020022
+  - DISA-STIG-RHEL-08-020023
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
   - NIST-800-53-IA-5(c)
@@ -8624,7 +8930,7 @@
     line: even_deny_root
     state: present
   when:
-  - DISA_STIG_RHEL_08_020022 | bool
+  - DISA_STIG_RHEL_08_020023 | bool
   - accounts_passwords_pam_faillock_deny_root | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -8635,7 +8941,7 @@
   - result_faillock_conf_check.stat.exists
   tags:
   - CCE-80668-7
-  - DISA-STIG-RHEL-08-020022
+  - DISA-STIG-RHEL-08-020023
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
   - NIST-800-53-IA-5(c)
@@ -8924,7 +9230,7 @@
     when:
     - result_pam_file_present.stat.exists
   when:
-  - DISA_STIG_RHEL_08_020022 | bool
+  - DISA_STIG_RHEL_08_020023 | bool
   - accounts_passwords_pam_faillock_deny_root | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -8935,7 +9241,7 @@
   - result_faillock_conf_check.stat.exists
   tags:
   - CCE-80668-7
-  - DISA-STIG-RHEL-08-020022
+  - DISA-STIG-RHEL-08-020023
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
   - NIST-800-53-IA-5(c)
@@ -8985,7 +9291,7 @@
     when:
     - result_pam_faillock_even_deny_root_parameter_is_present.found == 0
   when:
-  - DISA_STIG_RHEL_08_020022 | bool
+  - DISA_STIG_RHEL_08_020023 | bool
   - accounts_passwords_pam_faillock_deny_root | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -8996,7 +9302,7 @@
   - not result_faillock_conf_check.stat.exists
   tags:
   - CCE-80668-7
-  - DISA-STIG-RHEL-08-020022
+  - DISA-STIG-RHEL-08-020023
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
   - NIST-800-53-IA-5(c)
@@ -9725,6 +10031,7 @@
   tags:
   - CCE-80669-5
   - DISA-STIG-RHEL-08-020012
+  - DISA-STIG-RHEL-08-020013
   - NIST-800-53-AC-7(a)
   - NIST-800-53-CM-6(a)
   - accounts_passwords_pam_faillock_interval
@@ -9735,6 +10042,7 @@
   - restrict_strategy
   when:
   - DISA_STIG_RHEL_08_020012 | bool
+  - DISA_STIG_RHEL_08_020013 | bool
   - accounts_passwords_pam_faillock_interval | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -9748,6 +10056,7 @@
   register: result_authselect_present
   when:
   - DISA_STIG_RHEL_08_020012 | bool
+  - DISA_STIG_RHEL_08_020013 | bool
   - accounts_passwords_pam_faillock_interval | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -9758,6 +10067,7 @@
   tags:
   - CCE-80669-5
   - DISA-STIG-RHEL-08-020012
+  - DISA-STIG-RHEL-08-020013
   - NIST-800-53-AC-7(a)
   - NIST-800-53-CM-6(a)
   - accounts_passwords_pam_faillock_interval
@@ -9811,6 +10121,7 @@
     - result_authselect_enable_feature_cmd is success
   when:
   - DISA_STIG_RHEL_08_020012 | bool
+  - DISA_STIG_RHEL_08_020013 | bool
   - accounts_passwords_pam_faillock_interval | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -9822,6 +10133,7 @@
   tags:
   - CCE-80669-5
   - DISA-STIG-RHEL-08-020012
+  - DISA-STIG-RHEL-08-020013
   - NIST-800-53-AC-7(a)
   - NIST-800-53-CM-6(a)
   - accounts_passwords_pam_faillock_interval
@@ -9876,6 +10188,7 @@
     - result_pam_faillock_is_enabled.found == 0
   when:
   - DISA_STIG_RHEL_08_020012 | bool
+  - DISA_STIG_RHEL_08_020013 | bool
   - accounts_passwords_pam_faillock_interval | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -9887,6 +10200,7 @@
   tags:
   - CCE-80669-5
   - DISA-STIG-RHEL-08-020012
+  - DISA-STIG-RHEL-08-020013
   - NIST-800-53-AC-7(a)
   - NIST-800-53-CM-6(a)
   - accounts_passwords_pam_faillock_interval
@@ -9902,6 +10216,7 @@
   register: result_faillock_conf_check
   when:
   - DISA_STIG_RHEL_08_020012 | bool
+  - DISA_STIG_RHEL_08_020013 | bool
   - accounts_passwords_pam_faillock_interval | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -9912,6 +10227,7 @@
   tags:
   - CCE-80669-5
   - DISA-STIG-RHEL-08-020012
+  - DISA-STIG-RHEL-08-020013
   - NIST-800-53-AC-7(a)
   - NIST-800-53-CM-6(a)
   - accounts_passwords_pam_faillock_interval
@@ -9929,6 +10245,7 @@
     state: present
   when:
   - DISA_STIG_RHEL_08_020012 | bool
+  - DISA_STIG_RHEL_08_020013 | bool
   - accounts_passwords_pam_faillock_interval | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -9940,6 +10257,7 @@
   tags:
   - CCE-80669-5
   - DISA-STIG-RHEL-08-020012
+  - DISA-STIG-RHEL-08-020013
   - NIST-800-53-AC-7(a)
   - NIST-800-53-CM-6(a)
   - accounts_passwords_pam_faillock_interval
@@ -10226,6 +10544,7 @@
     - result_pam_file_present.stat.exists
   when:
   - DISA_STIG_RHEL_08_020012 | bool
+  - DISA_STIG_RHEL_08_020013 | bool
   - accounts_passwords_pam_faillock_interval | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -10237,6 +10556,7 @@
   tags:
   - CCE-80669-5
   - DISA-STIG-RHEL-08-020012
+  - DISA-STIG-RHEL-08-020013
   - NIST-800-53-AC-7(a)
   - NIST-800-53-CM-6(a)
   - accounts_passwords_pam_faillock_interval
@@ -10311,6 +10631,7 @@
     - result_pam_faillock_fail_interval_parameter_is_present.found > 0
   when:
   - DISA_STIG_RHEL_08_020012 | bool
+  - DISA_STIG_RHEL_08_020013 | bool
   - accounts_passwords_pam_faillock_interval | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -10322,6 +10643,7 @@
   tags:
   - CCE-80669-5
   - DISA-STIG-RHEL-08-020012
+  - DISA-STIG-RHEL-08-020013
   - NIST-800-53-AC-7(a)
   - NIST-800-53-CM-6(a)
   - accounts_passwords_pam_faillock_interval
@@ -10594,7 +10916,7 @@
   tags:
   - CCE-80670-3
   - CJIS-5.5.3
-  - DISA-STIG-RHEL-08-020016
+  - DISA-STIG-RHEL-08-020015
   - NIST-800-171-3.1.8
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
@@ -10607,7 +10929,7 @@
   - no_reboot_needed
   - restrict_strategy
   when:
-  - DISA_STIG_RHEL_08_020016 | bool
+  - DISA_STIG_RHEL_08_020015 | bool
   - accounts_passwords_pam_faillock_unlock_time | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -10620,7 +10942,7 @@
     path: /usr/bin/authselect
   register: result_authselect_present
   when:
-  - DISA_STIG_RHEL_08_020016 | bool
+  - DISA_STIG_RHEL_08_020015 | bool
   - accounts_passwords_pam_faillock_unlock_time | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -10631,7 +10953,7 @@
   tags:
   - CCE-80670-3
   - CJIS-5.5.3
-  - DISA-STIG-RHEL-08-020016
+  - DISA-STIG-RHEL-08-020015
   - NIST-800-171-3.1.8
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
@@ -10685,7 +11007,7 @@
     - result_authselect_enable_feature_cmd is not skipped
     - result_authselect_enable_feature_cmd is success
   when:
-  - DISA_STIG_RHEL_08_020016 | bool
+  - DISA_STIG_RHEL_08_020015 | bool
   - accounts_passwords_pam_faillock_unlock_time | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -10697,7 +11019,7 @@
   tags:
   - CCE-80670-3
   - CJIS-5.5.3
-  - DISA-STIG-RHEL-08-020016
+  - DISA-STIG-RHEL-08-020015
   - NIST-800-171-3.1.8
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
@@ -10754,7 +11076,7 @@
     when:
     - result_pam_faillock_is_enabled.found == 0
   when:
-  - DISA_STIG_RHEL_08_020016 | bool
+  - DISA_STIG_RHEL_08_020015 | bool
   - accounts_passwords_pam_faillock_unlock_time | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -10766,7 +11088,7 @@
   tags:
   - CCE-80670-3
   - CJIS-5.5.3
-  - DISA-STIG-RHEL-08-020016
+  - DISA-STIG-RHEL-08-020015
   - NIST-800-171-3.1.8
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
@@ -10784,7 +11106,7 @@
     path: /etc/security/faillock.conf
   register: result_faillock_conf_check
   when:
-  - DISA_STIG_RHEL_08_020016 | bool
+  - DISA_STIG_RHEL_08_020015 | bool
   - accounts_passwords_pam_faillock_unlock_time | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -10795,7 +11117,7 @@
   tags:
   - CCE-80670-3
   - CJIS-5.5.3
-  - DISA-STIG-RHEL-08-020016
+  - DISA-STIG-RHEL-08-020015
   - NIST-800-171-3.1.8
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
@@ -10815,7 +11137,7 @@
     line: unlock_time = {{ var_accounts_passwords_pam_faillock_unlock_time }}
     state: present
   when:
-  - DISA_STIG_RHEL_08_020016 | bool
+  - DISA_STIG_RHEL_08_020015 | bool
   - accounts_passwords_pam_faillock_unlock_time | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -10827,7 +11149,7 @@
   tags:
   - CCE-80670-3
   - CJIS-5.5.3
-  - DISA-STIG-RHEL-08-020016
+  - DISA-STIG-RHEL-08-020015
   - NIST-800-171-3.1.8
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
@@ -11109,7 +11431,7 @@
     when:
     - result_pam_file_present.stat.exists
   when:
-  - DISA_STIG_RHEL_08_020016 | bool
+  - DISA_STIG_RHEL_08_020015 | bool
   - accounts_passwords_pam_faillock_unlock_time | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -11121,7 +11443,7 @@
   tags:
   - CCE-80670-3
   - CJIS-5.5.3
-  - DISA-STIG-RHEL-08-020016
+  - DISA-STIG-RHEL-08-020015
   - NIST-800-171-3.1.8
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
@@ -11198,7 +11520,7 @@
     when:
     - result_pam_faillock_unlock_time_parameter_is_present.found > 0
   when:
-  - DISA_STIG_RHEL_08_020016 | bool
+  - DISA_STIG_RHEL_08_020015 | bool
   - accounts_passwords_pam_faillock_unlock_time | bool
   - low_complexity | bool
   - low_disruption | bool
@@ -11210,7 +11532,7 @@
   tags:
   - CCE-80670-3
   - CJIS-5.5.3
-  - DISA-STIG-RHEL-08-020016
+  - DISA-STIG-RHEL-08-020015
   - NIST-800-171-3.1.8
   - NIST-800-53-AC-7(b)
   - NIST-800-53-CM-6(a)
@@ -13310,6 +13632,54 @@
   - no_reboot_needed
   - set_password_hashing_algorithm_systemauth
 
+- name: Set Password Hashing Rounds in /etc/login.defs - Ensure SHA_CRYPT_MIN_ROUNDS has Minimum Value of 5000
+  ansible.builtin.replace:
+    path: /etc/login.defs
+    regexp: (^\s*SHA_CRYPT_MIN_ROUNDS\s+)(?!(?:[5-9]\d{3,}|\d{5,}))\S*(\s*$)
+    replace: \g<1>5000\g<2>
+    backup: false
+  tags:
+  - CCE-89707-4
+  - DISA-STIG-RHEL-08-010130
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  - set_password_hashing_min_rounds_logindefs
+  when:
+  - DISA_STIG_RHEL_08_010130 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - set_password_hashing_min_rounds_logindefs | bool
+
+- name: Set Password Hashing Rounds in /etc/login.defs - Ensure SHA_CRYPT_MAX_ROUNDS has Minimum Value of 5000
+  ansible.builtin.replace:
+    path: /etc/login.defs
+    regexp: (^\s*SHA_CRYPT_MAX_ROUNDS\s+)(?!(?:[5-9]\d{3,}|\d{5,}))\S*(\s*$)
+    replace: \g<1>5000\g<2>
+    backup: false
+  tags:
+  - CCE-89707-4
+  - DISA-STIG-RHEL-08-010130
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  - set_password_hashing_min_rounds_logindefs
+  when:
+  - DISA_STIG_RHEL_08_010130 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - set_password_hashing_min_rounds_logindefs | bool
+
 - name: Block Disable service debug-shell
   block:
   - name: Disable service debug-shell
@@ -13345,7 +13715,7 @@
   - service_debug-shell_disabled
 
 - name: Unit Socket Exists - debug-shell.socket
-  command: systemctl list-unit-files debug-shell.socket
+  command: systemctl -q list-unit-files debug-shell.socket
   register: socket_file_exists
   changed_when: false
   failed_when: socket_file_exists.rc not in [0, 1]
@@ -13386,7 +13756,7 @@
   - no_reboot_needed | bool
   - service_debug_shell_disabled | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-  - '"debug-shell.socket" in socket_file_exists.stdout_lines[1]'
+  - socket_file_exists.stdout_lines is search("debug-shell.socket",multiline=True)
   tags:
   - CCE-80876-6
   - DISA-STIG-RHEL-08-040180
@@ -13439,6 +13809,7 @@
   - low_complexity | bool
   - low_disruption | bool
   - no_reboot_needed | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   - '"systemd" in ansible_facts.packages'
   tags:
   - CCE-80784-2
@@ -13481,6 +13852,45 @@
   - low_complexity
   - low_disruption
   - no_reboot_needed
+
+- name: Set 'StopIdleSessionSec' to '{{ var_logind_session_timeout }}' in the [Login] section of '/etc/systemd/logind.conf'
+  ini_file:
+    path: /etc/systemd/logind.conf
+    section: Login
+    option: StopIdleSessionSec
+    value: '{{ var_logind_session_timeout }}'
+    create: true
+    mode: 420
+  when:
+  - DISA_STIG_RHEL_08_020035 | bool
+  - logind_session_timeout | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - reboot_required | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_distribution == 'RedHat' and ansible_distribution_version is version('8.7', '>=') and ansible_distribution ==
+    'RedHat' and ansible_distribution_version is version('9.0', '!=') )
+  tags:
+  - CCE-90784-0
+  - CJIS-5.5.6
+  - DISA-STIG-RHEL-08-020035
+  - NIST-800-171-3.1.11
+  - NIST-800-53-AC-12
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-AC-17(a)
+  - NIST-800-53-AC-2(5)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-SC-10
+  - PCI-DSS-Req-8.1.8
+  - logind_session_timeout
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - reboot_required
+  - restrict_strategy
 
 - name: Require emergency mode password
   lineinfile:
@@ -13592,7 +14002,7 @@
   ansible.builtin.find:
     paths: /etc
     patterns: bashrc
-    contains: .*case "$name" in sshd|login) tmux ;; esac.*
+    contains: .*case "$name" in (sshd|login) tmux ;; esac.*
   register: tmux_in_bashrc
   when:
   - DISA_STIG_RHEL_08_020041 | bool
@@ -13602,6 +14012,7 @@
   - low_disruption | bool
   - medium_severity | bool
   - no_reboot_needed | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   - '"tmux" in ansible_facts.packages'
   tags:
   - CCE-90782-4
@@ -13617,7 +14028,7 @@
   ansible.builtin.find:
     paths: /etc/profile.d
     patterns: '*.sh'
-    contains: .*case "$name" in sshd|login) tmux ;; esac.*
+    contains: .*case "$name" in (sshd|login) tmux ;; esac.*
   register: tmux_in_profile_d
   when:
   - DISA_STIG_RHEL_08_020041 | bool
@@ -13627,6 +14038,7 @@
   - low_disruption | bool
   - medium_severity | bool
   - no_reboot_needed | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   - '"tmux" in ansible_facts.packages'
   tags:
   - CCE-90782-4
@@ -13641,7 +14053,7 @@
 - name: 'Support session locking with tmux (not enforcing): Insert the correct script into /etc/profile.d/tmux.sh'
   ansible.builtin.blockinfile:
     path: /etc/profile.d/tmux.sh
-    block: "if [ \"$PS1\" ]; then\n  parent=$(ps -o ppid= -p $$)\n  name=$(ps -o comm= -p $parent)\n  case \"$name\" in sshd|login)\
+    block: "if [ \"$PS1\" ]; then\n  parent=$(ps -o ppid= -p $$)\n  name=$(ps -o comm= -p $parent)\n  case \"$name\" in (sshd|login)\
       \ tmux ;; esac\nfi\n"
     create: true
   when:
@@ -13652,6 +14064,7 @@
   - low_disruption | bool
   - medium_severity | bool
   - no_reboot_needed | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   - '"tmux" in ansible_facts.packages'
   - tmux_in_bashrc is defined and tmux_in_bashrc.matched == 0
   - tmux_in_profile_d is defined and tmux_in_profile_d.matched == 0
@@ -13821,7 +14234,7 @@
 - name: Insert correct line into /etc/tmux.conf
   lineinfile:
     path: /etc/tmux.conf
-    create: null
+    create: true
     regexp: \s*bind\s+\w\s+lock-session.*$
     mode: '0644'
     line: bind X lock-session
@@ -14074,6 +14487,63 @@
   - no_reboot_needed
   - restrict_strategy
 
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+  tags:
+  - CCE-80652-1
+  - CJIS-5.6.2.1
+  - DISA-STIG-RHEL-08-020231
+  - NIST-800-171-3.5.7
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(1)(a)
+  - NIST-800-53-IA-5(f)
+  - accounts_password_minlen_login_defs
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_020231 | bool
+  - accounts_password_minlen_login_defs | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Set Password Minimum Length in login.defs
+  lineinfile:
+    dest: /etc/login.defs
+    regexp: ^PASS_MIN_LEN *[0-9]*
+    state: present
+    line: PASS_MIN_LEN        {{ var_accounts_password_minlen_login_defs }}
+    create: true
+  when:
+  - DISA_STIG_RHEL_08_020231 | bool
+  - accounts_password_minlen_login_defs | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - '"shadow-utils" in ansible_facts.packages'
+  tags:
+  - CCE-80652-1
+  - CJIS-5.6.2.1
+  - DISA-STIG-RHEL-08-020231
+  - NIST-800-171-3.5.7
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(1)(a)
+  - NIST-800-53-IA-5(f)
+  - accounts_password_minlen_login_defs
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
 - name: Collect users with not correct maximum time period between password changes
   ansible.builtin.command:
     cmd: awk -F':' '(/^[^:]+:[^!*]/ && ($5 > {{ var_accounts_maximum_age_login_defs }} || $5 == "")) {print $1}' /etc/shadow
@@ -14120,6 +14590,59 @@
   - NIST-800-53-IA-5(1)(d)
   - NIST-800-53-IA-5(f)
   - accounts_password_set_max_life_existing
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Collect users with not correct minimum time period between password changes
+  command: 'awk -F'':'' ''(/^[^:]+:[^!*]/ && ($4 < {{ var_accounts_minimum_age_login_defs }} || $4 == "")) {print $1}'' /etc/shadow
+
+    '
+  register: user_names
+  tags:
+  - CCE-82472-2
+  - DISA-STIG-RHEL-08-020180
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(1)(d)
+  - NIST-800-53-IA-5(f)
+  - accounts_password_set_min_life_existing
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_020180 | bool
+  - accounts_password_set_min_life_existing | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Change the minimum time period between password changes
+  command: 'chage -m {{ var_accounts_minimum_age_login_defs }} {{ item }}
+
+    '
+  with_items: '{{ user_names.stdout_lines }}'
+  when:
+  - DISA_STIG_RHEL_08_020180 | bool
+  - accounts_password_set_min_life_existing | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - user_names.stdout_lines | length > 0
+  tags:
+  - CCE-82472-2
+  - DISA-STIG-RHEL-08-020180
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-IA-5(1)(d)
+  - NIST-800-53-IA-5(f)
+  - accounts_password_set_min_life_existing
   - low_complexity
   - low_disruption
   - medium_severity
@@ -14262,6 +14785,119 @@
   - medium_disruption
   - no_empty_passwords
   - no_reboot_needed
+
+- name: Collect users with no password
+  command: 'awk -F: ''!$2 {print $1}'' /etc/shadow
+
+    '
+  register: users_nopasswd
+  when:
+  - DISA_STIG_RHEL_08_010121 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_empty_passwords_etc_shadow | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-85953-8
+  - DISA-STIG-RHEL-08-010121
+  - NIST-800-53-CM-6(b)
+  - NIST-800-53-CM-6.1(iv)
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_empty_passwords_etc_shadow
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Lock users with no password
+  command: 'passwd -l {{ item }}
+
+    '
+  with_items: '{{ users_nopasswd.stdout_lines }}'
+  when:
+  - DISA_STIG_RHEL_08_010121 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_empty_passwords_etc_shadow | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - users_nopasswd.stdout_lines | length > 0
+  tags:
+  - CCE-85953-8
+  - DISA-STIG-RHEL-08-010121
+  - NIST-800-53-CM-6(b)
+  - NIST-800-53-CM-6.1(iv)
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_empty_passwords_etc_shadow
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Get all /etc/passwd file entries
+  getent:
+    database: passwd
+    split: ':'
+  tags:
+  - CCE-80649-7
+  - DISA-STIG-RHEL-08-040200
+  - NIST-800-171-3.1.1
+  - NIST-800-171-3.1.5
+  - NIST-800-53-AC-6(5)
+  - NIST-800-53-IA-2
+  - NIST-800-53-IA-4(b)
+  - PCI-DSS-Req-8.5
+  - PCI-DSSv4-8.2.2
+  - PCI-DSSv4-8.2.3
+  - accounts_no_uid_except_zero
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_040200 | bool
+  - accounts_no_uid_except_zero | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Lock the password of the user accounts other than root with uid 0
+  command: passwd -l {{ item.key }}
+  loop: '{{ getent_passwd | dict2items | rejectattr(''key'', ''search'', ''root'') | list }}'
+  when:
+  - DISA_STIG_RHEL_08_040200 | bool
+  - accounts_no_uid_except_zero | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - item.value.1  == '0'
+  tags:
+  - CCE-80649-7
+  - DISA-STIG-RHEL-08-040200
+  - NIST-800-171-3.1.1
+  - NIST-800-171-3.1.5
+  - NIST-800-53-AC-6(5)
+  - NIST-800-53-IA-2
+  - NIST-800-53-IA-4(b)
+  - PCI-DSS-Req-8.5
+  - PCI-DSSv4-8.2.2
+  - PCI-DSSv4-8.2.3
+  - accounts_no_uid_except_zero
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - restrict_strategy
 
 - name: Gather the package facts
   package_facts:
@@ -14906,6 +15542,79 @@
   - medium_severity
   - no_reboot_needed
   - restrict_strategy
+
+- name: Ensure All User Initialization Files Have Mode 0740 Or Less Permissive - Gather User Info
+  ansible.builtin.getent:
+    database: passwd
+  tags:
+  - CCE-84043-9
+  - DISA-STIG-RHEL-08-010770
+  - file_permission_user_init_files
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010770 | bool
+  - file_permission_user_init_files | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Ensure All User Initialization Files Have Mode 0740 Or Less Permissive - Find Init Files
+  ansible.builtin.find:
+    paths: '{{ item.value[4] }}'
+    pattern: '{{ var_user_initialization_files_regex }}'
+    hidden: true
+    use_regex: true
+  with_dict: '{{ ansible_facts.getent_passwd }}'
+  when:
+  - DISA_STIG_RHEL_08_010770 | bool
+  - file_permission_user_init_files | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - item.value[4] != "/sbin/nologin"
+  - item.key not in ["nobody", "nfsnobody"]
+  - item.value[1] | int >= 1000
+  register: found_init_files
+  tags:
+  - CCE-84043-9
+  - DISA-STIG-RHEL-08-010770
+  - file_permission_user_init_files
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Ensure All User Initialization Files Have Mode 0740 Or Less Permissive - Fix Init Files Permissions
+  ansible.builtin.file:
+    path: '{{ item.1.path }}'
+    mode: u-s,g-wxs,o=
+  loop: '{{ q(''ansible.builtin.subelements'', found_init_files.results, ''files'', {''skip_missing'': True}) }}'
+  tags:
+  - CCE-84043-9
+  - DISA-STIG-RHEL-08-010770
+  - file_permission_user_init_files
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010770 | bool
+  - file_permission_user_init_files | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
 
 - name: Get all local users from /etc/passwd
   ansible.builtin.getent:
@@ -30428,6 +31137,269 @@
   package_facts:
     manager: auto
   tags:
+  - CCE-80718-0
+  - DISA-STIG-RHEL-08-030590
+  - NIST-800-171-3.1.7
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-10.2.3
+  - PCI-DSSv4-10.2.1.3
+  - audit_rules_login_events_faillock
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - reboot_required
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_030590 | bool
+  - audit_rules_login_events_faillock | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - reboot_required | bool
+  - restrict_strategy | bool
+
+- name: Check if watch rule for /var/log/faillock already exists in /etc/audit/rules.d/
+  find:
+    paths: /etc/audit/rules.d
+    contains: ^\s*-w\s+/var/log/faillock\s+-p\s+wa(\s|$)+
+    patterns: '*.rules'
+  register: find_existing_watch_rules_d
+  when:
+  - DISA_STIG_RHEL_08_030590 | bool
+  - audit_rules_login_events_faillock | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - reboot_required | bool
+  - restrict_strategy | bool
+  - '"audit" in ansible_facts.packages'
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-80718-0
+  - DISA-STIG-RHEL-08-030590
+  - NIST-800-171-3.1.7
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-10.2.3
+  - PCI-DSSv4-10.2.1.3
+  - audit_rules_login_events_faillock
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - reboot_required
+  - restrict_strategy
+
+- name: Search /etc/audit/rules.d for other rules with specified key logins
+  find:
+    paths: /etc/audit/rules.d
+    contains: ^.*(?:-F key=|-k\s+)logins$
+    patterns: '*.rules'
+  register: find_watch_key
+  when:
+  - DISA_STIG_RHEL_08_030590 | bool
+  - audit_rules_login_events_faillock | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - reboot_required | bool
+  - restrict_strategy | bool
+  - '"audit" in ansible_facts.packages'
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - find_existing_watch_rules_d.matched is defined and find_existing_watch_rules_d.matched == 0
+  tags:
+  - CCE-80718-0
+  - DISA-STIG-RHEL-08-030590
+  - NIST-800-171-3.1.7
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-10.2.3
+  - PCI-DSSv4-10.2.1.3
+  - audit_rules_login_events_faillock
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - reboot_required
+  - restrict_strategy
+
+- name: Use /etc/audit/rules.d/logins.rules as the recipient for the rule
+  set_fact:
+    all_files:
+    - /etc/audit/rules.d/logins.rules
+  when:
+  - DISA_STIG_RHEL_08_030590 | bool
+  - audit_rules_login_events_faillock | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - reboot_required | bool
+  - restrict_strategy | bool
+  - '"audit" in ansible_facts.packages'
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - find_watch_key.matched is defined and find_watch_key.matched == 0 and find_existing_watch_rules_d.matched is defined and
+    find_existing_watch_rules_d.matched == 0
+  tags:
+  - CCE-80718-0
+  - DISA-STIG-RHEL-08-030590
+  - NIST-800-171-3.1.7
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-10.2.3
+  - PCI-DSSv4-10.2.1.3
+  - audit_rules_login_events_faillock
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - reboot_required
+  - restrict_strategy
+
+- name: Use matched file as the recipient for the rule
+  set_fact:
+    all_files:
+    - '{{ find_watch_key.files | map(attribute=''path'') | list | first }}'
+  when:
+  - DISA_STIG_RHEL_08_030590 | bool
+  - audit_rules_login_events_faillock | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - reboot_required | bool
+  - restrict_strategy | bool
+  - '"audit" in ansible_facts.packages'
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - find_watch_key.matched is defined and find_watch_key.matched > 0 and find_existing_watch_rules_d.matched is defined and
+    find_existing_watch_rules_d.matched == 0
+  tags:
+  - CCE-80718-0
+  - DISA-STIG-RHEL-08-030590
+  - NIST-800-171-3.1.7
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-10.2.3
+  - PCI-DSSv4-10.2.1.3
+  - audit_rules_login_events_faillock
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - reboot_required
+  - restrict_strategy
+
+- name: Add watch rule for /var/log/faillock in /etc/audit/rules.d/
+  lineinfile:
+    path: '{{ all_files[0] }}'
+    line: -w /var/log/faillock -p wa -k logins
+    create: true
+    mode: '0640'
+  when:
+  - DISA_STIG_RHEL_08_030590 | bool
+  - audit_rules_login_events_faillock | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - reboot_required | bool
+  - restrict_strategy | bool
+  - '"audit" in ansible_facts.packages'
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - find_existing_watch_rules_d.matched is defined and find_existing_watch_rules_d.matched == 0
+  tags:
+  - CCE-80718-0
+  - DISA-STIG-RHEL-08-030590
+  - NIST-800-171-3.1.7
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-10.2.3
+  - PCI-DSSv4-10.2.1.3
+  - audit_rules_login_events_faillock
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - reboot_required
+  - restrict_strategy
+
+- name: Check if watch rule for /var/log/faillock already exists in /etc/audit/audit.rules
+  find:
+    paths: /etc/audit/
+    contains: ^\s*-w\s+/var/log/faillock\s+-p\s+wa(\s|$)+
+    patterns: audit.rules
+  register: find_existing_watch_audit_rules
+  when:
+  - DISA_STIG_RHEL_08_030590 | bool
+  - audit_rules_login_events_faillock | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - reboot_required | bool
+  - restrict_strategy | bool
+  - '"audit" in ansible_facts.packages'
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-80718-0
+  - DISA-STIG-RHEL-08-030590
+  - NIST-800-171-3.1.7
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-10.2.3
+  - PCI-DSSv4-10.2.1.3
+  - audit_rules_login_events_faillock
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - reboot_required
+  - restrict_strategy
+
+- name: Add watch rule for /var/log/faillock in /etc/audit/audit.rules
+  lineinfile:
+    line: -w /var/log/faillock -p wa -k logins
+    state: present
+    dest: /etc/audit/audit.rules
+    create: true
+    mode: '0640'
+  when:
+  - DISA_STIG_RHEL_08_030590 | bool
+  - audit_rules_login_events_faillock | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - reboot_required | bool
+  - restrict_strategy | bool
+  - '"audit" in ansible_facts.packages'
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - find_existing_watch_audit_rules.matched is defined and find_existing_watch_audit_rules.matched == 0
+  tags:
+  - CCE-80718-0
+  - DISA-STIG-RHEL-08-030590
+  - NIST-800-171-3.1.7
+  - NIST-800-53-AC-6(9)
+  - NIST-800-53-AU-12(c)
+  - NIST-800-53-AU-2(d)
+  - NIST-800-53-CM-6(a)
+  - PCI-DSS-Req-10.2.3
+  - PCI-DSSv4-10.2.1.3
+  - audit_rules_login_events_faillock
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - reboot_required
+  - restrict_strategy
+
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+  tags:
   - CCE-80719-8
   - DISA-STIG-RHEL-08-030600
   - NIST-800-171-3.1.7
@@ -34606,6 +35578,63 @@
   - restrict_strategy
   - rsyslog_remote_loghost
 
+- name: Ensure System is Not Acting as a Network Sniffer - Gather network interfaces
+  ansible.builtin.command:
+    cmd: ip link show
+  register: network_interfaces
+  when:
+  - DISA_STIG_RHEL_08_040330 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - network_sniffer_disabled | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-82283-3
+  - DISA-STIG-RHEL-08-040330
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-7(2)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-MA-3
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - network_sniffer_disabled
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Ensure System is Not Acting as a Network Sniffer - Disable promiscuous mode
+  ansible.builtin.command:
+    cmd: ip link set dev {{ item.split(':')[1] }} multicast off promisc off
+  loop: '{{ network_interfaces.stdout_lines }}'
+  when:
+  - DISA_STIG_RHEL_08_040330 | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - network_sniffer_disabled | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - item.split(':') | length == 3
+  tags:
+  - CCE-82283-3
+  - DISA-STIG-RHEL-08-040330
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-7(2)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-MA-3
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - network_sniffer_disabled
+  - no_reboot_needed
+  - restrict_strategy
+
 - name: Ensure firewalld is installed
   package:
     name: firewalld
@@ -34630,6 +35659,34 @@
   - no_reboot_needed
   - package_firewalld_installed
 
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+  tags:
+  - CCE-80877-4
+  - DISA-STIG-RHEL-08-040101
+  - NIST-800-171-3.1.3
+  - NIST-800-171-3.4.7
+  - NIST-800-53-AC-4
+  - NIST-800-53-CA-3(5)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-SC-7(21)
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - service_firewalld_enabled
+  when:
+  - DISA_STIG_RHEL_08_040101 | bool
+  - enable_strategy | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - service_firewalld_enabled | bool
+
 - name: Enable service firewalld
   block:
   - name: Gather the package facts
@@ -34652,6 +35709,7 @@
   - no_reboot_needed | bool
   - service_firewalld_enabled | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - '"firewalld" in ansible_facts.packages'
   tags:
   - CCE-80877-4
   - DISA-STIG-RHEL-08-040101
@@ -36643,8 +37701,8 @@
   - unknown_strategy
   - wireless_disable_interfaces
 
-- name: Configure excluded (non local) file systems
-  set_fact:
+- name: Ensure All World-Writable Directories Are Owned by root User - Define Excluded (Non-Local) File Systems and Paths
+  ansible.builtin.set_fact:
     excluded_fstypes:
     - afs
     - ceph
@@ -36665,6 +37723,12 @@
     - lustre
     - davfs
     - fuse.sshfs
+    excluded_paths:
+    - dev
+    - proc
+    - run
+    - sys
+    search_paths: []
   tags:
   - CCE-83375-6
   - DISA-STIG-RHEL-08-010700
@@ -36683,9 +37747,15 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
 
-- name: Create empty list of excluded paths
-  set_fact:
-    excluded_paths: []
+- name: Ensure All World-Writable Directories Are Owned by root User - Find Relevant Root Directories Ignoring Pre-Defined
+    Excluded Paths
+  ansible.builtin.find:
+    paths: /
+    file_type: directory
+    excludes: '{{ excluded_paths }}'
+    hidden: true
+    recurse: false
+  register: result_relevant_root_dirs
   tags:
   - CCE-83375-6
   - DISA-STIG-RHEL-08-010700
@@ -36704,9 +37774,33 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
 
-- name: Detect nonlocal file systems and add them to excluded paths
-  set_fact:
-    excluded_paths: '{{ excluded_paths | union([item.mount]) }}'
+- name: Ensure All World-Writable Directories Are Owned by root User - Include Relevant Root Directories in a List of Paths
+    to be Searched
+  ansible.builtin.set_fact:
+    search_paths: '{{ search_paths | union([item.path]) }}'
+  loop: '{{ result_relevant_root_dirs.files }}'
+  tags:
+  - CCE-83375-6
+  - DISA-STIG-RHEL-08-010700
+  - dir_perms_world_writable_root_owned
+  - low_complexity
+  - medium_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010700 | bool
+  - dir_perms_world_writable_root_owned | bool
+  - low_complexity | bool
+  - medium_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Ensure All World-Writable Directories Are Owned by root User - Increment Search Paths List with Local Partitions Mount
+    Points
+  ansible.builtin.set_fact:
+    search_paths: '{{ search_paths | union([item.mount]) }}'
   loop: '{{ ansible_mounts }}'
   when:
   - DISA_STIG_RHEL_08_010700 | bool
@@ -36716,7 +37810,8 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - restrict_strategy | bool
-  - item.fstype in excluded_fstypes
+  - item.fstype not in excluded_fstypes
+  - item.mount != '/'
   tags:
   - CCE-83375-6
   - DISA-STIG-RHEL-08-010700
@@ -36727,14 +37822,33 @@
   - no_reboot_needed
   - restrict_strategy
 
-- name: Find all directories excluding non-local partitions
-  find:
-    paths: /
-    excludes: excluded_paths
-    file_type: directory
-    hidden: true
-    recurse: true
-  register: found_dirs
+- name: Ensure All World-Writable Directories Are Owned by root User - Increment Search Paths List with Local NFS File System
+    Targets
+  ansible.builtin.set_fact:
+    search_paths: '{{ search_paths | union([item.device.split('':'')[1]]) }}'
+  loop: '{{ ansible_mounts }}'
+  when:
+  - DISA_STIG_RHEL_08_010700 | bool
+  - dir_perms_world_writable_root_owned | bool
+  - low_complexity | bool
+  - medium_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - item.device is search("localhost:")
+  tags:
+  - CCE-83375-6
+  - DISA-STIG-RHEL-08-010700
+  - dir_perms_world_writable_root_owned
+  - low_complexity
+  - medium_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Ensure All World-Writable Directories Are Owned by root User - Define Rule Specific Facts
+  ansible.builtin.set_fact:
+    world_writable_dirs: []
   tags:
   - CCE-83375-6
   - DISA-STIG-RHEL-08-010700
@@ -36753,9 +37867,12 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
 
-- name: Create list of world writable directories
-  set_fact:
-    world_writable_dirs: '{{ found_dirs.files | selectattr(''woth'') | list }}'
+- name: Ensure All World-Writable Directories Are Owned by root User - Find All Uncompliant Directories in Local File Systems
+  ansible.builtin.command:
+    cmd: find {{ item }} -xdev -type d -perm -0002 -uid +0
+  loop: '{{ search_paths }}'
+  changed_when: false
+  register: result_found_dirs
   tags:
   - CCE-83375-6
   - DISA-STIG-RHEL-08-010700
@@ -36774,12 +37891,34 @@
   - no_reboot_needed | bool
   - restrict_strategy | bool
 
-- name: Change owner to root on directories which are world writable
-  file:
-    path: '{{ item.path }}'
+- name: Ensure All World-Writable Directories Are Owned by root User - Create List of World Writable Directories Not Owned
+    by root
+  ansible.builtin.set_fact:
+    world_writable_dirs: '{{ world_writable_dirs | union(item.stdout_lines) | list }}'
+  loop: '{{ result_found_dirs.results }}'
+  tags:
+  - CCE-83375-6
+  - DISA-STIG-RHEL-08-010700
+  - dir_perms_world_writable_root_owned
+  - low_complexity
+  - medium_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010700 | bool
+  - dir_perms_world_writable_root_owned | bool
+  - low_complexity | bool
+  - medium_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Ensure All World-Writable Directories Are Owned by root User - Ensure root Ownership on Local World Writable Directories
+  ansible.builtin.file:
+    path: '{{ item }}'
     owner: root
   loop: '{{ world_writable_dirs }}'
-  ignore_errors: true
   tags:
   - CCE-83375-6
   - DISA-STIG-RHEL-08-010700
@@ -38245,7 +39384,7 @@
   - no_reboot_needed | bool
 
 - name: Find /lib/ file(s) matching ^.*$ recursively
-  command: find -H /lib/  -type f ! -gid 0 -regex "^.*$"
+  command: find -H /lib/  -type f ! -group 0 -regex "^.*$"
   register: files_found
   changed_when: false
   failed_when: false
@@ -38298,7 +39437,7 @@
   - root_permissions_syslibrary_files | bool
 
 - name: Find /lib64/ file(s) matching ^.*$ recursively
-  command: find -H /lib64/  -type f ! -gid 0 -regex "^.*$"
+  command: find -H /lib64/  -type f ! -group 0 -regex "^.*$"
   register: files_found
   changed_when: false
   failed_when: false
@@ -38351,7 +39490,7 @@
   - root_permissions_syslibrary_files | bool
 
 - name: Find /usr/lib/ file(s) matching ^.*$ recursively
-  command: find -H /usr/lib/  -type f ! -gid 0 -regex "^.*$"
+  command: find -H /usr/lib/  -type f ! -group 0 -regex "^.*$"
   register: files_found
   changed_when: false
   failed_when: false
@@ -38404,7 +39543,7 @@
   - root_permissions_syslibrary_files | bool
 
 - name: Find /usr/lib64/ file(s) matching ^.*$ recursively
-  command: find -H /usr/lib64/  -type f ! -gid 0 -regex "^.*$"
+  command: find -H /usr/lib64/  -type f ! -group 0 -regex "^.*$"
   register: files_found
   changed_when: false
   failed_when: false
@@ -38494,7 +39633,7 @@
   - service_autofs_disabled
 
 - name: Unit Socket Exists - autofs.socket
-  command: systemctl list-unit-files autofs.socket
+  command: systemctl -q list-unit-files autofs.socket
   register: socket_file_exists
   changed_when: false
   failed_when: socket_file_exists.rc not in [0, 1]
@@ -38538,7 +39677,7 @@
   - no_reboot_needed | bool
   - service_autofs_disabled | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-  - '"autofs.socket" in socket_file_exists.stdout_lines[1]'
+  - socket_file_exists.stdout_lines is search("autofs.socket",multiline=True)
   tags:
   - CCE-80873-3
   - DISA-STIG-RHEL-08-040070
@@ -39627,7 +40766,8 @@
   - medium_severity | bool
   - mount_option_home_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/home" in ansible_mounts
+    | map(attribute="mount") | list )
   tags:
   - CCE-81050-7
   - DISA-STIG-RHEL-08-010570
@@ -39658,7 +40798,8 @@
   - medium_severity | bool
   - mount_option_home_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/home" in ansible_mounts
+    | map(attribute="mount") | list )
   - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length > 0)
   tags:
@@ -39697,7 +40838,8 @@
   - medium_severity | bool
   - mount_option_home_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/home" in ansible_mounts
+    | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
   - (device_name.stdout | length == 0)
   tags:
@@ -39727,7 +40869,8 @@
   - medium_severity | bool
   - mount_option_home_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/home" in ansible_mounts
+    | map(attribute="mount") | list )
   - mount_info is defined and "nosuid" not in mount_info.options
   tags:
   - CCE-81050-7
@@ -39760,7 +40903,8 @@
   - medium_severity | bool
   - mount_option_home_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/home" in ansible_mounts
+    | map(attribute="mount") | list )
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-81050-7
@@ -40427,7 +41571,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_nodev | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   tags:
   - CCE-82080-3
   - DISA-STIG-RHEL-08-040129
@@ -40458,7 +41603,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_nodev | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length > 0)
   tags:
@@ -40497,7 +41643,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_nodev | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
   - (device_name.stdout | length == 0)
   tags:
@@ -40527,7 +41674,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_nodev | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - mount_info is defined and "nodev" not in mount_info.options
   tags:
   - CCE-82080-3
@@ -40560,7 +41708,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_nodev | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-82080-3
@@ -40591,7 +41740,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_noexec | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   tags:
   - CCE-82975-4
   - DISA-STIG-RHEL-08-040131
@@ -40622,7 +41772,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_noexec | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length > 0)
   tags:
@@ -40661,7 +41812,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_noexec | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
   - (device_name.stdout | length == 0)
   tags:
@@ -40691,7 +41843,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_noexec | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - mount_info is defined and "noexec" not in mount_info.options
   tags:
   - CCE-82975-4
@@ -40724,7 +41877,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_noexec | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-82975-4
@@ -40755,7 +41909,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   tags:
   - CCE-82921-8
   - DISA-STIG-RHEL-08-040130
@@ -40786,7 +41941,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length > 0)
   tags:
@@ -40825,7 +41981,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
   - (device_name.stdout | length == 0)
   tags:
@@ -40855,7 +42012,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - mount_info is defined and "nosuid" not in mount_info.options
   tags:
   - CCE-82921-8
@@ -40888,7 +42046,8 @@
   - medium_severity | bool
   - mount_option_var_log_audit_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
+    | map(attribute="mount") | list )
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-82921-8
@@ -40919,7 +42078,8 @@
   - medium_severity | bool
   - mount_option_var_log_nodev | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   tags:
   - CCE-82077-9
   - DISA-STIG-RHEL-08-040126
@@ -40950,7 +42110,8 @@
   - medium_severity | bool
   - mount_option_var_log_nodev | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length > 0)
   tags:
@@ -40989,7 +42150,8 @@
   - medium_severity | bool
   - mount_option_var_log_nodev | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
   - (device_name.stdout | length == 0)
   tags:
@@ -41019,7 +42181,8 @@
   - medium_severity | bool
   - mount_option_var_log_nodev | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - mount_info is defined and "nodev" not in mount_info.options
   tags:
   - CCE-82077-9
@@ -41052,7 +42215,8 @@
   - medium_severity | bool
   - mount_option_var_log_nodev | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-82077-9
@@ -41083,7 +42247,8 @@
   - medium_severity | bool
   - mount_option_var_log_noexec | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   tags:
   - CCE-82008-4
   - DISA-STIG-RHEL-08-040128
@@ -41114,7 +42279,8 @@
   - medium_severity | bool
   - mount_option_var_log_noexec | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length > 0)
   tags:
@@ -41153,7 +42319,8 @@
   - medium_severity | bool
   - mount_option_var_log_noexec | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
   - (device_name.stdout | length == 0)
   tags:
@@ -41183,7 +42350,8 @@
   - medium_severity | bool
   - mount_option_var_log_noexec | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - mount_info is defined and "noexec" not in mount_info.options
   tags:
   - CCE-82008-4
@@ -41216,7 +42384,8 @@
   - medium_severity | bool
   - mount_option_var_log_noexec | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-82008-4
@@ -41247,7 +42416,8 @@
   - medium_severity | bool
   - mount_option_var_log_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   tags:
   - CCE-82065-4
   - DISA-STIG-RHEL-08-040127
@@ -41278,7 +42448,8 @@
   - medium_severity | bool
   - mount_option_var_log_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length > 0)
   tags:
@@ -41317,7 +42488,8 @@
   - medium_severity | bool
   - mount_option_var_log_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
   - (device_name.stdout | length == 0)
   tags:
@@ -41347,7 +42519,8 @@
   - medium_severity | bool
   - mount_option_var_log_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - mount_info is defined and "nosuid" not in mount_info.options
   tags:
   - CCE-82065-4
@@ -41380,7 +42553,8 @@
   - medium_severity | bool
   - mount_option_var_log_nosuid | bool
   - no_reboot_needed | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
+    | map(attribute="mount") | list )
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-82065-4
@@ -42494,45 +43668,11 @@
   - reboot_required
   - sysctl_user_max_user_namespaces
 
-- name: Block Disable service systemd-coredump
-  block:
-  - name: Disable service systemd-coredump
-    block:
-    - name: Disable service systemd-coredump
-      systemd:
-        name: systemd-coredump.service
-        enabled: 'no'
-        state: stopped
-        masked: 'yes'
-    rescue:
-    - name: Intentionally ignored previous 'Disable service systemd-coredump' failure, service was already disabled
-      meta: noop
-  when:
-  - DISA_STIG_RHEL_08_010672 | bool
-  - disable_strategy | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - service_systemd_coredump_disabled | bool
-  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-  tags:
-  - CCE-82881-4
-  - DISA-STIG-RHEL-08-010672
-  - NIST-800-53-SC-7(10)
-  - disable_strategy
-  - low_complexity
-  - low_disruption
-  - medium_severity
-  - no_reboot_needed
-  - service_systemd-coredump_disabled
-
-- name: Unit Socket Exists - systemd-coredump.socket
-  command: systemctl list-unit-files systemd-coredump.socket
-  register: socket_file_exists
+- name: Disable acquiring, saving, and processing core dumps - Collect systemd Socket Units Present in the System
+  ansible.builtin.command:
+    cmd: systemctl -q list-unit-files --type socket
+  register: result_systemd_unit_files
   changed_when: false
-  failed_when: socket_file_exists.rc not in [0, 1]
-  check_mode: false
   when:
   - DISA_STIG_RHEL_08_010672 | bool
   - disable_strategy | bool
@@ -42553,12 +43693,12 @@
   - no_reboot_needed
   - service_systemd-coredump_disabled
 
-- name: Disable socket systemd-coredump
-  systemd:
+- name: Disable acquiring, saving, and processing core dumps - Ensure systemd-coredump.socket is Masked
+  ansible.builtin.systemd:
     name: systemd-coredump.socket
-    enabled: 'no'
     state: stopped
-    masked: 'yes'
+    enabled: false
+    masked: true
   when:
   - DISA_STIG_RHEL_08_010672 | bool
   - disable_strategy | bool
@@ -42568,7 +43708,7 @@
   - no_reboot_needed | bool
   - service_systemd_coredump_disabled | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-  - '"systemd-coredump.socket" in socket_file_exists.stdout_lines[1]'
+  - result_systemd_unit_files.stdout_lines is search("systemd-coredump.socket")
   tags:
   - CCE-82881-4
   - DISA-STIG-RHEL-08-010672
@@ -43247,7 +44387,7 @@
   - service_kdump_disabled
 
 - name: Unit Socket Exists - kdump.socket
-  command: systemctl list-unit-files kdump.socket
+  command: systemctl -q list-unit-files kdump.socket
   register: socket_file_exists
   changed_when: false
   failed_when: socket_file_exists.rc not in [0, 1]
@@ -43289,7 +44429,7 @@
   - no_reboot_needed | bool
   - service_kdump_disabled | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-  - '"kdump.socket" in socket_file_exists.stdout_lines[1]'
+  - socket_file_exists.stdout_lines is search("kdump.socket",multiline=True)
   tags:
   - CCE-80878-2
   - DISA-STIG-RHEL-08-010670
@@ -43464,6 +44604,30 @@
   - low_disruption
   - medium_severity
   - no_reboot_needed
+
+- name: Ensure mailx is installed
+  package:
+    name: mailx
+    state: present
+  when:
+  - DISA_STIG_RHEL_08_010358 | bool
+  - enable_strategy | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - package_mailx_installed | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-87036-0
+  - DISA-STIG-RHEL-08-010358
+  - NIST-800-53-CM-3(5)
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - package_mailx_installed
 
 - name: Ensure postfix is installed
   package:
@@ -44202,6 +45366,470 @@
   - no_reboot_needed | bool
   - package_rsh_server_removed | bool
 
+- name: Remove Host-Based Authentication Files - Define Excluded (Non-Local) File Systems and Paths
+  ansible.builtin.set_fact:
+    excluded_fstypes:
+    - afs
+    - ceph
+    - cifs
+    - smb3
+    - smbfs
+    - sshfs
+    - ncpfs
+    - ncp
+    - nfs
+    - nfs4
+    - gfs
+    - gfs2
+    - glusterfs
+    - gpfs
+    - pvfs2
+    - ocfs2
+    - lustre
+    - davfs
+    - fuse.sshfs
+    excluded_paths:
+    - dev
+    - proc
+    - run
+    - sys
+    search_paths: []
+  tags:
+  - CCE-84055-3
+  - DISA-STIG-RHEL-08-010460
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_host_based_files
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010460 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_host_based_files | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Remove Host-Based Authentication Files - Find Relevant Root Directories Ignoring Pre-Defined Excluded Paths
+  ansible.builtin.find:
+    paths: /
+    file_type: directory
+    excludes: '{{ excluded_paths }}'
+    hidden: true
+    recurse: false
+  register: result_relevant_root_dirs
+  tags:
+  - CCE-84055-3
+  - DISA-STIG-RHEL-08-010460
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_host_based_files
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010460 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_host_based_files | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Remove Host-Based Authentication Files - Include Relevant Root Directories in a List of Paths to be Searched
+  ansible.builtin.set_fact:
+    search_paths: '{{ search_paths | union([item.path]) }}'
+  loop: '{{ result_relevant_root_dirs.files }}'
+  tags:
+  - CCE-84055-3
+  - DISA-STIG-RHEL-08-010460
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_host_based_files
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010460 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_host_based_files | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Remove Host-Based Authentication Files - Increment Search Paths List with Local Partitions Mount Points
+  ansible.builtin.set_fact:
+    search_paths: '{{ search_paths | union([item.mount]) }}'
+  loop: '{{ ansible_mounts }}'
+  when:
+  - DISA_STIG_RHEL_08_010460 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_host_based_files | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - item.fstype not in excluded_fstypes
+  - item.mount != '/'
+  tags:
+  - CCE-84055-3
+  - DISA-STIG-RHEL-08-010460
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_host_based_files
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Remove Host-Based Authentication Files - Increment Search Paths List with Local NFS File System Targets
+  ansible.builtin.set_fact:
+    search_paths: '{{ search_paths | union([item.device.split('':'')[1]]) }}'
+  loop: '{{ ansible_mounts }}'
+  when:
+  - DISA_STIG_RHEL_08_010460 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_host_based_files | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - item.device is search("localhost:")
+  tags:
+  - CCE-84055-3
+  - DISA-STIG-RHEL-08-010460
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_host_based_files
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Remove Host-Based Authentication Files - Define Rule Specific Facts
+  ansible.builtin.set_fact:
+    shosts_equiv_files:
+    - /shosts.equiv
+  tags:
+  - CCE-84055-3
+  - DISA-STIG-RHEL-08-010460
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_host_based_files
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010460 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_host_based_files | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Remove Host-Based Authentication Files - Find All shosts.equiv Files in Local File Systems
+  ansible.builtin.command:
+    cmd: find {{ item }} -xdev -type f -name "shosts.equiv"
+  loop: '{{ search_paths }}'
+  changed_when: false
+  register: result_found_shosts_equiv_files
+  tags:
+  - CCE-84055-3
+  - DISA-STIG-RHEL-08-010460
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_host_based_files
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010460 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_host_based_files | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Remove Host-Based Authentication Files - Create List of shosts.equiv Files Present in Local File Systems
+  ansible.builtin.set_fact:
+    shosts_equiv_files: '{{ shosts_equiv_files | union(item.stdout_lines) | list }}'
+  loop: '{{ result_found_shosts_equiv_files.results }}'
+  tags:
+  - CCE-84055-3
+  - DISA-STIG-RHEL-08-010460
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_host_based_files
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010460 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_host_based_files | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Remove Host-Based Authentication Files - Ensure No shosts.equiv Files Are Present in the System
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: absent
+  loop: '{{ shosts_equiv_files }}'
+  tags:
+  - CCE-84055-3
+  - DISA-STIG-RHEL-08-010460
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_host_based_files
+  - no_reboot_needed
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010460 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_host_based_files | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+
+- name: Remove User Host-Based Authentication Files - Define Excluded (Non-Local) File Systems and Paths
+  ansible.builtin.set_fact:
+    excluded_fstypes:
+    - afs
+    - ceph
+    - cifs
+    - smb3
+    - smbfs
+    - sshfs
+    - ncpfs
+    - ncp
+    - nfs
+    - nfs4
+    - gfs
+    - gfs2
+    - glusterfs
+    - gpfs
+    - pvfs2
+    - ocfs2
+    - lustre
+    - davfs
+    - fuse.sshfs
+    excluded_paths:
+    - dev
+    - proc
+    - run
+    - sys
+    search_paths: []
+  tags:
+  - CCE-84056-1
+  - DISA-STIG-RHEL-08-010470
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - no_user_host_based_files
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010470 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - no_user_host_based_files | bool
+  - restrict_strategy | bool
+
+- name: Remove User Host-Based Authentication Files - Find Relevant Root Directories Ignoring Pre-Defined Excluded Paths
+  ansible.builtin.find:
+    paths: /
+    file_type: directory
+    excludes: '{{ excluded_paths }}'
+    hidden: true
+    recurse: false
+  register: result_relevant_root_dirs
+  tags:
+  - CCE-84056-1
+  - DISA-STIG-RHEL-08-010470
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - no_user_host_based_files
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010470 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - no_user_host_based_files | bool
+  - restrict_strategy | bool
+
+- name: Remove User Host-Based Authentication Files - Include Relevant Root Directories in a List of Paths to be Searched
+  ansible.builtin.set_fact:
+    search_paths: '{{ search_paths | union([item.path]) }}'
+  loop: '{{ result_relevant_root_dirs.files }}'
+  tags:
+  - CCE-84056-1
+  - DISA-STIG-RHEL-08-010470
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - no_user_host_based_files
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010470 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - no_user_host_based_files | bool
+  - restrict_strategy | bool
+
+- name: Remove User Host-Based Authentication Files - Increment Search Paths List with Local Partitions Mount Points
+  ansible.builtin.set_fact:
+    search_paths: '{{ search_paths | union([item.mount]) }}'
+  loop: '{{ ansible_mounts }}'
+  when:
+  - DISA_STIG_RHEL_08_010470 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - no_user_host_based_files | bool
+  - restrict_strategy | bool
+  - item.fstype not in excluded_fstypes
+  - item.mount != '/'
+  tags:
+  - CCE-84056-1
+  - DISA-STIG-RHEL-08-010470
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - no_user_host_based_files
+  - restrict_strategy
+
+- name: Remove User Host-Based Authentication Files - Increment Search Paths List with Local NFS File System Targets
+  ansible.builtin.set_fact:
+    search_paths: '{{ search_paths | union([item.device.split('':'')[1]]) }}'
+  loop: '{{ ansible_mounts }}'
+  when:
+  - DISA_STIG_RHEL_08_010470 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - no_user_host_based_files | bool
+  - restrict_strategy | bool
+  - item.device is search("localhost:")
+  tags:
+  - CCE-84056-1
+  - DISA-STIG-RHEL-08-010470
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - no_user_host_based_files
+  - restrict_strategy
+
+- name: Remove User Host-Based Authentication Files - Define Rule Specific Facts
+  ansible.builtin.set_fact:
+    user_shosts_files:
+    - /.shosts
+  tags:
+  - CCE-84056-1
+  - DISA-STIG-RHEL-08-010470
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - no_user_host_based_files
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010470 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - no_user_host_based_files | bool
+  - restrict_strategy | bool
+
+- name: Remove User Host-Based Authentication Files - Find All .shosts Files in Local File Systems
+  ansible.builtin.command:
+    cmd: find {{ item }} -xdev -type f -name ".shosts"
+  loop: '{{ search_paths }}'
+  changed_when: false
+  register: result_found_shosts_files
+  tags:
+  - CCE-84056-1
+  - DISA-STIG-RHEL-08-010470
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - no_user_host_based_files
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010470 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - no_user_host_based_files | bool
+  - restrict_strategy | bool
+
+- name: Remove User Host-Based Authentication Files - Create List of .shosts Files Present in Local File Systems
+  ansible.builtin.set_fact:
+    user_shosts_files: '{{ user_shosts_files | union(item.stdout_lines) | list }}'
+  loop: '{{ result_found_shosts_files.results }}'
+  tags:
+  - CCE-84056-1
+  - DISA-STIG-RHEL-08-010470
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - no_user_host_based_files
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010470 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - no_user_host_based_files | bool
+  - restrict_strategy | bool
+
+- name: Remove User Host-Based Authentication Files - Ensure No .shosts Files Are Present in the System
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: absent
+  loop: '{{ user_shosts_files }}'
+  tags:
+  - CCE-84056-1
+  - DISA-STIG-RHEL-08-010470
+  - high_severity
+  - low_complexity
+  - low_disruption
+  - no_reboot_needed
+  - no_user_host_based_files
+  - restrict_strategy
+  when:
+  - DISA_STIG_RHEL_08_010470 | bool
+  - high_severity | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - no_reboot_needed | bool
+  - no_user_host_based_files | bool
+  - restrict_strategy | bool
+
 - name: Ensure telnet-server is removed
   package:
     name: telnet-server
@@ -44364,6 +45992,37 @@
   - medium_severity
   - no_reboot_needed
   - tftpd_uses_secure_mode
+
+- name: Enable service rngd
+  block:
+  - name: Gather the package facts
+    package_facts:
+      manager: auto
+  - name: Enable service rngd
+    systemd:
+      name: rngd
+      enabled: 'yes'
+      state: started
+      masked: 'no'
+    when:
+    - '"rng-tools" in ansible_facts.packages'
+  when:
+  - enable_strategy | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - low_severity | bool
+  - no_reboot_needed | bool
+  - service_rngd_enabled | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - ansible_distribution == 'RedHat' and ansible_distribution_version is version('8.3', '<=')
+  tags:
+  - CCE-82831-9
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - low_severity
+  - no_reboot_needed
+  - service_rngd_enabled
 
 - name: Ensure openssh-server is installed
   package:
@@ -45425,6 +47084,7 @@
     section: sssd
     option: certificate_verification
     state: absent
+    mode: 384
   when:
   - DISA_STIG_RHEL_08_010400 | bool
   - configure_strategy | bool
@@ -45451,6 +47111,7 @@
     section: sssd
     option: certificate_verification
     state: absent
+    mode: 384
   when:
   - DISA_STIG_RHEL_08_010400 | bool
   - configure_strategy | bool
@@ -45478,6 +47139,7 @@
     option: certificate_verification
     value: ocsp_dgst = {{ var_sssd_certificate_verification_digest_function }}
     state: present
+    mode: 384
   when:
   - DISA_STIG_RHEL_08_010400 | bool
   - configure_strategy | bool
