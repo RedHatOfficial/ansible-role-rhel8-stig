@@ -202,6 +202,7 @@ DISA_STIG_RHEL_08_020060: true
 DISA_STIG_RHEL_08_020070: true
 DISA_STIG_RHEL_08_020080: true
 DISA_STIG_RHEL_08_020081: true
+DISA_STIG_RHEL_08_020082: true
 DISA_STIG_RHEL_08_020100: true
 DISA_STIG_RHEL_08_020101: true
 DISA_STIG_RHEL_08_020104: true
@@ -315,6 +316,7 @@ DISA_STIG_RHEL_08_040001: true
 DISA_STIG_RHEL_08_040002: true
 DISA_STIG_RHEL_08_040004: true
 DISA_STIG_RHEL_08_040010: true
+DISA_STIG_RHEL_08_040020: true
 DISA_STIG_RHEL_08_040021: true
 DISA_STIG_RHEL_08_040022: true
 DISA_STIG_RHEL_08_040023: true
@@ -344,9 +346,11 @@ DISA_STIG_RHEL_08_040133: true
 DISA_STIG_RHEL_08_040134: true
 DISA_STIG_RHEL_08_040135: true
 DISA_STIG_RHEL_08_040136: true
+DISA_STIG_RHEL_08_040137: true
 DISA_STIG_RHEL_08_040139: true
 DISA_STIG_RHEL_08_040140: true
 DISA_STIG_RHEL_08_040141: true
+DISA_STIG_RHEL_08_040150: true
 DISA_STIG_RHEL_08_040159: true
 DISA_STIG_RHEL_08_040160: true
 DISA_STIG_RHEL_08_040161: true
@@ -537,6 +541,7 @@ dconf_gnome_login_banner_text: true
 dconf_gnome_screensaver_idle_delay: true
 dconf_gnome_screensaver_lock_delay: true
 dconf_gnome_screensaver_lock_enabled: true
+dconf_gnome_screensaver_lock_locked: true
 dconf_gnome_screensaver_user_locks: true
 dconf_gnome_session_idle_user_locks: true
 dir_group_ownership_library_dirs: true
@@ -560,6 +565,7 @@ ensure_gpgcheck_globally_activated: true
 ensure_gpgcheck_local_packages: true
 ensure_gpgcheck_never_disabled: true
 ensure_redhat_gpgkey_installed: true
+fapolicy_default_deny: true
 file_audit_tools_group_ownership: true
 file_audit_tools_ownership: true
 file_audit_tools_permissions: true
@@ -603,6 +609,7 @@ kernel_module_can_disabled: true
 kernel_module_cramfs_disabled: true
 kernel_module_sctp_disabled: true
 kernel_module_tipc_disabled: true
+kernel_module_uvcvideo_disabled: true
 logind_session_timeout: true
 low_complexity: true
 low_disruption: true
