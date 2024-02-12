@@ -14746,8 +14746,9 @@
 
 - name: Change the maximum time period between password changes
   ansible.builtin.user:
-    user: '{{ item }}'
-    password_expire_max: '{{ var_accounts_maximum_age_login_defs }}'
+      command: 'chage -M {{ var_accounts_maximum_age_login_defs }} {{ item }}
+
+    '
   with_items: '{{ user_names.stdout_lines }}'
   when:
   - DISA_STIG_RHEL_08_020210 | bool
