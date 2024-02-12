@@ -16639,9 +16639,8 @@
     create: true
     line: -e 2
     mode: o-rwx
-  loop:
-  - /etc/audit/audit.rules
-  - /etc/audit/rules.d/immutable.rules
+    insertafter: EOF
+  loop: "{{ find_rules_d.files }}"
   when:
   - DISA_STIG_RHEL_08_030121 | bool
   - audit_rules_immutable | bool
