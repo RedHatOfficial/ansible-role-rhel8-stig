@@ -14750,8 +14750,9 @@
 
 - name: Change the maximum time period between password changes
   ansible.builtin.user:
-    user: '{{ item }}'
-    password_expire_max: '{{ var_accounts_maximum_age_login_defs }}'
+      command: 'chage -M {{ var_accounts_maximum_age_login_defs }} {{ item }}
+
+    '
   with_items: '{{ user_names.stdout_lines }}'
   when:
   - DISA_STIG_RHEL_08_020210 | bool
@@ -16643,9 +16644,8 @@
     create: true
     line: -e 2
     mode: o-rwx
-  loop:
-  - /etc/audit/audit.rules
-  - /etc/audit/rules.d/immutable.rules
+    insertafter: EOF
+  loop: "{{ find_rules_d.files }}"
   when:
   - DISA_STIG_RHEL_08_030121 | bool
   - audit_rules_immutable | bool
@@ -36124,6 +36124,7 @@
     - /etc/sysctl.d/
     - /run/sysctl.d/
     - /usr/local/lib/sysctl.d/
+    - /usr/lib/sysctl.d/
     contains: ^[\s]*net.ipv6.conf.all.accept_ra.*$
     patterns: '*.conf'
     file_type: any
