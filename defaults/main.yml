@@ -57,6 +57,7 @@ var_selinux_policy_name: targeted
 var_selinux_state: enforcing
 var_multiple_time_servers: 0.us.pool.ntp.mil
 var_time_service_set_maxpoll: '16'
+var_tftpd_secure_directory: /var/lib/tftpboot
 var_sshd_set_keepalive: '1'
 sshd_idle_timeout_value: '600'
 var_rekey_limit_size: 1G
@@ -300,6 +301,7 @@ DISA_STIG_RHEL_08_030620: true
 DISA_STIG_RHEL_08_030630: true
 DISA_STIG_RHEL_08_030640: true
 DISA_STIG_RHEL_08_030650: true
+DISA_STIG_RHEL_08_030655: true
 DISA_STIG_RHEL_08_030670: true
 DISA_STIG_RHEL_08_030680: true
 DISA_STIG_RHEL_08_030690: true
@@ -387,10 +389,12 @@ DISA_STIG_RHEL_08_040321: true
 DISA_STIG_RHEL_08_040330: true
 DISA_STIG_RHEL_08_040340: true
 DISA_STIG_RHEL_08_040341: true
+DISA_STIG_RHEL_08_040350: true
 DISA_STIG_RHEL_08_040360: true
 DISA_STIG_RHEL_08_040370: true
 DISA_STIG_RHEL_08_040380: true
 DISA_STIG_RHEL_08_040390: true
+DISA_STIG_needed_rules: true
 account_disable_post_pw_expiration: true
 account_password_pam_faillock_password_auth: true
 account_password_pam_faillock_system_auth: true
@@ -452,6 +456,7 @@ audit_rules_dac_modification_lremovexattr: true
 audit_rules_dac_modification_lsetxattr: true
 audit_rules_dac_modification_removexattr: true
 audit_rules_dac_modification_setxattr: true
+audit_rules_etc_cron_d: true
 audit_rules_execution_chacl: true
 audit_rules_execution_chcon: true
 audit_rules_execution_semanage: true
@@ -505,6 +510,7 @@ audit_rules_usergroup_modification_gshadow: true
 audit_rules_usergroup_modification_opasswd: true
 audit_rules_usergroup_modification_passwd: true
 audit_rules_usergroup_modification_shadow: true
+audit_rules_var_spool_cron: true
 auditd_data_disk_error_action: true
 auditd_data_disk_full_action: true
 auditd_data_retention_action_mail_acct: true
@@ -705,6 +711,7 @@ set_password_hashing_algorithm_logindefs: true
 set_password_hashing_algorithm_passwordauth: true
 set_password_hashing_algorithm_systemauth: true
 set_password_hashing_min_rounds_logindefs: true
+special_service_block: true
 sshd_disable_empty_passwords: true
 sshd_disable_gssapi_auth: true
 sshd_disable_kerb_auth: true
@@ -755,6 +762,7 @@ sysctl_net_ipv6_conf_all_forwarding: true
 sysctl_net_ipv6_conf_default_accept_ra: true
 sysctl_net_ipv6_conf_default_accept_redirects: true
 sysctl_net_ipv6_conf_default_accept_source_route: true
+tftp_uses_secure_mode_systemd: true
 unknown_strategy: true
 usbguard_generate_policy: true
 wireless_disable_interfaces: true
