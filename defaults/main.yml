@@ -36,12 +36,6 @@ var_accounts_fail_delay: '4'
 var_accounts_max_concurrent_login_sessions: '10'
 var_user_initialization_files_regex: ^(\.bashrc|\.zshrc|\.cshrc|\.profile|\.bash_login|\.bash_profile)$
 var_accounts_user_umask: '077'
-var_auditd_disk_error_action: syslog|single|halt
-var_auditd_disk_full_action: syslog|single|halt
-var_auditd_action_mail_acct: root
-var_auditd_space_left_action: email
-var_auditd_space_left_percentage: '25'
-var_auditd_name_format: hostname|fqd|numeric
 rsyslog_remote_loghost_address: logcollector
 sysctl_net_ipv6_conf_all_accept_ra_value: '0'
 sysctl_net_ipv6_conf_all_accept_redirects_value: '0'
@@ -62,6 +56,7 @@ sysctl_kernel_kptr_restrict_value: '1'
 var_slub_debug_options: P
 var_selinux_policy_name: targeted
 var_selinux_state: enforcing
+var_multiple_time_servers: 0.us.pool.ntp.mil
 var_time_service_set_maxpoll: '16'
 var_tftpd_secure_directory: /var/lib/tftpboot
 var_sshd_set_keepalive: '1'
@@ -69,7 +64,12 @@ sshd_idle_timeout_value: '600'
 var_rekey_limit_size: 1G
 var_rekey_limit_time: 1h
 var_sssd_certificate_verification_digest_function: sha1
-DISA_STIG_RHEL_08_010010: true
+var_auditd_disk_error_action: syslog|single|halt
+var_auditd_disk_full_action: syslog|single|halt
+var_auditd_action_mail_acct: root
+var_auditd_space_left_action: email
+var_auditd_space_left_percentage: '25'
+var_auditd_name_format: hostname|fqd|numeric
 DISA_STIG_RHEL_08_010019: true
 DISA_STIG_RHEL_08_010020: true
 DISA_STIG_RHEL_08_010040: true
@@ -190,6 +190,8 @@ DISA_STIG_RHEL_08_020019: true
 DISA_STIG_RHEL_08_020021: true
 DISA_STIG_RHEL_08_020023: true
 DISA_STIG_RHEL_08_020024: true
+DISA_STIG_RHEL_08_020025: true
+DISA_STIG_RHEL_08_020026: true
 DISA_STIG_RHEL_08_020030: true
 DISA_STIG_RHEL_08_020031: true
 DISA_STIG_RHEL_08_020032: true
@@ -395,6 +397,8 @@ DISA_STIG_RHEL_08_040370: true
 DISA_STIG_RHEL_08_040380: true
 DISA_STIG_RHEL_08_040390: true
 account_disable_post_pw_expiration: true
+account_password_pam_faillock_password_auth: true
+account_password_pam_faillock_system_auth: true
 accounts_have_homedir_login_defs: true
 accounts_logon_fail_delay: true
 accounts_max_concurrent_login_sessions: true
@@ -519,6 +523,7 @@ banner_etc_issue: true
 chronyd_client_only: true
 chronyd_no_chronyc_network: true
 chronyd_or_ntpd_set_maxpoll: true
+chronyd_specify_remote_server: true
 clean_components_post_updating: true
 configure_bashrc_tmux: true
 configure_crypto_policy: true
@@ -681,7 +686,6 @@ package_tmux_installed: true
 package_tuned_removed: true
 package_usbguard_installed: true
 package_vsftpd_removed: true
-patch_strategy: true
 postfix_client_configure_mail_alias_postmaster: true
 postfix_prevent_unrestricted_relay: true
 reboot_required: true
@@ -694,7 +698,6 @@ rsyslog_encrypt_offload_actionsendstreamdrivermode: true
 rsyslog_encrypt_offload_defaultnetstreamdriver: true
 rsyslog_remote_access_monitoring: true
 rsyslog_remote_loghost: true
-security_patches_up_to_date: true
 selinux_policytype: true
 selinux_state: true
 service_auditd_enabled: true
@@ -712,7 +715,6 @@ set_password_hashing_algorithm_logindefs: true
 set_password_hashing_algorithm_passwordauth: true
 set_password_hashing_algorithm_systemauth: true
 set_password_hashing_min_rounds_logindefs: true
-skip_ansible_lint: true
 sshd_disable_empty_passwords: true
 sshd_disable_gssapi_auth: true
 sshd_disable_kerb_auth: true
