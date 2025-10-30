@@ -53,12 +53,10 @@ sysctl_net_ipv4_conf_default_accept_source_route_value: '0'
 sysctl_net_ipv4_icmp_echo_ignore_broadcasts_value: '1'
 var_removable_partition: /dev/cdrom
 sysctl_kernel_kptr_restrict_value: '1'
-var_slub_debug_options: P
 var_selinux_policy_name: targeted
 var_selinux_state: enforcing
 var_multiple_time_servers: 0.us.pool.ntp.mil
 var_time_service_set_maxpoll: '16'
-var_tftpd_secure_directory: /var/lib/tftpboot
 var_sshd_set_keepalive: '1'
 sshd_idle_timeout_value: '600'
 var_rekey_limit_size: 1G
@@ -104,6 +102,7 @@ DISA_STIG_RHEL_08_010291: true
 DISA_STIG_RHEL_08_010292: true
 DISA_STIG_RHEL_08_010293: true
 DISA_STIG_RHEL_08_010295: true
+DISA_STIG_RHEL_08_010296: true
 DISA_STIG_RHEL_08_010300: true
 DISA_STIG_RHEL_08_010310: true
 DISA_STIG_RHEL_08_010320: true
@@ -316,7 +315,6 @@ DISA_STIG_RHEL_08_040000: true
 DISA_STIG_RHEL_08_040001: true
 DISA_STIG_RHEL_08_040002: true
 DISA_STIG_RHEL_08_040004: true
-DISA_STIG_RHEL_08_040010: true
 DISA_STIG_RHEL_08_040020: true
 DISA_STIG_RHEL_08_040021: true
 DISA_STIG_RHEL_08_040022: true
@@ -379,7 +377,6 @@ DISA_STIG_RHEL_08_040280: true
 DISA_STIG_RHEL_08_040281: true
 DISA_STIG_RHEL_08_040282: true
 DISA_STIG_RHEL_08_040283: true
-DISA_STIG_RHEL_08_040284: true
 DISA_STIG_RHEL_08_040285: true
 DISA_STIG_RHEL_08_040286: true
 DISA_STIG_RHEL_08_040290: true
@@ -390,7 +387,6 @@ DISA_STIG_RHEL_08_040321: true
 DISA_STIG_RHEL_08_040330: true
 DISA_STIG_RHEL_08_040340: true
 DISA_STIG_RHEL_08_040341: true
-DISA_STIG_RHEL_08_040350: true
 DISA_STIG_RHEL_08_040360: true
 DISA_STIG_RHEL_08_040370: true
 DISA_STIG_RHEL_08_040380: true
@@ -560,10 +556,9 @@ disable_users_coredumps: true
 disallow_bypass_password_sudo: true
 display_login_attempts: true
 enable_authselect: true
+enable_gpgcheck_for_all_repositories: true
 enable_strategy: true
-ensure_gpgcheck_globally_activated: true
 ensure_gpgcheck_local_packages: true
-ensure_gpgcheck_never_disabled: true
 ensure_redhat_gpgkey_installed: true
 fapolicy_default_deny: true
 file_audit_tools_group_ownership: true
@@ -591,11 +586,13 @@ file_permissions_var_log_messages: true
 gnome_gdm_disable_automatic_login: true
 grub2_audit_argument: true
 grub2_audit_backlog_limit_argument: true
+grub2_init_on_free: true
 grub2_page_poison_argument: true
 grub2_pti_argument: true
-grub2_slub_debug_argument: true
 grub2_vsyscall_argument: true
+harden_sshd_ciphers_openssh_conf_crypto_policy: true
 harden_sshd_ciphers_opensshserver_conf_crypto_policy: true
+harden_sshd_macs_openssh_conf_crypto_policy: true
 harden_sshd_macs_opensshserver_conf_crypto_policy: true
 high_disruption: true
 high_severity: true
@@ -669,7 +666,6 @@ package_policycoreutils_installed: true
 package_postfix_installed: true
 package_python3_abrt_addon_removed: true
 package_rng_tools_installed: true
-package_rsh_server_removed: true
 package_rsyslog_gnutls_installed: true
 package_rsyslog_installed: true
 package_sendmail_removed: true
@@ -685,6 +681,7 @@ require_emergency_target_auth: true
 require_singleuser_auth: true
 restrict_strategy: true
 root_permissions_syslibrary_files: true
+rootfiles_configured: true
 rsyslog_cron_logging: true
 rsyslog_encrypt_offload_actionsendstreamdriverauthmode: true
 rsyslog_encrypt_offload_actionsendstreamdrivermode: true
@@ -758,8 +755,6 @@ sysctl_net_ipv6_conf_all_forwarding: true
 sysctl_net_ipv6_conf_default_accept_ra: true
 sysctl_net_ipv6_conf_default_accept_redirects: true
 sysctl_net_ipv6_conf_default_accept_source_route: true
-sysctl_user_max_user_namespaces: true
-tftpd_uses_secure_mode: true
 unknown_strategy: true
 usbguard_generate_policy: true
 wireless_disable_interfaces: true
