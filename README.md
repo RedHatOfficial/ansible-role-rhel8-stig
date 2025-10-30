@@ -5,7 +5,7 @@ Ansible Role for DISA STIG for Red Hat Enterprise Linux 8
   
 Profile Description:  
 This profile contains configuration checks that align to the  
-DISA STIG for Red Hat Enterprise Linux 8 V1R14.  
+DISA STIG for Red Hat Enterprise Linux 8 V2R1.  
 In addition to being applicable to Red Hat Enterprise Linux 8, DISA recognizes this  
 configuration baseline as applicable to the operating system tier of  
 Red Hat technologies that are based on Red Hat Enterprise Linux 8, such as:  
