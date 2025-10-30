@@ -28,7 +28,7 @@ var_password_pam_retry: '3'
 var_password_pam_ucredit: '-1'
 var_password_hashing_algorithm: SHA512
 var_password_hashing_algorithm_pam: sha512
-var_logind_session_timeout: '900'
+var_logind_session_timeout: '600'
 var_account_disable_post_pw_expiration: '35'
 var_accounts_maximum_age_login_defs: '60'
 var_accounts_minimum_age_login_defs: '1'
@@ -200,13 +200,8 @@ DISA_STIG_RHEL_08_020030: true
 DISA_STIG_RHEL_08_020031: true
 DISA_STIG_RHEL_08_020032: true
 DISA_STIG_RHEL_08_020035: true
-DISA_STIG_RHEL_08_020039: true
-DISA_STIG_RHEL_08_020040: true
-DISA_STIG_RHEL_08_020041: true
-DISA_STIG_RHEL_08_020042: true
 DISA_STIG_RHEL_08_020050: true
 DISA_STIG_RHEL_08_020060: true
-DISA_STIG_RHEL_08_020070: true
 DISA_STIG_RHEL_08_020080: true
 DISA_STIG_RHEL_08_020081: true
 DISA_STIG_RHEL_08_020082: true
@@ -243,6 +238,7 @@ DISA_STIG_RHEL_08_020351: true
 DISA_STIG_RHEL_08_020352: true
 DISA_STIG_RHEL_08_020353: true
 DISA_STIG_RHEL_08_030000: true
+DISA_STIG_RHEL_08_030010: true
 DISA_STIG_RHEL_08_030020: true
 DISA_STIG_RHEL_08_030030: true
 DISA_STIG_RHEL_08_030040: true
@@ -533,7 +529,7 @@ chronyd_no_chronyc_network: true
 chronyd_or_ntpd_set_maxpoll: true
 chronyd_specify_remote_server: true
 clean_components_post_updating: true
-configure_bashrc_tmux: true
+configure_bind_crypto_policy: true
 configure_crypto_policy: true
 configure_gnutls_tls_crypto_policy: true
 configure_kerberos_crypto_policy: true
@@ -541,9 +537,6 @@ configure_libreswan_crypto_policy: true
 configure_openssl_crypto_policy: true
 configure_ssh_crypto_policy: true
 configure_strategy: true
-configure_tmux_lock_after_time: true
-configure_tmux_lock_command: true
-configure_tmux_lock_keybinding: true
 configure_usbguard_auditbackend: true
 coredump_disable_backtraces: true
 coredump_disable_storage: true
@@ -662,7 +655,6 @@ no_empty_passwords: true
 no_empty_passwords_etc_shadow: true
 no_host_based_files: true
 no_reboot_needed: true
-no_tmux_in_shells: true
 no_user_host_based_files: true
 package_abrt_addon_ccpp_removed: true
 package_abrt_addon_kerneloops_removed: true
@@ -692,7 +684,6 @@ package_rsyslog_installed: true
 package_sendmail_removed: true
 package_telnet_server_removed: true
 package_tftp_server_removed: true
-package_tmux_installed: true
 package_tuned_removed: true
 package_usbguard_installed: true
 package_vsftpd_removed: true
@@ -703,6 +694,7 @@ require_emergency_target_auth: true
 require_singleuser_auth: true
 restrict_strategy: true
 root_permissions_syslibrary_files: true
+rsyslog_cron_logging: true
 rsyslog_encrypt_offload_actionsendstreamdriverauthmode: true
 rsyslog_encrypt_offload_actionsendstreamdrivermode: true
 rsyslog_encrypt_offload_defaultnetstreamdriver: true
