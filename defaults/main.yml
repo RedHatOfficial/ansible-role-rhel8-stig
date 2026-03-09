@@ -1,9 +1,7 @@
 ---
 # defaults file for rhel8_stig
 var_aide_scan_notification_email: root@localhost
-var_system_crypto_policy: FIPS
-sshd_approved_ciphers: aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes128-ctr
-sshd_approved_macs: hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
+var_system_crypto_policy: FIPS:STIG
 inactivity_timeout_value: '900'
 var_screensaver_lock_delay: '5'
 var_sudo_timestamp_timeout: '0'
@@ -34,6 +32,7 @@ var_accounts_minimum_age_login_defs: '1'
 var_accounts_password_minlen_login_defs: '15'
 var_accounts_fail_delay: '4'
 var_accounts_max_concurrent_login_sessions: '10'
+var_accounts_tmout: '600'
 var_user_initialization_files_regex: ^\.[\w\- ]+$
 var_accounts_user_umask: '077'
 rsyslog_remote_loghost_address: logcollector
@@ -70,6 +69,7 @@ var_auditd_action_mail_acct: root
 var_auditd_space_left_action: email
 var_auditd_space_left_percentage: '25'
 var_auditd_name_format: hostname|fqd|numeric
+DISA_STIG_RHEL_08_010015: true
 DISA_STIG_RHEL_08_010019: true
 DISA_STIG_RHEL_08_010020: true
 DISA_STIG_RHEL_08_010040: true
@@ -98,13 +98,14 @@ DISA_STIG_RHEL_08_010230: true
 DISA_STIG_RHEL_08_010240: true
 DISA_STIG_RHEL_08_010250: true
 DISA_STIG_RHEL_08_010260: true
-DISA_STIG_RHEL_08_010287: true
+DISA_STIG_RHEL_08_010270: true
+DISA_STIG_RHEL_08_010275: true
+DISA_STIG_RHEL_08_010280: true
 DISA_STIG_RHEL_08_010290: true
 DISA_STIG_RHEL_08_010291: true
 DISA_STIG_RHEL_08_010292: true
-DISA_STIG_RHEL_08_010293: true
-DISA_STIG_RHEL_08_010295: true
 DISA_STIG_RHEL_08_010296: true
+DISA_STIG_RHEL_08_010297: true
 DISA_STIG_RHEL_08_010300: true
 DISA_STIG_RHEL_08_010310: true
 DISA_STIG_RHEL_08_010320: true
@@ -162,7 +163,6 @@ DISA_STIG_RHEL_08_010620: true
 DISA_STIG_RHEL_08_010630: true
 DISA_STIG_RHEL_08_010640: true
 DISA_STIG_RHEL_08_010650: true
-DISA_STIG_RHEL_08_010660: true
 DISA_STIG_RHEL_08_010670: true
 DISA_STIG_RHEL_08_010671: true
 DISA_STIG_RHEL_08_010672: true
@@ -230,7 +230,6 @@ DISA_STIG_RHEL_08_020310: true
 DISA_STIG_RHEL_08_020330: true
 DISA_STIG_RHEL_08_020331: true
 DISA_STIG_RHEL_08_020332: true
-DISA_STIG_RHEL_08_020340: true
 DISA_STIG_RHEL_08_020350: true
 DISA_STIG_RHEL_08_020351: true
 DISA_STIG_RHEL_08_020352: true
@@ -247,6 +246,7 @@ DISA_STIG_RHEL_08_030063: true
 DISA_STIG_RHEL_08_030070: true
 DISA_STIG_RHEL_08_030100: true
 DISA_STIG_RHEL_08_030110: true
+DISA_STIG_RHEL_08_030120: true
 DISA_STIG_RHEL_08_030121: true
 DISA_STIG_RHEL_08_030122: true
 DISA_STIG_RHEL_08_030130: true
@@ -318,6 +318,7 @@ DISA_STIG_RHEL_08_040000: true
 DISA_STIG_RHEL_08_040001: true
 DISA_STIG_RHEL_08_040002: true
 DISA_STIG_RHEL_08_040004: true
+DISA_STIG_RHEL_08_040010: true
 DISA_STIG_RHEL_08_040020: true
 DISA_STIG_RHEL_08_040021: true
 DISA_STIG_RHEL_08_040022: true
@@ -429,12 +430,9 @@ accounts_passwords_pam_faillock_dir: true
 accounts_passwords_pam_faillock_interval: true
 accounts_passwords_pam_faillock_silent: true
 accounts_passwords_pam_faillock_unlock_time: true
-accounts_umask_etc_bashrc: true
-accounts_umask_etc_csh_cshrc: true
+accounts_tmout: true
 accounts_umask_etc_login_defs: true
-accounts_umask_etc_profile: true
 accounts_umask_interactive_users: true
-accounts_user_dot_no_world_writable_programs: true
 accounts_user_interactive_home_directory_defined: true
 accounts_user_interactive_home_directory_exists: true
 accounts_users_home_files_groupownership: true
@@ -529,11 +527,7 @@ chronyd_specify_remote_server: true
 clean_components_post_updating: true
 configure_bind_crypto_policy: true
 configure_crypto_policy: true
-configure_gnutls_tls_crypto_policy: true
-configure_kerberos_crypto_policy: true
 configure_libreswan_crypto_policy: true
-configure_openssl_crypto_policy: true
-configure_ssh_crypto_policy: true
 configure_strategy: true
 configure_usbguard_auditbackend: true
 coredump_disable_backtraces: true
@@ -556,15 +550,16 @@ dir_perms_world_writable_root_owned: true
 dir_perms_world_writable_sticky_bits: true
 directory_group_ownership_var_log_audit: true
 directory_ownership_var_log_audit: true
+directory_permissions_var_log_audit: true
 disable_ctrlaltdel_burstaction: true
 disable_ctrlaltdel_reboot: true
 disable_strategy: true
 disable_users_coredumps: true
 disallow_bypass_password_sudo: true
-display_login_attempts: true
 enable_authselect: true
 enable_gpgcheck_for_all_repositories: true
 enable_strategy: true
+ensure_epel_repos_disabled: true
 ensure_gpgcheck_local_packages: true
 ensure_redhat_gpgkey_installed: true
 fapolicy_default_deny: true
@@ -590,6 +585,7 @@ file_permissions_sshd_pub_key: true
 file_permissions_var_log: true
 file_permissions_var_log_audit: true
 file_permissions_var_log_messages: true
+fips_custom_stig_sub_policy: true
 gnome_gdm_disable_automatic_login: true
 grub2_audit_argument: true
 grub2_audit_backlog_limit_argument: true
@@ -597,10 +593,6 @@ grub2_init_on_free: true
 grub2_page_poison_argument: true
 grub2_pti_argument: true
 grub2_vsyscall_argument: true
-harden_sshd_ciphers_openssh_conf_crypto_policy: true
-harden_sshd_ciphers_opensshserver_conf_crypto_policy: true
-harden_sshd_macs_openssh_conf_crypto_policy: true
-harden_sshd_macs_opensshserver_conf_crypto_policy: true
 high_disruption: true
 high_severity: true
 install_smartcard_packages: true
@@ -658,6 +650,7 @@ package_abrt_plugin_sosreport_removed: true
 package_abrt_removed: true
 package_aide_installed: true
 package_audit_installed: true
+package_crypto_policies_installed: true
 package_fapolicyd_installed: true
 package_firewalld_installed: true
 package_gssproxy_removed: true
