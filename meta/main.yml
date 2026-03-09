@@ -30,4 +30,8 @@ galaxy_info:
   - disa
 
 
+collections:
+  - community.general
+  - ansible.posix
+
 dependencies: []
