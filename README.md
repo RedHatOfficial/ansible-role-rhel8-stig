@@ -50,6 +50,11 @@ Next, check the playbook using (on the localhost) the following example:
 
     ansible-playbook -i "localhost," -c local --check playbook.yml
 
+If you encounter errors pertaining to _ini_file or sysctl, you may need additional ansible collections:
+
+    ansible-galaxy collection install community.general
+    ansible-galaxy collection install ansible.posix
+
 To deploy it, use (this may change configuration of your local machine!):
 
     ansible-playbook -i "localhost," -c local playbook.yml
