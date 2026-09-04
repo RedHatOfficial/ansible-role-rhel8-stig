@@ -2,7 +2,7 @@
 # defaults file for rhel8_stig
 var_aide_scan_notification_email: root@localhost
 var_system_crypto_policy: FIPS:STIG
-inactivity_timeout_value: '900'
+inactivity_timeout_value: '600'
 var_screensaver_lock_delay: '5'
 var_sudo_timestamp_timeout: '0'
 var_authselect_profile: sssd
@@ -67,9 +67,12 @@ sysctl_net_ipv6_conf_default_accept_source_route_value: '0'
 sysctl_net_ipv4_conf_all_accept_redirects_value: '0'
 sysctl_net_ipv4_conf_all_accept_source_route_value: '0'
 sysctl_net_ipv4_conf_all_forwarding_value: '0'
+sysctl_net_ipv4_conf_all_log_martians_value: '1'
 sysctl_net_ipv4_conf_all_rp_filter_value: '1'
 sysctl_net_ipv4_conf_default_accept_redirects_value: '0'
 sysctl_net_ipv4_conf_default_accept_source_route_value: '0'
+sysctl_net_ipv4_conf_default_log_martians_value: '1'
+sysctl_net_ipv4_conf_default_rp_filter_value: '1'
 sysctl_net_ipv4_icmp_echo_ignore_broadcasts_value: '1'
 var_removable_partition: /dev/cdrom
 var_selinux_policy_name: targeted
@@ -254,6 +257,7 @@ DISA_STIG_RHEL_08_020350: true
 DISA_STIG_RHEL_08_020351: true
 DISA_STIG_RHEL_08_020352: true
 DISA_STIG_RHEL_08_020353: true
+DISA_STIG_RHEL_08_020360: true
 DISA_STIG_RHEL_08_030000: true
 DISA_STIG_RHEL_08_030010: true
 DISA_STIG_RHEL_08_030020: true
@@ -386,6 +390,8 @@ DISA_STIG_RHEL_08_040200: true
 DISA_STIG_RHEL_08_040209: true
 DISA_STIG_RHEL_08_040210: true
 DISA_STIG_RHEL_08_040220: true
+DISA_STIG_RHEL_08_040221: true
+DISA_STIG_RHEL_08_040222: true
 DISA_STIG_RHEL_08_040230: true
 DISA_STIG_RHEL_08_040239: true
 DISA_STIG_RHEL_08_040240: true
@@ -403,6 +409,7 @@ DISA_STIG_RHEL_08_040282: true
 DISA_STIG_RHEL_08_040283: true
 DISA_STIG_RHEL_08_040285: true
 DISA_STIG_RHEL_08_040286: true
+DISA_STIG_RHEL_08_040287: true
 DISA_STIG_RHEL_08_040290: true
 DISA_STIG_RHEL_08_040300: true
 DISA_STIG_RHEL_08_040310: true
@@ -451,7 +458,10 @@ accounts_passwords_pam_faillock_interval: true
 accounts_passwords_pam_faillock_silent: true
 accounts_passwords_pam_faillock_unlock_time: true
 accounts_tmout: true
+accounts_umask_etc_bashrc: true
+accounts_umask_etc_csh_cshrc: true
 accounts_umask_etc_login_defs: true
+accounts_umask_etc_profile: true
 accounts_umask_interactive_users: true
 accounts_user_interactive_home_directory_defined: true
 accounts_user_interactive_home_directory_exists: true
@@ -596,9 +606,8 @@ file_owner_var_log_messages: true
 file_ownership_binary_dirs: true
 file_ownership_library_dirs: true
 file_permission_user_init_files_root: true
+file_permissions_audit_configuration_stig: true
 file_permissions_binary_dirs: true
-file_permissions_etc_audit_auditd: true
-file_permissions_etc_audit_rulesd: true
 file_permissions_home_directories: true
 file_permissions_library_dirs: true
 file_permissions_sshd_private_key: true
@@ -764,10 +773,13 @@ sysctl_net_core_bpf_jit_harden: true
 sysctl_net_ipv4_conf_all_accept_redirects: true
 sysctl_net_ipv4_conf_all_accept_source_route: true
 sysctl_net_ipv4_conf_all_forwarding: true
+sysctl_net_ipv4_conf_all_log_martians: true
 sysctl_net_ipv4_conf_all_rp_filter: true
 sysctl_net_ipv4_conf_all_send_redirects: true
 sysctl_net_ipv4_conf_default_accept_redirects: true
 sysctl_net_ipv4_conf_default_accept_source_route: true
+sysctl_net_ipv4_conf_default_log_martians: true
+sysctl_net_ipv4_conf_default_rp_filter: true
 sysctl_net_ipv4_conf_default_send_redirects: true
 sysctl_net_ipv4_icmp_echo_ignore_broadcasts: true
 sysctl_net_ipv6_conf_all_accept_ra: true
@@ -778,6 +790,7 @@ sysctl_net_ipv6_conf_default_accept_ra: true
 sysctl_net_ipv6_conf_default_accept_redirects: true
 sysctl_net_ipv6_conf_default_accept_source_route: true
 tftp_uses_secure_mode_systemd: true
+unknown_severity: true
 unknown_strategy: true
 usbguard_generate_policy: true
 wireless_disable_interfaces: true
